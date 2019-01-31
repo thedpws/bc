@@ -1,12 +1,10 @@
 grammar Calculator;
 program: line*;
-line: (exprList | varDef) '\n';
+line: (topExpr | varDef) NEWLINE;
 
-exprList: topExpr ( ';' topExpr)* ';'? ; 
+varDef: ID '=' expr;
 
-varDef: VAR ID '=' expr;
-
-topExpr: expr
+topExpr: expr 
     { System.out.println("result: "+ Integer.toString($expr.i));}
 ;
 
@@ -40,4 +38,5 @@ COMMENT: '/*' (.)*? '*/' -> skip;   //Comment
 
 ID: [_A-Za-z]+;
 INT: [0-9]+ ;
-WS : [ \t\r\n]+ -> skip ;
+WS : [ \t]+ -> skip ;
+NEWLINE: [\r\n];
