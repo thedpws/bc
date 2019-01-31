@@ -1,4 +1,11 @@
 grammar Calculator;
+
+@header {
+    import java.util.*;
+    import java.lang.*;
+}
+
+
 program: line*;
 line: (topExpr | varDef)? (COMMENT)? NEWLINE;
 
