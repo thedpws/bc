@@ -1,6 +1,6 @@
 grammar Calculator;
 program: line*;
-line: (topExpr | varDef) NEWLINE;
+line: (topExpr | varDef)? (COMMENT)? NEWLINE;
 
 varDef: ID '=' expr;
 
@@ -19,8 +19,6 @@ expr returns [int i]:
     | ID                
     | '(' e=expr ')'    
     ;
-
-VAR: 'var';                         // Keyword
 
 BASICEXP                            // Basic Expressions
     : '-'
