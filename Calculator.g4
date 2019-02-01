@@ -13,8 +13,6 @@ grammar Calculator;
 }
 
 
-
-
 program: line*;
 line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
 
@@ -25,8 +23,8 @@ topExpr
 
 
 
-expr returns [double i]: 
-    el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
+expr returns [double i]
+    : el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
     | el=expr op='*' er=expr    { $i=$el.i*$er.i; print=true;}
     | el=expr op='/' er=expr    { $i=$el.i/$er.i; print=true;}
     | el=expr op='+' er=expr    { $i=$el.i+$er.i; print=true;}
@@ -67,13 +65,6 @@ boolExpr returns [boolean b]
     | ID '=' boolExpr           { memory.put($ID.text, $boolExpr.b ? 1.0:0.0); $b=$boolExpr.b;print=false;}
     ;
 
-
-
-BOOLEXP                             // Boolean Expressions
-    : '!' 
-    | '&&' 
-    | '||'
-    ;      
     
 COMMENT: '/*' (.)*? '*/' -> skip;   //Comment
 
