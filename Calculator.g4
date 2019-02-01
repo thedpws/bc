@@ -28,14 +28,22 @@ expr returns [int i]:
     | INT                       { $i=Integer.parseInt($INT.text); }
     | ID                        { $i = memory.get($ID.text); } 
     | '(' e=expr ')'            { $i=$expr.i; } 
+    | ID '=' expr               { $i=$expr.i; memory.put($ID.text, $expr.i); }
+    | '-' ID                    { $i=-1*memory.get($ID.text); }
+    | '+' ID                    { $i=memory.get($ID.text); }
+    | ID '--'                   { $i=memory.put($ID.text, memory.get($ID.text)-1); }
+    | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); }
+    | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); }
+    | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); }
+    | ID '^=' expr              { memory.put($ID.text, (int)Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); }
+    | ID '%=' expr              { memory.put($ID.text, memory.get($ID.text)%$expr.i); $i=memory.get($ID.text); }
+    | ID '*=' expr              { memory.put($ID.text, memory.get($ID.text)*$expr.i); $i=memory.get($ID.text); }
+    | ID '/=' expr              { memory.put($ID.text, memory.get($ID.text)/$expr.i); $i=memory.get($ID.text); }
+    | ID '+=' expr              { memory.put($ID.text, memory.get($ID.text)+$expr.i); $i=memory.get($ID.text); }
+    | ID '-=' expr              { memory.put($ID.text, memory.get($ID.text)-$expr.i); $i=memory.get($ID.text); }
     ;
 
-BASICEXP                            // Basic Expressions
-    : '-'
-    | '+'
-    | '--'
-    | '++'
-    ;                                  
+
 BOOLEXP                             // Boolean Expressions
     : '!' 
     | '&&' 
