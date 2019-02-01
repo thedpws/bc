@@ -6,8 +6,9 @@ grammar Calculator;
 }
 
 @parser::members { 
-    Map<String, Integer> memory = new HashMap<String, Integer>(); 
+    Map<String, Double> memory = new HashMap<String, Double>(); 
     Scanner sc = new Scanner(System.in);
+    final static double EPSILON = 0.00000001;
 }
 
 
@@ -16,29 +17,30 @@ program: line*;
 line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
 
 topBoolExpr: boolExpr { System.out.println($boolExpr.b); };
-topExpr: expr { System.out.println(Integer.toString($expr.i));} ;
+topExpr: expr { if ($expr.i % 1 < EPSILON) System.out.println((int)$expr.i); else System.out.println((double)$expr.i);} ;
 
 
 
-expr returns [int i]: 
-    el=expr op='^' er=expr { $i=1; for (int j=0; j<$er.i; j++) $i *= $el.i;}
+expr returns [double i]: 
+    el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); }
     | el=expr op='*' er=expr    { $i=$el.i*$er.i; }
     | el=expr op='/' er=expr    { $i=$el.i/$er.i; }
     | el=expr op='+' er=expr    { $i=$el.i+$er.i; }
     | el=expr op='-' er=expr    { $i=$el.i-$er.i; }
     | el=expr op='%' er=expr    { $i=$el.i%$er.i; }
-    | INT                       { $i=Integer.parseInt($INT.text); }
-    | 'read()'                  { $i = sc.nextInt(); }
+    | INT                       { $i=Double.parseDouble($INT.text); }
+    | 'read()'                  { $i = sc.nextDouble(); }
+    | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); }
     | ID                        { $i = memory.get($ID.text); } 
     | '(' e=expr ')'            { $i=$expr.i; } 
     | ID '=' expr               { $i=$expr.i; memory.put($ID.text, $expr.i); }
-    | '-' ID                    { $i=-1*memory.get($ID.text); }
+    | '-' ID                    { $i=-1.0*memory.get($ID.text); }
     | '+' ID                    { $i=memory.get($ID.text); }
     | ID '--'                   { $i=memory.put($ID.text, memory.get($ID.text)-1); }
     | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); }
     | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); }
     | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); }
-    | ID '^=' expr              { memory.put($ID.text, (int)Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); }
+    | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); }
     | ID '%=' expr              { memory.put($ID.text, memory.get($ID.text)%$expr.i); $i=memory.get($ID.text); }
     | ID '*=' expr              { memory.put($ID.text, memory.get($ID.text)*$expr.i); $i=memory.get($ID.text); }
     | ID '/=' expr              { memory.put($ID.text, memory.get($ID.text)/$expr.i); $i=memory.get($ID.text); }
@@ -58,7 +60,7 @@ boolExpr returns [boolean b]
     | elb=boolExpr '||' erb=boolExpr { $b=$elb.b||$erb.b; }
     | 'true'                    { $b=true; }
     | 'false'                   { $b=false; }
-    | ID '=' boolExpr           { memory.put($ID.text, $boolExpr.b ? 1:0); $b=$boolExpr.b;}
+    | ID '=' boolExpr           { memory.put($ID.text, $boolExpr.b ? 1.0:0.0); $b=$boolExpr.b;}
     ;
 
 
