@@ -5,9 +5,7 @@ grammar Calculator;
     import java.lang.*;
 }
 
-@parser::members {
-    Map<String, Integer> memory = new HashMap<String, Integer>();
-}
+@parser::members { Map<String, Integer> memory = new HashMap<String, Integer>(); }
 
 
 program: line*;
@@ -18,23 +16,18 @@ varDef: ID '=' expr {
     memory.put($ID.text, $expr.i);
 };
 
-topExpr: expr 
-    { System.out.println(Integer.toString($expr.i));}
-;
+topExpr: expr { System.out.println(Integer.toString($expr.i));} ;
 
 expr returns [int i]: 
     el=expr op='^' er=expr { $i=1; for (int j=0; j<$er.i; j++) $i *= $el.i;}
-    | el=expr op='*' er=expr { $i=$el.i*$er.i; }
-    | el=expr op='/' er=expr { $i=$el.i/$er.i; }
-    | el=expr op='+' er=expr { $i=$el.i+$er.i; }
-    | el=expr op='-' er=expr { $i=$el.i-$er.i; }
-    | el=expr op='%' er=expr { $i=$el.i%$er.i; }
-    | INT { $i=Integer.parseInt($INT.text); }
-    | ID { 
-        //System.out.println("*looks up " + $ID.text + " in symbol table*");
-        $i = memory.get($ID.text);
-    } 
-    | '(' e=expr ')'    
+    | el=expr op='*' er=expr    { $i=$el.i*$er.i; }
+    | el=expr op='/' er=expr    { $i=$el.i/$er.i; }
+    | el=expr op='+' er=expr    { $i=$el.i+$er.i; }
+    | el=expr op='-' er=expr    { $i=$el.i-$er.i; }
+    | el=expr op='%' er=expr    { $i=$el.i%$er.i; }
+    | INT                       { $i=Integer.parseInt($INT.text); }
+    | ID                        { $i = memory.get($ID.text); } 
+    | '(' e=expr ')' 
     ;
 
 BASICEXP                            // Basic Expressions
