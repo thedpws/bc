@@ -8,7 +8,7 @@ grammar Calculator;
 @parser::members { 
     Map<String, Double> memory = new HashMap<String, Double>(); 
     Scanner sc = new Scanner(System.in);
-    final static double EPSILON = 0.00000001;
+    final static double EPSILON = 0.0;
 }
 
 
@@ -28,7 +28,7 @@ expr returns [double i]:
     | el=expr op='+' er=expr    { $i=$el.i+$er.i; }
     | el=expr op='-' er=expr    { $i=$el.i-$er.i; }
     | el=expr op='%' er=expr    { $i=$el.i%$er.i; }
-    | INT                       { $i=Double.parseDouble($INT.text); }
+    | NUM                       { $i=Double.parseDouble($NUM.text); }
     | 'read()'                  { $i = sc.nextDouble(); }
     | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); }
     | ID                        { $i = memory.get($ID.text); } 
@@ -74,6 +74,6 @@ BOOLEXP                             // Boolean Expressions
 COMMENT: '/*' (.)*? '*/' -> skip;   //Comment
 
 ID: [_A-Za-z]+;
-INT: [0-9]+ ;
+NUM: [0-9]+('.'[0-9]+)? ;
 WS : [ \t]+ -> skip ;
 NEWLINE: [\r\n];
