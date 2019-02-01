@@ -27,7 +27,7 @@ expr returns [int i]:
     | el=expr op='%' er=expr    { $i=$el.i%$er.i; }
     | INT                       { $i=Integer.parseInt($INT.text); }
     | ID                        { $i = memory.get($ID.text); } 
-    | '(' e=expr ')' 
+    | '(' e=expr ')'            { $i=$expr.i; } 
     ;
 
 BASICEXP                            // Basic Expressions
