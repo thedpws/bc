@@ -9,9 +9,12 @@ grammar Calculator;
 
 
 program: line*;
-line: (topExpr | varDef)? (COMMENT)? NEWLINE;
+line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
 
+topBoolExpr: boolExpr { System.out.println($boolExpr.b); };
 topExpr: expr { System.out.println(Integer.toString($expr.i));} ;
+
+
 
 expr returns [int i]: 
     el=expr op='^' er=expr { $i=1; for (int j=0; j<$er.i; j++) $i *= $el.i;}
@@ -36,6 +39,21 @@ expr returns [int i]:
     | ID '/=' expr              { memory.put($ID.text, memory.get($ID.text)/$expr.i); $i=memory.get($ID.text); }
     | ID '+=' expr              { memory.put($ID.text, memory.get($ID.text)+$expr.i); $i=memory.get($ID.text); }
     | ID '-=' expr              { memory.put($ID.text, memory.get($ID.text)-$expr.i); $i=memory.get($ID.text); }
+    ;
+
+boolExpr returns [boolean b]
+    : el=expr '<' er=expr       { $b=$el.i<$er.i; }
+    | el=expr '<=' er=expr      { $b=$el.i<=$er.i; }
+    | el=expr '>' er=expr       { $b=$el.i>$er.i; }
+    | el=expr '>=' er=expr      { $b=$el.i>=$er.i; }
+    | el=expr '==' er=expr      { $b=$el.i==$er.i; }
+    | el=expr '!=' er=expr      { $b=$el.i!=$er.i; }
+    | '!' boolExpr              { $b=!$boolExpr.b; }
+    | elb=boolExpr '&&' erb=boolExpr { $b=$elb.b&&$erb.b; }
+    | elb=boolExpr '||' erb=boolExpr { $b=$elb.b||$erb.b; }
+    | 'true'                    { $b=true; }
+    | 'false'                   { $b=false; }
+    | ID '=' boolExpr           { memory.put($ID.text, $boolExpr.b ? 1:0); $b=$boolExpr.b;}
     ;
 
 
