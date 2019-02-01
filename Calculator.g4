@@ -5,7 +5,11 @@ grammar Calculator;
     import java.lang.*;
 }
 
-@parser::members { Map<String, Integer> memory = new HashMap<String, Integer>(); }
+@parser::members { 
+    Map<String, Integer> memory = new HashMap<String, Integer>(); 
+    Scanner sc = new Scanner(System.in);
+}
+
 
 
 program: line*;
@@ -24,6 +28,7 @@ expr returns [int i]:
     | el=expr op='-' er=expr    { $i=$el.i-$er.i; }
     | el=expr op='%' er=expr    { $i=$el.i%$er.i; }
     | INT                       { $i=Integer.parseInt($INT.text); }
+    | 'read()'                  { $i = sc.nextInt(); }
     | ID                        { $i = memory.get($ID.text); } 
     | '(' e=expr ')'            { $i=$expr.i; } 
     | ID '=' expr               { $i=$expr.i; memory.put($ID.text, $expr.i); }
@@ -55,6 +60,7 @@ boolExpr returns [boolean b]
     | 'false'                   { $b=false; }
     | ID '=' boolExpr           { memory.put($ID.text, $boolExpr.b ? 1:0); $b=$boolExpr.b;}
     ;
+
 
 
 BOOLEXP                             // Boolean Expressions
