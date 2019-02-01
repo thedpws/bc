@@ -5,11 +5,18 @@ grammar Calculator;
     import java.lang.*;
 }
 
+@parser::members {
+    Map<String, Integer> memory = new HashMap<String, Integer>();
+}
+
 
 program: line*;
 line: (topExpr | varDef)? (COMMENT)? NEWLINE;
 
-varDef: id=ID '=' expr { System.out.println("*stores " +$id.text + " in symbol table*"); };
+varDef: ID '=' expr { 
+    //System.out.println("*stores " +$ID.text + " in symbol table*");
+    memory.put($ID.text, $expr.i);
+};
 
 topExpr: expr 
     { System.out.println(Integer.toString($expr.i));}
@@ -23,7 +30,10 @@ expr returns [int i]:
     | el=expr op='-' er=expr { $i=$el.i-$er.i; }
     | el=expr op='%' er=expr { $i=$el.i%$er.i; }
     | INT { $i=Integer.parseInt($INT.text); }
-    | id=ID { System.out.println("*looks up " + $id.text + " in symbol table*"); } 
+    | ID { 
+        //System.out.println("*looks up " + $ID.text + " in symbol table*");
+        $i = memory.get($ID.text);
+    } 
     | '(' e=expr ')'    
     ;
 
