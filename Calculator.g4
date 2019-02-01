@@ -11,11 +11,6 @@ grammar Calculator;
 program: line*;
 line: (topExpr | varDef)? (COMMENT)? NEWLINE;
 
-varDef: ID '=' expr { 
-    //System.out.println("*stores " +$ID.text + " in symbol table*");
-    memory.put($ID.text, $expr.i);
-};
-
 topExpr: expr { System.out.println(Integer.toString($expr.i));} ;
 
 expr returns [int i]: 
