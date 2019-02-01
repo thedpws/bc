@@ -5,7 +5,7 @@ Following the example we had in class, write a grammar for the part of the langu
 
 Part of the language to implement
 
-For this first project, you need to implement the following (refer to the manual (Links to an external site.)Links to an external site. for sections with the same name)
+For this first project, you need to implement the following (refer to the manual (https://www.gnu.org/software/bc/manual/html_mono/bc.html)Links to an external site. for sections with the same name)
 
 * Comments: /* ... */
 * Basic expressions with variables
