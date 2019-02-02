@@ -34,12 +34,12 @@ topExpr
 
 expr returns [double i]
     : '(' e=expr ')'            { $i=$expr.i; print=true;} 
-    | ID '--'                   { $i=memory.put($ID.text, memory.get($ID.text)-1); print=true;}
-    | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); print=true;}
-    | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); print=true;}
-    | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); print=true;}
-    | '-' ID                    { $i=-1.0*memory.get($ID.text); print=true;}
-    | '+' ID                    { $i=memory.get($ID.text); print=true;}
+    | ID '--'                   { $i=insert($ID.text, lookup($ID.text)-1); print=true;}
+    | ID '++'                   { $i=insert($ID.text, lookup($ID.text)+1); print=true;}
+    | '--' ID                   { insert($ID.text, lookup($ID.text)-1); $i=lookup($ID.text); print=true;}
+    | '++' ID                   { insert($ID.text, lookup($ID.text)+1); $i=lookup($ID.text); print=true;}
+    | '-' ID                    { $i=-1.0*lookup($ID.text); print=true;}
+    | '+' ID                    { $i=lookup($ID.text); print=true;}
     | el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
     | el=expr op=('*'|'/'|'%') er=expr    { if($op.text.equals("*")) $i=$el.i*$er.i; else if($op.text.equals("/")) $i=$el.i/$er.i; else if($op.text.equals("%")) $i=$el.i%$er.i; print=true;}
     | el=expr op=('+'|'-') er=expr    { if($op.text.equals("+")) $i=$el.i+$er.i; else if($op.text.equals("-")) $i=$el.i-$er.i; print=true; }
