@@ -43,7 +43,7 @@ expr returns [double i]
     | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); print=true;}
     | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); print=true;}
     | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); print=true;}
-    | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); }
+    | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); print=false;}
     | ID '%=' expr              { memory.put($ID.text, memory.get($ID.text)%$expr.i); $i=memory.get($ID.text); print=false;}
     | ID '*=' expr              { memory.put($ID.text, memory.get($ID.text)*$expr.i); $i=memory.get($ID.text); print=false;}
     | ID '/=' expr              { memory.put($ID.text, memory.get($ID.text)/$expr.i); $i=memory.get($ID.text); print=false;}
