@@ -22,6 +22,7 @@ grammar Calculator;
 
 
 program: line*;
+
 line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
 
 topBoolExpr
@@ -32,15 +33,23 @@ topExpr
 
 
 expr returns [double i]
-    : el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
-    | el=expr op='*' er=expr    { $i=$el.i*$er.i; print=true;}
-    | el=expr op='/' er=expr    { $i=$el.i/$er.i; print=true;}
-    | el=expr op='+' er=expr    { $i=$el.i+$er.i; print=true;}
-    | el=expr op='-' er=expr    { $i=$el.i-$er.i; print=true;}
-    | el=expr op='%' er=expr    { $i=$el.i%$er.i; print=true;}
+    : '(' e=expr ')'            { $i=$expr.i; print=true;} 
+    | ID '--'                   { $i=memory.put($ID.text, memory.get($ID.text)-1); print=true;}
+    | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); print=true;}
+    | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); print=true;}
+    | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); print=true;}
+    | '-' ID                    { $i=-1.0*memory.get($ID.text); print=true;}
+    | '+' ID                    { $i=memory.get($ID.text); print=true;}
+    | el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
+    | el=expr op=('*'|'/'|'%') er=expr    { if($op.text.equals("*")) $i=$el.i*$er.i; else if($op.text.equals("/")) $i=$el.i/$er.i; else if($op.text.equals("%")) $i=$el.i%$er.i; print=true;}
+    | el=expr op=('+'|'-') er=expr    { if($op.text.equals("+")) $i=$el.i+$er.i; else if($op.text.equals("-")) $i=$el.i-$er.i; print=true; }
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | 'read()'                  { $i = sc.nextDouble(); print=true;}
     | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true; printDouble=true;}
+    | 's(' expr ')'             { $i = Math.sin($expr.i); print=true;}
+    | 'c(' expr ')'             { $i = Math.cos($expr.i); print=true;}
+    | 'l(' expr ')'             { $i = Math.log($expr.i); print=true;}
+    | 'e(' expr ')'             { $i = Math.exp($expr.i); print=true;}
     | ID                        { $i = lookup($ID.text); print=true;} 
     | '(' e=expr ')'            { $i=$expr.i; print=true;} 
     | ID '=' expr               { $i=$expr.i; insert($ID.text, $expr.i); print=false;}
