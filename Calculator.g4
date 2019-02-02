@@ -8,8 +8,9 @@ grammar Calculator;
 @parser::members { 
     Map<String, Double> memory = new HashMap<String, Double>(); 
     Scanner sc = new Scanner(System.in);
-    final static double EPSILON = 0.0000000000000010;
+    final static double EPSILON = 0.0000000000000000;
     static boolean print = false;
+    static boolean printDouble = false;
 }
 
 
@@ -17,9 +18,9 @@ program: line*;
 line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
 
 topBoolExpr
-@after{ print=false; }: boolExpr { if (print) System.out.println($boolExpr.b); };
+@after{ print=false; printDouble=false; }: boolExpr { if (print) System.out.println($boolExpr.b); };
 topExpr
-@after{ print=false; }: expr { if (print) if ($expr.i % 1 < EPSILON) System.out.println((int)$expr.i); else System.out.println((double)$expr.i);} ;
+@after{ print=false; printDouble=false; }: expr { if (print) if ($expr.i % 1 <= EPSILON) System.out.println((int)$expr.i); else System.out.printf("%.20f%n", $expr.i);} ;
 
 
 
@@ -32,7 +33,7 @@ expr returns [double i]
     | el=expr op='%' er=expr    { $i=$el.i%$er.i; print=true;}
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | 'read()'                  { $i = sc.nextDouble(); print=true;}
-    | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true;}
+    | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true; printDouble=true;}
     | ID                        { $i = memory.get($ID.text); print=true;} 
     | '(' e=expr ')'            { $i=$expr.i; print=true;} 
     | ID '=' expr               { $i=$expr.i; memory.put($ID.text, $expr.i); print=false;}
@@ -42,7 +43,7 @@ expr returns [double i]
     | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); print=true;}
     | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); print=true;}
     | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); print=true;}
-    | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); }
+    | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); print=false;}
     | ID '%=' expr              { memory.put($ID.text, memory.get($ID.text)%$expr.i); $i=memory.get($ID.text); print=false;}
     | ID '*=' expr              { memory.put($ID.text, memory.get($ID.text)*$expr.i); $i=memory.get($ID.text); print=false;}
     | ID '/=' expr              { memory.put($ID.text, memory.get($ID.text)/$expr.i); $i=memory.get($ID.text); print=false;}
@@ -67,6 +68,7 @@ boolExpr returns [boolean b]
 
     
 COMMENT: '/*' (.)*? '*/' -> skip;   //Comment
+QUIT: 'quit' -> skip;
 
 ID: [_A-Za-z]+;
 NUM: [0-9]+('.'[0-9]+)? ;
