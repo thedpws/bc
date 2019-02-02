@@ -38,6 +38,10 @@ expr returns [double i]
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | 'read()'                  { $i = sc.nextDouble(); print=true;}
     | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true;}
+    | 's(' expr ')'             { $i = Math.sin($expr.i); print=true;}
+    | 'c(' expr ')'             { $i = Math.cos($expr.i); print=true;}
+    | 'l(' expr ')'             { $i = Math.log($expr.i); print=true;}
+    | 'e(' expr ')'             { $i = Math.exp($expr.i); print=true;}
     | ID                        { $i = memory.get($ID.text); print=true;} 
     | ID '=' expr               { $i=$expr.i; memory.put($ID.text, $expr.i); print=false;}
     | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); }
