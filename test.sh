@@ -16,6 +16,7 @@ for i in $( ls tests/testcases); do
                 echo -e "EXPECTED: \n$BC_OUTPUT"
                 echo -e "GOT: \n$OUR_OUTPUT"
         fi
+        echo $DIFF > tests/logs/log.txt
 done
 
 echo '###################################################################'
