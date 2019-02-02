@@ -6,11 +6,18 @@ grammar Calculator;
 }
 
 @parser::members { 
-    Map<String, Double> memory = new HashMap<String, Double>(); 
+    static Map<String, Double> memory = new HashMap<String, Double>(); 
     Scanner sc = new Scanner(System.in);
     final static double EPSILON = 0.0000000000000000;
     static boolean print = false;
     static boolean printDouble = false;
+
+    //returns the previous value
+    private static Double insert(String key, Double value){ return memory.put(key, value); }
+
+    private static boolean has(String key){ return memory.get(key) != null; }
+
+    private static Double lookup(String key){ if (!has(key)) insert(key, 0.0); return memory.get(key); }
 }
 
 
@@ -34,21 +41,21 @@ expr returns [double i]
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | 'read()'                  { $i = sc.nextDouble(); print=true;}
     | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true; printDouble=true;}
-    | ID                        { $i = memory.get($ID.text); print=true;} 
+    | ID                        { $i = lookup($ID.text); print=true;} 
     | '(' e=expr ')'            { $i=$expr.i; print=true;} 
-    | ID '=' expr               { $i=$expr.i; memory.put($ID.text, $expr.i); print=false;}
-    | '-' ID                    { $i=-1.0*memory.get($ID.text); print=true;}
-    | '+' ID                    { $i=memory.get($ID.text); print=true;}
-    | ID '--'                   { $i=memory.put($ID.text, memory.get($ID.text)-1); print=true;}
-    | ID '++'                   { $i=memory.put($ID.text, memory.get($ID.text)+1); print=true;}
-    | '--' ID                   { memory.put($ID.text, memory.get($ID.text)-1); $i=memory.get($ID.text); print=true;}
-    | '++' ID                   { memory.put($ID.text, memory.get($ID.text)+1); $i=memory.get($ID.text); print=true;}
-    | ID '^=' expr              { memory.put($ID.text, Math.pow(memory.get($ID.text), $expr.i)); $i=memory.get($ID.text); print=false;}
-    | ID '%=' expr              { memory.put($ID.text, memory.get($ID.text)%$expr.i); $i=memory.get($ID.text); print=false;}
-    | ID '*=' expr              { memory.put($ID.text, memory.get($ID.text)*$expr.i); $i=memory.get($ID.text); print=false;}
-    | ID '/=' expr              { memory.put($ID.text, memory.get($ID.text)/$expr.i); $i=memory.get($ID.text); print=false;}
-    | ID '+=' expr              { memory.put($ID.text, memory.get($ID.text)+$expr.i); $i=memory.get($ID.text); print=false;}
-    | ID '-=' expr              { memory.put($ID.text, memory.get($ID.text)-$expr.i); $i=memory.get($ID.text); print=false;}
+    | ID '=' expr               { $i=$expr.i; insert($ID.text, $expr.i); print=false;}
+    | '-' ID                    { $i=-1.0*lookup($ID.text); print=true;}
+    | '+' ID                    { $i=lookup($ID.text); print=true;}
+    | ID '--'                   { $i=insert($ID.text, lookup($ID.text)-1); print=true;}
+    | ID '++'                   { $i=insert($ID.text, lookup($ID.text)+1); print=true;}
+    | '--' ID                   { insert($ID.text, lookup($ID.text)-1); $i=lookup($ID.text); print=true;}
+    | '++' ID                   { insert($ID.text, lookup($ID.text)+1); $i=lookup($ID.text); print=true;}
+    | ID '^=' expr              { insert($ID.text, Math.pow(lookup($ID.text), $expr.i)); $i=lookup($ID.text); print=false;}
+    | ID '%=' expr              { insert($ID.text, lookup($ID.text)%$expr.i); $i=lookup($ID.text); print=false;}
+    | ID '*=' expr              { insert($ID.text, lookup($ID.text)*$expr.i); $i=lookup($ID.text); print=false;}
+    | ID '/=' expr              { insert($ID.text, lookup($ID.text)/$expr.i); $i=lookup($ID.text); print=false;}
+    | ID '+=' expr              { insert($ID.text, lookup($ID.text)+$expr.i); $i=lookup($ID.text); print=false;}
+    | ID '-=' expr              { insert($ID.text, lookup($ID.text)-$expr.i); $i=lookup($ID.text); print=false;}
     ;
 
 boolExpr returns [boolean b]
@@ -63,7 +70,7 @@ boolExpr returns [boolean b]
     | elb=boolExpr '||' erb=boolExpr { $b=$elb.b||$erb.b; print=true;}
     | 'true'                    { $b=true; print=true;}
     | 'false'                   { $b=false; print=true;}
-    | ID '=' boolExpr           { memory.put($ID.text, $boolExpr.b ? 1.0:0.0); $b=$boolExpr.b;print=false;}
+    | ID '=' boolExpr           { insert($ID.text, $boolExpr.b ? 1.0:0.0); $b=$boolExpr.b;print=false;}
     ;
 
     
