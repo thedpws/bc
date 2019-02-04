@@ -3,14 +3,30 @@ grammar Calculator;
 @header {
     import java.util.*;
     import java.lang.*;
+    import java.util.function.*;
 }
 
 @parser::members { 
     static Map<String, Double> memory = new HashMap<String, Double>(); 
+    static Map<String, DoubleFunction<Double>> fx = new HashMap<String, DoubleFunction<Double>>(){
+    {
+            //insert s(), c(), l(), e() into functions
+            put("s", d -> Math.sin(d));
+            put("c", d -> Math.cos(d));
+            put("l", d -> Math.log(d));
+            put("e", d -> Math.exp(d));
+    }
+    };
     Scanner sc = new Scanner(System.in);
     final static double EPSILON = 0.0000000000000000;
     static boolean print = false;
     static boolean printDouble = false;
+
+    
+
+    private static Double functions(String fName, double d){
+        return fx.get(fName).apply(d);
+    }
 
     //returns the previous value
     private static Double insert(String key, Double value){ return memory.put(key, value); }
@@ -46,10 +62,6 @@ expr returns [double i]
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | 'read()'                  { $i = sc.nextDouble(); print=true;}
     | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true; printDouble=true;}
-    | 's(' expr ')'             { $i = Math.sin($expr.i); print=true;}
-    | 'c(' expr ')'             { $i = Math.cos($expr.i); print=true;}
-    | 'l(' expr ')'             { $i = Math.log($expr.i); print=true;}
-    | 'e(' expr ')'             { $i = Math.exp($expr.i); print=true;}
     | ID                        { $i = lookup($ID.text); print=true;} 
     | '(' e=expr ')'            { $i=$expr.i; print=true;} 
     | ID '=' expr               { $i=$expr.i; insert($ID.text, $expr.i); print=false;}
@@ -65,6 +77,7 @@ expr returns [double i]
     | ID '/=' expr              { insert($ID.text, lookup($ID.text)/$expr.i); $i=lookup($ID.text); print=false;}
     | ID '+=' expr              { insert($ID.text, lookup($ID.text)+$expr.i); $i=lookup($ID.text); print=false;}
     | ID '-=' expr              { insert($ID.text, lookup($ID.text)-$expr.i); $i=lookup($ID.text); print=false;}
+    | ID '(' expr ')'            { $i = functions($ID.text, $expr.i); print=true;}
     ;
 
 boolExpr returns [boolean b]
