@@ -39,7 +39,7 @@ grammar Calculator;
 
 program: line*;
 
-line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
+line: (topExpr | topBoolExpr)?  NEWLINE;
 
 topBoolExpr
 @after{ print=false; printDouble=false; }: boolExpr { if (print) System.out.println($boolExpr.b); };
@@ -59,6 +59,7 @@ expr returns [double i]
     | el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
     | el=expr op=('*'|'/'|'%') er=expr    { if($op.text.equals("*")) $i=$el.i*$er.i; else if($op.text.equals("/")) $i=$el.i/$er.i; else if($op.text.equals("%")) $i=$el.i%$er.i; print=true;}
     | el=expr op=('+'|'-') er=expr    { if($op.text.equals("+")) $i=$el.i+$er.i; else if($op.text.equals("-")) $i=$el.i-$er.i; print=true; }
+    | '-' NUM                   { $i=-1.0*Double.parseDouble($NUM.text); print=true;}
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | 'read()'                  { $i = sc.nextDouble(); print=true;}
     | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true; printDouble=true;}
