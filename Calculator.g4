@@ -44,7 +44,7 @@ line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
 topBoolExpr
 @after{ print=false; printDouble=false; }: boolExpr { if (print) System.out.println($boolExpr.b); };
 topExpr
-@after{ print=false; printDouble=false; }: expr { if (print) if ($expr.i % 1 <= EPSILON) System.out.println((int)$expr.i); else System.out.printf("%.20f%n", $expr.i);} ;
+@after{ print=false; printDouble=false; }: expr { if (print) if (Math.abs($expr.i % 1) <= EPSILON) System.out.println((int)$expr.i); else System.out.printf("%.20f%n", $expr.i);} ;
 
 
 
