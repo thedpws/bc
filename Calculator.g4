@@ -81,12 +81,11 @@ boolExpr returns [boolean b]
     | 'false'                   { $b=false; print=true;}
     | ID '=' boolExpr           { insert($ID.text, $boolExpr.b ? 1.0:0.0); $b=$boolExpr.b;print=false;}
     ;
-
     
 COMMENT: '/*' (.)*? '*/' -> skip;   //Comment
 QUIT: 'quit' -> skip;
 
-ID: [_A-Za-z]+;
+ID: [a-z]+[_0-9a-z]*;
 NUM: [0-9]+('.'[0-9]+)? ;
 WS : [ \t]+ -> skip ;
 NEWLINE: [\r\n];
