@@ -62,6 +62,16 @@ expr returns [double i]
     | ARR el=expr ']' '=' er=expr   { $i=$er.i; insert($ARR.text+$el.text+"]", $er.i); print=false;}
     ;
 
+
+// now just replace the ID with var and all ID.text with var.s (or you could just do var.text and get rid of var's return value)
+var returns [String s]
+    : ID                        { $s = $ID.text; }
+    | arr                       { $s = $arr.s; }
+    ;
+
+arr returns [String s]
+    : ID '[' expr ']'           { $s = $ID.text + '[' + (int)Math.floor($expr.i) + ']'; }
+
 boolExpr returns [boolean b]
     : el=expr '<' er=expr       { $b=$el.i<$er.i; print=true;}
     | el=expr '<=' er=expr      { $b=$el.i<=$er.i; print=true;}
