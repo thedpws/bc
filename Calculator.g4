@@ -3,14 +3,30 @@ grammar Calculator;
 @header {
     import java.util.*;
     import java.lang.*;
+    import java.util.function.*;
 }
 
 @parser::members { 
     static Map<String, Double> memory = new HashMap<String, Double>(); 
+    static Map<String, DoubleFunction<Double>> fx = new HashMap<String, DoubleFunction<Double>>(){
+    {
+            //insert s(), c(), l(), e() into functions
+            put("s", d -> Math.sin(d));
+            put("c", d -> Math.cos(d));
+            put("l", d -> Math.log(d));
+            put("e", d -> Math.exp(d));
+    }
+    };
     Scanner sc = new Scanner(System.in);
     final static double EPSILON = 0.0000000000000000;
     static boolean print = false;
     static boolean printDouble = false;
+
+    
+
+    private static Double functions(String fName, double d){
+        return fx.get(fName).apply(d);
+    }
 
     //returns the previous value
     private static Double insert(String key, Double value){ return memory.put(key, value); }
@@ -23,12 +39,12 @@ grammar Calculator;
 
 program: line*;
 
-line: (topExpr | topBoolExpr)? (COMMENT)? NEWLINE;
+line: (topExpr | topBoolExpr)?  NEWLINE;
 
 topBoolExpr
 @after{ print=false; printDouble=false; }: boolExpr { if (print) System.out.println($boolExpr.b); };
 topExpr
-@after{ print=false; printDouble=false; }: expr { if (print) if ($expr.i % 1 <= EPSILON) System.out.println((int)$expr.i); else System.out.printf("%.20f%n", $expr.i);} ;
+@after{ print=false; printDouble=false; }: expr { if (print) if (Math.abs($expr.i % 1) <= EPSILON) System.out.println((int)$expr.i); else System.out.printf("%.20f%n", $expr.i);} ;
 
 
 
