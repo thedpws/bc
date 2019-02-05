@@ -43,28 +43,23 @@ expr returns [double i]
     | el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
     | el=expr op=('*'|'/'|'%') er=expr    { if($op.text.equals("*")) $i=$el.i*$er.i; else if($op.text.equals("/")) $i=$el.i/$er.i; else if($op.text.equals("%")) $i=$el.i%$er.i; print=true;}
     | el=expr op=('+'|'-') er=expr    { if($op.text.equals("+")) $i=$el.i+$er.i; else if($op.text.equals("-")) $i=$el.i-$er.i; print=true; }
+    | 'read()'                  { $i=sc.nextDouble(); print=true;}
+    | 'sqrt(' expr ')'          { $i=Math.sqrt($expr.i); print=true; printDouble=true;}
+    | 's(' expr ')'             { $i=Math.sin($expr.i); print=true;}
+    | 'c(' expr ')'             { $i=Math.cos($expr.i); print=true;}
+    | 'l(' expr ')'             { $i=Math.log($expr.i); print=true;}
+    | 'e(' expr ')'             { $i=Math.exp($expr.i); print=true;}
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
-    | 'read()'                  { $i = sc.nextDouble(); print=true;}
-    | 'sqrt(' expr ')'          { $i = Math.sqrt($expr.i); print=true; printDouble=true;}
-    | 's(' expr ')'             { $i = Math.sin($expr.i); print=true;}
-    | 'c(' expr ')'             { $i = Math.cos($expr.i); print=true;}
-    | 'l(' expr ')'             { $i = Math.log($expr.i); print=true;}
-    | 'e(' expr ')'             { $i = Math.exp($expr.i); print=true;}
-    | ID                        { $i = lookup($ID.text); print=true;} 
-    | '(' e=expr ')'            { $i=$expr.i; print=true;} 
+    | ID                        { $i=lookup($ID.text); print=true;} 
     | ID '=' expr               { $i=$expr.i; insert($ID.text, $expr.i); print=false;}
-    | '-' ID                    { $i=-1.0*lookup($ID.text); print=true;}
-    | '+' ID                    { $i=lookup($ID.text); print=true;}
-    | ID '--'                   { $i=insert($ID.text, lookup($ID.text)-1); print=true;}
-    | ID '++'                   { $i=insert($ID.text, lookup($ID.text)+1); print=true;}
-    | '--' ID                   { insert($ID.text, lookup($ID.text)-1); $i=lookup($ID.text); print=true;}
-    | '++' ID                   { insert($ID.text, lookup($ID.text)+1); $i=lookup($ID.text); print=true;}
     | ID '^=' expr              { insert($ID.text, Math.pow(lookup($ID.text), $expr.i)); $i=lookup($ID.text); print=false;}
-    | ID '%=' expr              { insert($ID.text, lookup($ID.text)%$expr.i); $i=lookup($ID.text); print=false;}
+    | ID '%=' expr              { insert($ID.text, lookup($ID.text)%$expr.i); $i=lookup($ID.text); print=false;}           
     | ID '*=' expr              { insert($ID.text, lookup($ID.text)*$expr.i); $i=lookup($ID.text); print=false;}
     | ID '/=' expr              { insert($ID.text, lookup($ID.text)/$expr.i); $i=lookup($ID.text); print=false;}
     | ID '+=' expr              { insert($ID.text, lookup($ID.text)+$expr.i); $i=lookup($ID.text); print=false;}
     | ID '-=' expr              { insert($ID.text, lookup($ID.text)-$expr.i); $i=lookup($ID.text); print=false;}
+    | ARR expr ']'              { $i=lookup($ARR.text+$expr.text+"]"); print=true;}
+    | ARR el=expr ']' '=' er=expr   { $i=$er.i; insert($ARR.text+$el.text+"]", $er.i); print=false;}
     ;
 
 boolExpr returns [boolean b]
@@ -82,10 +77,11 @@ boolExpr returns [boolean b]
     | ID '=' boolExpr           { insert($ID.text, $boolExpr.b ? 1.0:0.0); $b=$boolExpr.b;print=false;}
     ;
     
-COMMENT: '/*' (.)*? '*/' -> skip;   //Comment
+COMMENT: '/*' (.)*? '*/' -> skip;
 QUIT: 'quit' -> skip;
 
-ID: [a-z]+[_0-9a-z]*;
+ID: ([a-z]+[_0-9a-z]*)| ([a-z]+[_0-9a-z]*'['[0-9]+('.'[0-9]+)?']'); 
+ARR: [a-z]+[_0-9a-z]*'[';
 NUM: [0-9]+('.'[0-9]+)? ;
 WS : [ \t]+ -> skip ;
 NEWLINE: [\r\n];
