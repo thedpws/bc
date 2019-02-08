@@ -11,7 +11,9 @@ All the basic requirements have been met
 * Statements: expressions (print value on the screen when executed), print expressions
 * Math library functions: s, c, l, e (no need for a and j)
 
-Arrays are also working. It has been included as a subdirectory. Arbitrary precision is NOT working properly and has been included in a separate directory.
+Arrays are working, and we'd prefer if you tested using .g4 at arrays/Calculator.g4. This is our master copy and the one in the superdirectory was stripped of its Array functionality.
+
+Arbitrary precision is NOT working properly and has been included in a separate directory.
 
 ## How to run
 Use the grun test rig to run the code. `antlr4 Calculator.g4; javac *.java; grun Calculator program`
