@@ -7,6 +7,7 @@ grammar Calculator;
 }
 
 @parser::members { 
+    static Scanner sc = new Scanner(System.in);
     static Map<String, Double> memory = new HashMap<String, Double>(); 
     static Map<String, DoubleFunction<Double>> fx = new HashMap<String, DoubleFunction<Double>>(){
     {
@@ -15,9 +16,11 @@ grammar Calculator;
             put("c", d -> Math.cos(d));
             put("l", d -> Math.log(d));
             put("e", d -> Math.exp(d));
+            put("read", d -> sc.nextDouble());
+            put("sqrt", d -> Math.sqrt(d));
+
     }
     };
-    Scanner sc = new Scanner(System.in);
     final static double EPSILON = 0.0000000000000000;
     static boolean print = false;
     static boolean printDouble = false;
@@ -59,12 +62,7 @@ expr returns [double i]
     | el=expr op='^' er=expr      { $i=Math.pow($el.i, $er.i); print=true;}
     | el=expr op=('*'|'/'|'%') er=expr    { if($op.text.equals("*")) $i=$el.i*$er.i; else if($op.text.equals("/")) $i=$el.i/$er.i; else if($op.text.equals("%")) $i=$el.i%$er.i; print=true;}
     | el=expr op=('+'|'-') er=expr    { if($op.text.equals("+")) $i=$el.i+$er.i; else if($op.text.equals("-")) $i=$el.i-$er.i; print=true; }
-    | 'read()'                  { $i=sc.nextDouble(); print=true;}
-    | 'sqrt(' expr ')'          { $i=Math.sqrt($expr.i); print=true; printDouble=true;}
-    | 's(' expr ')'             { $i=Math.sin($expr.i); print=true;}
-    | 'c(' expr ')'             { $i=Math.cos($expr.i); print=true;}
-    | 'l(' expr ')'             { $i=Math.log($expr.i); print=true;}
-    | 'e(' expr ')'             { $i=Math.exp($expr.i); print=true;}
+    | function                  { $i=$function.i; print=true; }
     | NUM                       { $i=Double.parseDouble($NUM.text); print=true;}
     | var                       { $i=lookup($var.s); print=true;} 
     | var '=' expr              { $i=$expr.i; insert($var.s, $expr.i); print=false;}
@@ -83,6 +81,11 @@ var returns [String s]
 
 arr returns [String s]
     : ID '[' expr ']'           { $s = $ID.text + '[' + (int)Math.floor($expr.i) + ']'; }
+    ;
+
+function returns [double i]
+    : ID '(' expr ')'           { $i = functions($ID.text, $expr.i); }
+    | ID '()'                   { $i = functions($ID.text, -1.0); }
     ;
 
 boolExpr returns [boolean b]
