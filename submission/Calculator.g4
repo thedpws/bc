@@ -80,12 +80,8 @@ expr returns [double i]
 
 var returns [String s]
     : ID                        { $s = $ID.text; }
-    | arr                       { $s = $arr.s; }
     ;
 
-arr returns [String s]
-    : ID '[' expr ']'           { $s = $ID.text + '[' + (int)Math.floor($expr.i) + ']'; }
-    ;
 
 function returns [double i]
     : ID '(' expr ')'           { $i = functions($ID.text, $expr.i); }
