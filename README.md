@@ -1,5 +1,5 @@
-# Project 1
-# Antrl4 Grammar with Actions
+# Project 2
+# Antlr4: if-statements, for-loops, while-loops, functions, and scoping
 
 Following the example we had in class, write a grammar for the part of the language specified below with embedded actions that allow the language to be recognized and the calculation to be performed.
 
