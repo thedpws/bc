@@ -13,7 +13,7 @@ do
         grun Calculator program -tree ../../tests/$dir/$file
         mkdir -p ../../out/$dir
         tree="$(grun Calculator program -tree ../../tests/$dir/$file)"
-        echo $(python3 '../../.pp.py' "$tree") > ../../out/$dir$file.lisp
+        echo "$(python3 '../../.pp.py' "$tree")" > ../../out/$dir$file.lisp
     done
 done
 

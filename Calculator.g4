@@ -8,17 +8,19 @@ grammar Calculator;
 }
 
 // A program is a list of statements
-program: statement*;
+program
+    : statement* {}
+    ;
 
 // Statements don't get printed
 statement
     : delimiter
-    | expression delimiter //{ ast.push(new Statement(new Expression($expression.text))); }
-    | '{' statement* '}'
-    | whileLoop
-    | forLoop
-    | ifStatement
-    | defineFunction
+    | expression delimiter          {}
+    | '{' statement* '}'            {}
+    | whileLoop                     {}
+    | forLoop                       {}
+    | ifStatement                       {}
+    | defineFunction                        {}
     ;
 
 expression
