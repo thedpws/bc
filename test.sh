@@ -1,4 +1,4 @@
 source ~/.bash_profile
-cd parser
-grun Calculator program -tree ../tests/$1
+cd java/out
+grun Calculator program -tree ../../tests/$1
 

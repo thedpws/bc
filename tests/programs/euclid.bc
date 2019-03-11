@@ -1,6 +1,6 @@
 
 
-// Sample Euclidean algorithm function
+/* Sample Euclidean algorithm function */
 
 define euclidAlg(a, b){
     while (b != 0)

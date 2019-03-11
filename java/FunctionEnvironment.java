@@ -4,9 +4,9 @@ public class FunctionEnvironment extends Environment{
 
     public FunctionEnvironment(Environment head){
         // get the global environment
+        super();
         while (!(head instanceof GlobalEnvironment)) head = head.head;
         this.head = (GlobalEnvironment) head;
-        super();
     }
 
     @Override
