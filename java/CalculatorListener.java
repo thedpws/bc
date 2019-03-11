@@ -39,45 +39,45 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitExpression(CalculatorParser.ExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#while_}.
+	 * Enter a parse tree produced by {@link CalculatorParser#whileLoop}.
 	 * @param ctx the parse tree
 	 */
-	void enterWhile_(CalculatorParser.While_Context ctx);
+	void enterWhileLoop(CalculatorParser.WhileLoopContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#while_}.
+	 * Exit a parse tree produced by {@link CalculatorParser#whileLoop}.
 	 * @param ctx the parse tree
 	 */
-	void exitWhile_(CalculatorParser.While_Context ctx);
+	void exitWhileLoop(CalculatorParser.WhileLoopContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#for_}.
+	 * Enter a parse tree produced by {@link CalculatorParser#forLoop}.
 	 * @param ctx the parse tree
 	 */
-	void enterFor_(CalculatorParser.For_Context ctx);
+	void enterForLoop(CalculatorParser.ForLoopContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#for_}.
+	 * Exit a parse tree produced by {@link CalculatorParser#forLoop}.
 	 * @param ctx the parse tree
 	 */
-	void exitFor_(CalculatorParser.For_Context ctx);
+	void exitForLoop(CalculatorParser.ForLoopContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#if_}.
+	 * Enter a parse tree produced by {@link CalculatorParser#ifStatement}.
 	 * @param ctx the parse tree
 	 */
-	void enterIf_(CalculatorParser.If_Context ctx);
+	void enterIfStatement(CalculatorParser.IfStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#if_}.
+	 * Exit a parse tree produced by {@link CalculatorParser#ifStatement}.
 	 * @param ctx the parse tree
 	 */
-	void exitIf_(CalculatorParser.If_Context ctx);
+	void exitIfStatement(CalculatorParser.IfStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#define}.
+	 * Enter a parse tree produced by {@link CalculatorParser#defineFunction}.
 	 * @param ctx the parse tree
 	 */
-	void enterDefine(CalculatorParser.DefineContext ctx);
+	void enterDefineFunction(CalculatorParser.DefineFunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#define}.
+	 * Exit a parse tree produced by {@link CalculatorParser#defineFunction}.
 	 * @param ctx the parse tree
 	 */
-	void exitDefine(CalculatorParser.DefineContext ctx);
+	void exitDefineFunction(CalculatorParser.DefineFunctionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#condition}.
 	 * @param ctx the parse tree
@@ -178,4 +178,14 @@ public interface CalculatorListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParameters(CalculatorParser.ParametersContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#delimiter}.
+	 * @param ctx the parse tree
+	 */
+	void enterDelimiter(CalculatorParser.DelimiterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#delimiter}.
+	 * @param ctx the parse tree
+	 */
+	void exitDelimiter(CalculatorParser.DelimiterContext ctx);
 }

@@ -53,49 +53,49 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWhile_(CalculatorParser.While_Context ctx) { }
+	@Override public void enterWhileLoop(CalculatorParser.WhileLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitWhile_(CalculatorParser.While_Context ctx) { }
+	@Override public void exitWhileLoop(CalculatorParser.WhileLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFor_(CalculatorParser.For_Context ctx) { }
+	@Override public void enterForLoop(CalculatorParser.ForLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFor_(CalculatorParser.For_Context ctx) { }
+	@Override public void exitForLoop(CalculatorParser.ForLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIf_(CalculatorParser.If_Context ctx) { }
+	@Override public void enterIfStatement(CalculatorParser.IfStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIf_(CalculatorParser.If_Context ctx) { }
+	@Override public void exitIfStatement(CalculatorParser.IfStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDefine(CalculatorParser.DefineContext ctx) { }
+	@Override public void enterDefineFunction(CalculatorParser.DefineFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDefine(CalculatorParser.DefineContext ctx) { }
+	@Override public void exitDefineFunction(CalculatorParser.DefineFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -216,6 +216,18 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitParameters(CalculatorParser.ParametersContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDelimiter(CalculatorParser.DelimiterContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDelimiter(CalculatorParser.DelimiterContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

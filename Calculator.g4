@@ -4,6 +4,7 @@ grammar Calculator;
 }
 
 @parser::members { 
+    //AST ast = new AST();
 }
 
 // A program is a list of statements
@@ -11,13 +12,13 @@ program: statement*;
 
 // Statements don't get printed
 statement
-    : ';'
-    | expression ';'
-    | '{' statement* '}' // block
-    | while_
-    | for_
-    | if_
-    | define
+    : delimiter
+    | expression delimiter //{ ast.push(new Statement(new Expression($expression.text))); }
+    | '{' statement* '}'
+    | whileLoop
+    | forLoop
+    | ifStatement
+    | defineFunction
     ;
 
 expression
@@ -25,25 +26,25 @@ expression
     | variable
     | '(' expression ')'
     | variable unaryOperator             // i++
-    | unaryOperator variable             // ++i
+    | unaryOperator expression             // ++i
     | expression binaryOperator expression          // 5+5
     | variable operatorAssignment expression     // i += 1
     | function '(' expression* ')'          // e(5)
     ;
 
-while_
+whileLoop
     : 'while' '(' condition ')' statement
     ;
 
-for_
+forLoop
     : 'for' '(' expression? ';' condition? ';' expression? ')' statement
     ;
 
-if_
-    : 'if' '(' condition ')' statement ('else' if_)* ('else' statement)?
+ifStatement
+    : 'if' '(' condition ')' statement ('else' statement)?
     ;
 
-define
+defineFunction
     : 'define' ID '(' (parameters)? ')' '{' statement* 'return' expression? ';' '}'
     ;
 
@@ -100,6 +101,11 @@ booleanBinaryOperator
 variable: ID;
 function: ID;
 parameters: ID (',' ID)*;
+
+delimiter
+    : ';'
+    | NEWLINE
+    ;
     
 COMMENT: '/*' (.)*? '*/' -> skip;
 QUIT: 'quit' -> skip;
