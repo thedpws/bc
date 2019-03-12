@@ -9,7 +9,7 @@ grammar Calculator;
 
 // A program is a list of statements
 program
-    : statement* {}
+    : list=statement* {}
     ;
 
 // Statements don't get printed
