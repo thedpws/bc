@@ -1,7 +1,7 @@
 public class LocalEnvironment extends Environment{
     public LocalEnvironment(Environment head){
-        this.head = head;
         super();
+        this.head = head;
     }
 
     @Override

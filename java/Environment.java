@@ -1,3 +1,5 @@
+import java.util.Map;
+import java.util.HashMap;
 /* Differen environment types differ in how they scope.*/
 public class Environment {
     Map<String, Object> symbolTable;
@@ -9,10 +11,10 @@ public class Environment {
     }
 
     public Environment(Environment head){
+        this();
         this.head = head;
         while (!(head instanceof GlobalEnvironment)) head = head.head;
-        this.global = head;
-        this();
+        this.global = (GlobalEnvironment) head;
     }
 
     final void putSymbol(String key, Object val){
