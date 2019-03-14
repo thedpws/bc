@@ -42,8 +42,9 @@ public class Environment {
 
 
     public Function getFunction(String id){
-        return global.getFunction(id);
+        return AST.globalScope.getFunction(id);
     }
+    
     // TODO functions
     // Global env -> check self; return null
     // Local env -> check self; check head; return null

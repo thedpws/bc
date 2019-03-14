@@ -1,13 +1,13 @@
 import java.util.*;
 
 public class AST{
-    public static Environment globalScope = new Environment();
+    public static GlobalEnvironment globalScope;
     List<Statement> statementList;
-    Map<String, Function> functions;
+    public static Map<String, Function> functions;
     AST(){
         this.statementList = new LinkedList<>();
-        this.functions = new HashMap<>();
-        globalScope = new Environment();
+        functions = new HashMap<>();
+        globalScope = new GlobalEnvironment();
     }
     void execute(){
         for (Statement s : statementList) 

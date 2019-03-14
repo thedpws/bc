@@ -79,7 +79,7 @@ ifStatement returns [IfStatement rval]
     ;
 
 defineFunction returns [FunctionDefinition rval]
-    : 'define' fname '(' (parameters)? ')' delimiter* block                 { $rval = new FunctionDefinition($fname.text, $parameters.rval, $block.rval); }
+    : 'define' fname '(' (defParameters)? ')' delimiter* block                 { $rval = new FunctionDefinition($fname.text, $defParameters.rval, $block.rval); }
     ;
 
 condition returns [Condition rval]
@@ -130,6 +130,10 @@ parameters returns [List<Expression> rval]
     | expression               { $rval = new LinkedList<>(); $rval.add($expression.rval); }
     ;
 
+defParameters returns [List<ExpressionVariable> rval]
+    : variable ',' defParameters { $rval = $defParameters.rval; $rval.add(new ExpressionVariable($variable.text)); }
+    | variable               { $rval = new LinkedList<>(); $rval.add(new ExpressionVariable($variable.text)); }
+    ;
 delimiter
     : ';'
     | '\n'

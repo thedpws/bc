@@ -270,6 +270,16 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitParameters(CalculatorParser.ParametersContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#defParameters}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefParameters(CalculatorParser.DefParametersContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#defParameters}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefParameters(CalculatorParser.DefParametersContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#delimiter}.
 	 * @param ctx the parse tree
 	 */
