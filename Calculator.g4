@@ -15,7 +15,7 @@ program
 topStatement: statement { ast.push($statement.rval); };
 
 statement returns [Statement rval]
-    | block delimiter                       { $rval = $block.rval; ast.push($rval); }
+    : block delimiter                       { $rval = $block.rval; ast.push($rval); }
     | whileLoop delimiter                   { $rval = $whileLoop.rval; ast.push($whileLoop.rval);} //# while
     | forLoop delimiter                     { ast.push($forLoop.rval); } //# for
     | ifStatement delimiter                 { ast.push($ifStatement.rval); } //# branch
@@ -26,7 +26,7 @@ statement returns [Statement rval]
     | 'return' expression delimiter         { ast.push(new ReturnStatement($expression.rval));} //#returnExpression
     | 'return' delimiter                    { ast.push(new ReturnStatement());} //#returnVoid
     // expression statements are printed on execution
-    : expression delimiter                  { $rval = $expression.rval; ast.push($rval); }
+    | expression delimiter                  { $rval = $expression.rval; ast.push($rval); }
     ;
 
 expression returns [Expression rval]
@@ -34,9 +34,9 @@ expression returns [Expression rval]
     | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
     | variable                              { $rval = new ExpressionVariable($variable.text); }
     | '(' expression ')'                    { $rval = $expression.rval; }
-    | operand1=expression op=binaryOperator1 operand2=expression { $rval = new Expression($operand1.rval, $op.text, $operand2.rval); }
-    | operand1=expression op=binaryOperator2 operand2=expression { $rval = new Expression($operand1.rval, $op.text, $operand2.rval); }
-    | operand1=expression op=binaryOperator3 operand2=expression { $rval = new Expression($operand1.rval, $op.text, $operand2.rval); }
+    | operand1=expression binaryOperator1 operand2=expression { $rval = new Expression($operand1.rval, $binaryOperator1.text, $operand2.rval); }
+    | operand1=expression binaryOperator2 operand2=expression { $rval = new Expression($operand1.rval, $binaryOperator2.text, $operand2.rval); }
+    | operand1=expression binaryOperator3 operand2=expression { $rval = new Expression($operand1.rval, $binaryOperator3.text, $operand2.rval); }
     | variable unaryOperator                { $rval = new ExpressionVariableUnary(new ExpressionVariable($variable.text), $unaryOperator.text); }
     | expression unaryOperator              { $rval = new ExpressionUnary($expression.rval, $unaryOperator.text); }
     | unaryOperator variable                { $rval = new ExpressionVariableUnary($unaryOperator.text, new ExpressionVariable($variable.text)); }

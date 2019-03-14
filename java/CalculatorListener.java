@@ -159,15 +159,45 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitBinaryOperator3(CalculatorParser.BinaryOperator3Context ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#operatorAssignment}.
+	 * Enter a parse tree produced by {@link CalculatorParser#operatorAssignment1}.
 	 * @param ctx the parse tree
 	 */
-	void enterOperatorAssignment(CalculatorParser.OperatorAssignmentContext ctx);
+	void enterOperatorAssignment1(CalculatorParser.OperatorAssignment1Context ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#operatorAssignment}.
+	 * Exit a parse tree produced by {@link CalculatorParser#operatorAssignment1}.
 	 * @param ctx the parse tree
 	 */
-	void exitOperatorAssignment(CalculatorParser.OperatorAssignmentContext ctx);
+	void exitOperatorAssignment1(CalculatorParser.OperatorAssignment1Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#operatorAssignment2}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperatorAssignment2(CalculatorParser.OperatorAssignment2Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#operatorAssignment2}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperatorAssignment2(CalculatorParser.OperatorAssignment2Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#operatorAssignment3}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperatorAssignment3(CalculatorParser.OperatorAssignment3Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#operatorAssignment3}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperatorAssignment3(CalculatorParser.OperatorAssignment3Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#operatorAssignment4}.
+	 * @param ctx the parse tree
+	 */
+	void enterOperatorAssignment4(CalculatorParser.OperatorAssignment4Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#operatorAssignment4}.
+	 * @param ctx the parse tree
+	 */
+	void exitOperatorAssignment4(CalculatorParser.OperatorAssignment4Context ctx);
 	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#comparisonOperator}.
 	 * @param ctx the parse tree

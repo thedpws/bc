@@ -197,13 +197,49 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOperatorAssignment(CalculatorParser.OperatorAssignmentContext ctx) { }
+	@Override public void enterOperatorAssignment1(CalculatorParser.OperatorAssignment1Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOperatorAssignment(CalculatorParser.OperatorAssignmentContext ctx) { }
+	@Override public void exitOperatorAssignment1(CalculatorParser.OperatorAssignment1Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperatorAssignment2(CalculatorParser.OperatorAssignment2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperatorAssignment2(CalculatorParser.OperatorAssignment2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperatorAssignment3(CalculatorParser.OperatorAssignment3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperatorAssignment3(CalculatorParser.OperatorAssignment3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOperatorAssignment4(CalculatorParser.OperatorAssignment4Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOperatorAssignment4(CalculatorParser.OperatorAssignment4Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
