@@ -4,109 +4,117 @@ grammar Calculator;
 }
 
 @parser::members { 
-    //AST ast = new AST();
 }
 
 // A program is a list of statements
 program
-    : list=statement* {}
+    : (topStatement)*
     ;
+
+topStatement: statement ;
 
 // Statements don't get printed
-statement
-    : delimiter
-    | expression delimiter          {}
-    | '{' statement* '}'            {}
-    | whileLoop                     {}
-    | forLoop                       {}
-    | ifStatement                       {}
-    | defineFunction                        {}
+statement 
+    : block delimiter                                
+    | whileLoop delimiter                           
+    | forLoop delimiter                            
+    | ifStatement delimiter                       
+    | defineFunction      delimiter            
+    | 'break'                     delimiter   
+    | 'continue'                   delimiter 
+    | 'halt'                      delimiter 
+    | 'return' expression        delimiter 
+    | 'return'                  delimiter 
+    | expression delimiter
     ;
 
-expression
-    : NUM
-    | variable
-    | '(' expression ')'
-    | variable unaryOperator             // i++
-    | unaryOperator expression             // ++i
-    | expression binaryOperator expression          // 5+5
-    | variable operatorAssignment expression     // i += 1
-    | function '(' expression* ')'          // e(5)
+expression 
+    : NUM                       
+    | fname '(' parameters ')'          
+    | variable                 
+    | '(' expression ')'      
+    | l=expression binaryOperator1 r=expression
+    | l=expression binaryOperator2 r=expression
+    | l=expression binaryOperator3 r=expression
+    | variable unaryOperator 
+    | expression unaryOperator             
+    | unaryOperator variable
+    | unaryOperator expression              
+    | variable operatorAssignment expression    
     ;
 
-whileLoop
-    : 'while' '(' condition ')' statement
+statementList 
+    : statement delimiter 
+    | statement delimiter statementList 
     ;
 
-forLoop
-    : 'for' '(' expression? ';' condition? ';' expression? ')' statement
+block 
+    : '{'('\n')? statementList? '}' 
     ;
 
-ifStatement
-    : 'if' '(' condition ')' statement ('else' statement)?
+whileLoop 
+    : 'while' '(' condition ')' '\n'* statement   
     ;
 
-defineFunction
-    : 'define' ID '(' (parameters)? ')' '{' statement* 'return' expression? ';' '}'
+forLoop 
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' statement    
     ;
 
-condition
-    : 'true'
-    | 'false'
-    | '(' condition ')'
-    | booleanUnaryOperator condition            // !true
-    | expression comparisonOperator expression  // i < 0
-    | condition booleanBinaryOperator condition // lo < hi && hi > lo
+ifStatement 
+    : 'if' '(' condition ')' trueBranch=statement ('else' falseBranch=statement)?                   
+    ;
+
+defineFunction 
+    : 'define' fname '(' (parameters)? ')' '\n'* block                 
+    ;
+
+condition 
+    : 'true'                                        
+    | 'false'                                      
+    | '(' condition ')'                           
+    | booleanUnaryOperator condition             
+                                                
+    | lexpr=expression comparisonOperator rexpr=expression      
+    | leftCondition=condition booleanBinaryOperator1 rightCondition=condition 
+    | leftCondition=condition booleanBinaryOperator2 rightCondition=condition 
     ;
 
 unaryOperator
-    : '++'
-    | '--'
-    | '-'
-    | '+'
+    : ('++' | '--' | '-' | '+')
     ;
 
-binaryOperator
-    : '+'
-    | '-'
-    | '*'
-    | '/'
-    | '^'
-    | '%'
+binaryOperator1
+    : ('^')
+    ;
+binaryOperator2
+    : ('*' | '/' | '%')
+    ;
+binaryOperator3
+    : ('+' | '-')
     ;
 operatorAssignment
-    : '='
-    | '+='
-    | '-='
-    | '*='
-    | '/='
-    | '^='
-    | '%='
+    : ('=' | '^=' | '*=' | '/=' | '%=' | '+=' | '-=')
     ;
 comparisonOperator
-    : '<'
-    | '<='
-    | '=='
-    | '!='
-    | '>='
-    | '>'
+    : ('<' | '<=' | '==' | '!=' | '>=' | '>' )
     ;
 booleanUnaryOperator
     : '!'
     ;
 
-booleanBinaryOperator
-    : '&&'
-    | '||'
-    ;
+booleanBinaryOperator1: '&&';
+booleanBinaryOperator2: '||';
 
 variable: ID;
-function: ID;
-parameters: ID (',' ID)*;
+fname: ID;
+parameters 
+    : expression               
+    | expression ',' parameters 
+    ;
 
 delimiter
-    : ';'
-    | NEWLINE
+    : ';' '\n'*
+    | '\n'*
     ;
     
 COMMENT: '/*' (.)*? '*/' -> skip;
@@ -115,4 +123,4 @@ QUIT: 'quit' -> skip;
 ID: ([a-z]+[_0-9a-zA-Z]*); 
 NUM: [0-9]+('.'[0-9]+)? ;
 WS : [ \t]+ -> skip ;
-NEWLINE: [\r\n] -> skip ;
+NEWLINE: [\r\n];
