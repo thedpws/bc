@@ -1,6 +1,7 @@
 grammar Calculator;
 
 @header {
+    import java.util.*;
 }
 
 @parser::members { 
@@ -34,11 +35,10 @@ expression returns [Expression rval]
     | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
     | variable                              { $rval = new ExpressionVariable($variable.text); }
     | '(' expression ')'                    { $rval = $expression.rval; }
-    | operand1=expression binaryOperator1 operand2=expression { $rval = new Expression($operand1.rval, $binaryOperator1.text, $operand2.rval); }
-    | operand1=expression binaryOperator2 operand2=expression { $rval = new Expression($operand1.rval, $binaryOperator2.text, $operand2.rval); }
-    | operand1=expression binaryOperator3 operand2=expression { $rval = new Expression($operand1.rval, $binaryOperator3.text, $operand2.rval); }
+    | operand1=expression binaryOperator1 operand2=expression { $rval = new ExpressionBinary($operand1.rval, $binaryOperator1.text, $operand2.rval); }
+    | operand1=expression binaryOperator2 operand2=expression { $rval = new ExpressionBinary($operand1.rval, $binaryOperator2.text, $operand2.rval); }
+    | operand1=expression binaryOperator3 operand2=expression { $rval = new ExpressionBinary($operand1.rval, $binaryOperator3.text, $operand2.rval); }
     | variable unaryOperator                { $rval = new ExpressionVariableUnary(new ExpressionVariable($variable.text), $unaryOperator.text); }
-    | expression unaryOperator              { $rval = new ExpressionUnary($expression.rval, $unaryOperator.text); }
     | unaryOperator variable                { $rval = new ExpressionVariableUnary($unaryOperator.text, new ExpressionVariable($variable.text)); }
     | unaryOperator expression              { $rval = new ExpressionUnary($unaryOperator.text, $expression.rval); }
     | variable operatorAssignment1 expression    { $rval = new ExpressionAssignment(new ExpressionVariable($variable.text), $operatorAssignment1.text, $expression.rval); }
@@ -68,8 +68,8 @@ ifStatement returns [IfStatement rval]
     : 'if' '(' condition ')' '\n'* trueBranch=statement ('else' '\n'* falseBranch=statement)?                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
     ;
 
-defineFunction returns [Function rval]
-    : 'define' fname '(' (parameters)? ')' '\n'* block                 { $rval = new Function($fname.text, $parameters.rval, $block.rval); }
+defineFunction returns [FunctionDefinition rval]
+    : 'define' fname '(' (parameters)? ')' '\n'* block                 { $rval = new FunctionDefinition($fname.text, $parameters.rval, $block.rval); }
     ;
 
 condition returns [Condition rval]

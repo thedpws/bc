@@ -1,0 +1,14 @@
+public class HaltStatement implements Statement {
+    public HaltStatement(){
+        
+    }
+
+    @Override
+    public void execute(){
+    }
+
+    @Override
+    public void print(){
+        
+    }
+}
