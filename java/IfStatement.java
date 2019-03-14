@@ -18,19 +18,19 @@ public class IfStatement implements Statement{
     */
 
     @Override
-    public void execute() {
-        if(c.evaluate()){
-            s1.execute();
+    public void execute(Environment scope) {
+        if(c.evaluate(scope)){
+            s1.execute(scope);
         }
         else{
-            s2.execute();
+            s2.execute(scope);
         }
         
     }
 
     @Override
     public void print() {
-        
+        System.out.println("if ( " + c.toString() + " ) " + s1.toString() + " [ else " + s2.toString() + " ] ");
     }
 
 }

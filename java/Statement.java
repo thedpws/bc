@@ -1,4 +1,4 @@
 public interface Statement{
-    void execute();
+    void execute(Environment scope);
     void print();
 }

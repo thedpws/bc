@@ -5,7 +5,7 @@ public class ContinueStatement implements Statement {
     }
 
     @Override
-    public void execute(){
+    public void execute(Environment scope){
 
     }
 

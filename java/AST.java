@@ -1,8 +1,8 @@
 import java.util.*;
 
 public class AST{
-    Environment globalScope;
-    LinkedList<Statement> statementList;
+    public static Environment globalScope;
+    List<Statement> statementList;
     Map<String, Function> functions;
     AST(){
         this.statementList = new LinkedList<>();
@@ -10,7 +10,7 @@ public class AST{
     }
     void execute(){
         for(int i = 0; i < statementList.size(); i++){
-            statementList.get(i).execute();
+            statementList.get(i).execute(globalScope);
         }
     }
     void push(Statement s){

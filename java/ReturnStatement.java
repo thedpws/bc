@@ -8,7 +8,7 @@ public class ReturnStatement implements Statement {
     }
 
     @Override
-    public void execute(){
+    public void execute(Environment scope){
 
     }
 

@@ -10,17 +10,45 @@ public class ConditionBinary implements Condition {
     }
     
     @Override
-    public void execute(){
-
+    public void execute(Environment scope){
+      // if(binaryOp == "&&"){
+      //   if(this.leftCondition.evaluate() && this.rightCondition.evaluate()){
+      //       System.out.println("true");
+      //   }
+      //   else{
+      //       System.out.println("false");
+      //   }
+      // }
+      // else if(binaryOp == "||"){
+      //     if(this.leftCondition.evaluate() || this.rightCondition.evaluate()){
+      //         System.out.println("true");
+      //     }
+      //     else{
+      //         System.out.println("false");
+      //     }
+      // }
+        System.out.println(this.evaluate(scope));
     }
 
     @Override
     public void print(){
-
+        System.out.println(leftCondition.toString() + binaryOp + rightCondition.toString());
     }
 
     @Override
-    public boolean evaluate(){
-       return false;
+    public boolean evaluate(Environment scope){
+       if(binaryOp == "&&"){
+          if(this.leftCondition.evaluate(scope) && this.rightCondition.evaluate(scope)){
+              return true;
+          }
+          return false;
+       }
+       else if(binaryOp == "||"){
+          if(this.leftCondition.evaluate(scope) || this.rightCondition.evaluate(scope)){
+            return true;
+          }
+          return false;
+       }
+       return false;          //Shouldn't be reached
     }
 }

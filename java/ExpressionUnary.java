@@ -9,22 +9,20 @@ public class ExpressionUnary implements Expression {
   }
 
   @Override
-  public void execute(){
-    //System.out.println(evaluate(globalScope));
+  public void execute(Environment scope){
+    System.out.println(evaluate(scope));
   }
 
   @Override
   public void print(){
-   // System.out.println(unaryOp + val.print());
+    System.out.print(this.unaryOp + this.val.toString());
+
   }
 
   @Override
-  public double evaluate(Environment scope){                  //Handle if val is a number
-    if(this.unaryOp == "+"){
-      return (double)Math.abs((double)scope.getSymbol(val.toString()));
-    }
-    else if(this.unaryOp == "-"){
-      return (double)(-1 * (double)scope.getSymbol(val.toString()));
+  public double evaluate(Environment scope){
+    if(this.unaryOp == "-"){
+      return (-1 * scope.getDouble(val.toString()));
     }
     return 0;
   }

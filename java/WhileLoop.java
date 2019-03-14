@@ -5,10 +5,12 @@ public class WhileLoop implements Statement{
         this.c = c;
         this.s = s;
     }
-    public void execute(){
-
+    public void execute(Environment scope){
+        while(c.evaluate(scope)){
+            s.execute(scope);
+        }
     }
     public void print(){
-
+        System.out.println("while ( " + c.toString() + " ) " + s.toString());
     }
 }

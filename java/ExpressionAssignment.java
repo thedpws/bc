@@ -10,8 +10,8 @@ public class ExpressionAssignment implements Expression {
     }
 
     @Override
-    public void execute() {
-      //System.out.println(this.var.execute());
+    public void execute(Environment scope) {
+      
     }
 
     @Override
@@ -21,30 +21,29 @@ public class ExpressionAssignment implements Expression {
 
     @Override
     public double evaluate(Environment scope){
-        return 0;
-        // switch(assignOp){
-        //     case "^=":
-        //         scope.putSymbol(this.var.toString(), Math.pow(scope.getSymbol(this.var.toString()), this.val.evaluate()));
-        //         break;
-        //     case "*=":
-        //         scope.putSymbol(this.var.toString(), scope.getSymbol(this.var.toString()) * this.val.evaluate());
-        //         break;
-        //     case "/=":
-        //         scope.putSymbol(this.var.toString(), scope.getSymbol(this.var.toString()) / this.val.evaluate());
-        //         break;
-        //     case "+=":
-        //         scope.putSymbol(this.var.toString(), scope.getSymbol(this.var.toString()) + this.val.evaulate());
-        //         break;
-        //     case "-=":
-        //         scope.putSymbol(this.var.toString(), scope.getSymbol(this.var.toString()) - this.val.evaluate());
-        //         break;
-        //     case "=":
-        //         scope.putSymbol(this.var.toString(), this.val.evaluate());
-        //         break;
-        //     default:
-        //         break;
+        switch(assignOp){
+            case "^=":
+                scope.putSymbol(this.var.toString(), Math.pow(scope.getDouble(this.var.toString()), this.val.evaluate(scope)));
+                break;
+            case "*=":
+                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) * this.val.evaluate(scope));
+                break;
+            case "/=":
+                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) / this.val.evaluate(scope));
+                break;
+            case "+=":
+                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) + this.val.evaluate(scope));
+                break;
+            case "-=":
+                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) - this.val.evaluate(scope));
+                break;
+            case "=":
+                scope.putSymbol(this.var.toString(), this.val.evaluate(scope));
+                break;
+            default:
+                break;
 
-        // return scope.getSymbol(this.var);
-        // }
+        }
+        return scope.getDouble(this.var.toString());
     }
   }

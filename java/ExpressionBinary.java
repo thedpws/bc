@@ -10,32 +10,30 @@ public class ExpressionBinary implements Expression {
         this.rightExpression = rightExpression;   
     }
     @Override
-    public void execute() {
- //     System.out.println(evaluate(globalScope));
+    public void execute(Environment scope) {
+        System.out.println(this.evaluate(scope));
     }
   
     @Override
     public void print() {
-        leftExpression.print();
-        rightExpression.print();
+        System.out.println(leftExpression.toString() + op + rightExpression.toString());
     }
   
     @Override
     public double evaluate(Environment scope) {
-        // switch(op){
-        //     case "^":
-        //         return Math.pow(this.leftExpression.evaluate(), this.rightExpression.evaluate());
-        //     case "*":
-        //         return (this.leftExpression.evaluate() * this.rightExpression.evaluate());
-        //     case "/":
-        //         return (this.leftExpression.evaluate() / this.rightExpression.evaluate());
-        //     case "+":
-        //         return (this.leftExpression.evaluate() + this.rightExpression.evaluate());
-        //     case "-":
-        //         return (this.leftExpression.evaluate() - this.rightExpression.evaluate());
-        //     default:
-        //         return 0;                                                                   //Maybe don't have this
-        // }
-        return 0;
+        switch(op){
+            case "^":
+                return Math.pow(this.leftExpression.evaluate(scope), this.rightExpression.evaluate(scope));
+            case "*":
+                return (this.leftExpression.evaluate(scope) * this.rightExpression.evaluate(scope));
+            case "/":
+                return (this.leftExpression.evaluate(scope) / this.rightExpression.evaluate(scope));
+            case "+":
+                return (this.leftExpression.evaluate(scope) + this.rightExpression.evaluate(scope));
+            case "-":
+                return (this.leftExpression.evaluate(scope) - this.rightExpression.evaluate(scope));
+            default:
+                return 0;                                                               
+        }
     }
   }

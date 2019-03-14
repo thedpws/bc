@@ -4,7 +4,8 @@ public class HaltStatement implements Statement {
     }
 
     @Override
-    public void execute(){
+    public void execute(Environment scope){
+
     }
 
     @Override

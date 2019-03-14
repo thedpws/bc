@@ -10,39 +10,40 @@ public class ConditionComparison implements Condition {
     }
 
     @Override
-    public void execute(){
-
+    public void execute(Environment scope){
+        System.out.println(this.evaluate(scope));
     }
 
     @Override
     public void print(){
-
+        System.out.println(this.leftExpression.toString() + comparisonOp + this.rightExpression.toString());
     }
 
     @Override
-    public boolean evaluate(){
-        return false;
-        // switch(comparisonOp){
-        //     case ">":
-        //         if(leftExpression.evaluate() > rightExpression.evaluate()){
-        //             return true;
-        //         }
-        //         return false;
-        //     case "<":
-        //         if(leftExpression.evaluate() > rightExpression.evaluate()){
-        //             return true; 
-        //         }
-        //         return false;
-        //     case ">=":
-        //         if(leftExpression.evaluate() > rightExpression.evaluate()){
-        //             return true;    
-        //         }
-        //         return false;
-        //     case "<=":
-        //         if(leftExpression.evaluate() > rightExpression.evaluate()){
-        //             return true;
-        //         }
-        //         return false;
-        // }
+    public boolean evaluate(Environment scope){
+        switch(comparisonOp){
+            case ">":
+                if(this.leftExpression.evaluate(scope) > this.rightExpression.evaluate(scope)){
+                    return true;
+                }
+                return false;
+            case "<":
+                if(this.leftExpression.evaluate(scope) < this.rightExpression.evaluate(scope)){
+                    return true; 
+                }
+                return false;
+            case ">=":
+                if(this.leftExpression.evaluate(scope) >= this.rightExpression.evaluate(scope)){
+                    return true;    
+                }
+                return false;
+            case "<=":
+                if(this.leftExpression.evaluate(scope) <= this.rightExpression.evaluate(scope)){
+                    return true;
+                }
+                return false;
+            default:
+                return false;                   //Shouldn't be reached
+        }
     }
 }

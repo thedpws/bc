@@ -6,8 +6,8 @@ public class ExpressionVariable implements Expression {
     }
     
     @Override
-    public void execute(){
-  //    System.out.println(evaluate(globalScope));
+    public void execute(Environment scope){
+      System.out.println(this.evaluate(scope));
     }
 
     @Override
@@ -17,6 +17,6 @@ public class ExpressionVariable implements Expression {
 
     @Override
     public double evaluate(Environment scope){
-      return (double)scope.getSymbol(varId);
+      return scope.getDouble(varId);
     }
 }

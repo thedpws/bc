@@ -11,8 +11,8 @@ public class ExpressionVariableUnary implements Expression {
     }
 
     @Override
-    public void execute(){
-//        System.out.println(this.var.evaluate(globalScope));                        //FIX LATER
+    public void execute(Environment scope){
+        System.out.println(this.var.evaluate(scope));                   //May need to fix later
     }
   
     @Override
@@ -22,33 +22,36 @@ public class ExpressionVariableUnary implements Expression {
           System.out.println(this.postUnaryOp);
         }
         else if(preUnaryOp != null && !postUnaryOp.isEmpty()){
-          System.out.print(this.postUnaryOp);
+          System.out.print(this.preUnaryOp);
           this.var.print();
         }
     }
   
     @Override
     public double evaluate(Environment scope){
-      //++i
-      if(preUnaryOp != null && !postUnaryOp.isEmpty()){
-          if(postUnaryOp == "++"){
-            scope.putSymbol(this.var.toString(), (double)scope.getSymbol(var.toString()) + 1);
-            return (double)scope.getSymbol(var.toString());
+      if(preUnaryOp != null && !preUnaryOp.isEmpty()){
+          // ++i
+          if(preUnaryOp == "++"){
+            scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) + 1);
+            return scope.getDouble(var.toString());
           }
-          else if(postUnaryOp == "--"){
-            scope.putSymbol(this.var.toString(), (double)scope.getSymbol(var.toString()) - 1);
-            return (double)scope.getSymbol(var.toString());
+          // --i
+          else if(preUnaryOp == "--"){
+            scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) - 1);
+            return scope.getDouble(var.toString());
           }
       }
-      //i++
+
       else if(postUnaryOp != null && !postUnaryOp.isEmpty()){
+        // i++
         if(postUnaryOp == "++"){
-          scope.putSymbol(this.var.toString(), (double)scope.getSymbol(var.toString()) + 1);
-          return (double)scope.getSymbol(var.toString()) - 1;
+          scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) + 1);
+          return scope.getDouble(var.toString()) - 1;
         }
+        // i--
         else if(postUnaryOp == "--"){
-          scope.putSymbol(this.var.toString(), (double)scope.getSymbol(var.toString()) - 1);
-          return (double)scope.getSymbol(var.toString()) + 1;
+          scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) - 1);
+          return scope.getDouble(var.toString()) + 1;
         }
       }
       return 0;
