@@ -1,0 +1,128 @@
+grammar Calculator;
+
+@header {
+}
+
+@parser::members { 
+    AST ast = new AST();
+}
+
+// A program is a list of statements
+program
+    : (topStatement delimiter)*
+    ;
+
+topStatement: statement { ast.push($statement.rval); };
+
+// Statements don't get printed
+statement returns [Statement rval]
+    : expression                            { $rval = $expression.rval; ast.push($rval); } //# print
+    | block                                 { $rval = $block.rval; ast.push($rval); }
+    | whileLoop                             { $rval = $whileLoop.rval; ast.push($whileLoop.rval);} //# while
+    | forLoop                               { ast.push($forLoop.rval); } //# for
+    | ifStatement                           { ast.push($ifStatement.rval); } //# branch
+    | defineFunction                        {ast.push($defineFunction.rval);} //# fndef
+    | 'break'                               {ast.push(new BreakStatement());} //#break
+    | 'continue'                            { ast.push(new ContinueStatement()); } //#continue
+    | 'halt'                                { ast.push(new HaltStatement()); } //#halt
+    | 'return' expression                   { ast.push(new ReturnStatement($expression.rval));} //#returnExpression
+    | 'return'                              {ast.push(new ReturnStatement());} //#returnVoid
+    ;
+
+expression returns [Expression rval]
+    : NUM                                   { $rval = new ExpressionConstant(Double.parseDouble($NUM.text)); }
+    | variable                              { $rval = new ExpressionVariable($variable.text); }
+    | '(' expression ')'                    { $rval = $expression.rval; }
+    | variable unaryOperator                { $rval = new ExpressionVariableUnary(new ExpressionVariable($variable.text), $unaryOperator.text); }
+    | unaryOperator variable                { $rval = new ExpressionVariableUnary($unaryOperator.text, new ExpressionVariable($variable.text)); }
+    | unaryOperator expression              { $rval = new ExpressionUnary($unaryOperator.text, $expression.rval); }
+    | expression unaryOperator              { $rval = new ExpressionUnary($expression.rval, $unaryOperator.text); }
+    | l=expression op='^' r=expression
+    | l=expression op=('*'|'/'|'%') r=expression
+    | l=expression op=('+'|'-') r=expression
+    | variable operatorAssignment expression    { $rval = new ExpressionAssignment(new ExpressionVariable($variable.text), $operatorAssignment.text, $expression.rval); }
+    | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
+    //| leftExpression=expression binaryOperator rightExpression=expression  { $rval = new ExpressionBinary($leftExpression.rval, $binaryOperator.text, $rightExpression.rval); }
+    ;
+
+statementList returns [List<Statement> rval]
+    : statement delimiter { $rval = new LinkedList<Statement>(); $rval.add($statement.rval); }
+    | statement delimiter statementList { $rval = $statementList.rval; $rval.add($statement.rval); }
+    ;
+
+block returns [Block rval]
+    : '{' statement* '}' { $rval = new Block($statement.text); }
+    | '{' statement (statement)* '}'
+    ;
+
+whileLoop returns [WhileLoop rval]
+    : 'while' '(' condition ')' statement   { $rval = new WhileLoop($condition.rval, $statement.rval); }
+    ;
+
+forLoop returns [ForLoop rval]
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' statement    { $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, $statement.rval); }
+    ;
+
+ifStatement returns [IfStatement rval]
+    : 'if' '(' condition ')' trueBranch=statement ('else' falseBranch=statement)?                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
+    ;
+
+defineFunction returns [Function rval]
+    : 'define' fname '(' (parameters)? ')' block                 { $rval = new Function($fname.text, $parameters.rval, $block.rval); }
+    ;
+
+condition returns [Condition rval]
+    : 'true'                                        { $rval = new ConditionConstant(true); }
+    | 'false'                                       { $rval = new ConditionConstant(false); }
+    | '(' condition ')'                             { $rval = $condition.rval; }
+    | booleanUnaryOperator condition                { $rval = new ConditionUnary($booleanUnaryOperator.text, $condition.rval);
+                                                    } // !true
+    | lexpr=expression comparisonOperator rexpr=expression      { $rval = new ConditionComparison($lexpr.rval, $comparisonOperator.text, $rexpr.rval);
+                                                    }// i < 0
+    | leftCondition=condition booleanBinaryOperator rightCondition=condition { $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator.text, $rightCondition.rval);
+                                                    }// lo < hi && hi > lo
+    ;
+
+unaryOperator
+    : ('++' | '--' | '-' | '+')
+    ;
+
+    /*
+binaryOperator
+    : ('^' | '*' | '/' | '%' | '+' | '-')
+    ;
+    */
+operatorAssignment
+    : ('=' | '^=' | '*=' | '/=' | '%=' | '+=' | '-=')
+    ;
+comparisonOperator
+    : ('<' | '<=' | '==' | '!=' | '>=' | '>' )
+    ;
+booleanUnaryOperator
+    : '!'
+    ;
+
+booleanBinaryOperator
+    : ('&&' | '||')
+    ;
+
+variable: ID;
+fname: ID;
+parameters returns [List<Expression> rval]
+    : NUM               { $rval = new LinkedList<>(); $rval.add(new ExpressionConstant(Double.parseDouble($NUM.text))); }
+    | ID                { $rval = new LinkedList<>(); $rval.add(new ExpressionVariable($ID.text));}
+    | ID ',' parameters { $rval = $parameters.rval; $rval.add(new ExpressionVariable($ID.text)); }
+    | NUM ',' parameters { $rval = $parameters.rval; $rval.add(new ExpressionConstant(Double.parseDouble($NUM.text))); }
+    ;
+
+delimiter
+    : (';' | NEWLINE | <EOF>)
+    ;
+    
+COMMENT: '/*' (.)*? '*/' -> skip;
+QUIT: 'quit' -> skip;
+
+ID: ([a-z]+[_0-9a-zA-Z]*); 
+NUM: [0-9]+('.'[0-9]+)? ;
+WS : [ \t]+ -> skip ;
+NEWLINE: [\r\n];

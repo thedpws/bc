@@ -12,4 +12,6 @@ define e (a, b)
     return a;
 }
 
+define e(a, b) { return b; }
+
 e(10, 15) /* gcd(10,15) = 5 -> 5 */
