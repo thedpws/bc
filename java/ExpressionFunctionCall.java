@@ -9,17 +9,25 @@ public class ExpressionFunctionCall implements Expression {
     }
 
     @Override
-    public void execute(){
-        System.out.println();
+    public void execute(Environment scope){
+        System.out.println(this.evaluate(scope));
     }
 
     @Override
     public void print(){
-        System.out.println();
+        System.out.printf("%s(%s);%n", fname, parameters);
     }
 
     @Override
     public double evaluate(Environment scope) {
-        return 0;
+        // retrieve the corresponding function
+        Function f = AST.globalScope.getFunction(this.fname);
+
+        // Prepare the parameters
+        List<Double> toPass = new ArrayList<>();
+        for (Expression var : this.parameters) {
+            toPass.add(var.evaluate(scope));
+        }
+        return f.run(toPass);
     }
 }

@@ -1,5 +1,3 @@
-import java.lang.Math.*;
-
 public class ExpressionUnary implements Expression {
   String unaryOp;
   Expression val;

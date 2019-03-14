@@ -13,4 +13,14 @@ public class FunctionEnvironment extends Environment{
     Object getSymbol(String key){
         return symbolTable.getOrDefault(key, head.getSymbol(key));
     }
+
+    @Override
+    public double getDouble(String key){
+        return (double)symbolTable.getOrDefault(key, head.getDouble(key));
+    }
+    @Override
+    public boolean getBoolean(String key){
+        return (boolean)symbolTable.getOrDefault(key, head.getBoolean(key));
+    }
+
 }

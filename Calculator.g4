@@ -10,24 +10,28 @@ grammar Calculator;
 
 // A program is a list of statements
 program
+@after {
+    ast.print();
+    ast.execute();
+}
     : (topStatement)*
     ;
 
-topStatement: statement { ast.push($statement.rval); };
+topStatement: statement delimiter+ { ast.push($statement.rval); };
 
 statement returns [Statement rval]
-    : block delimiter                       { $rval = $block.rval; ast.push($rval); }
-    | whileLoop delimiter                   { $rval = $whileLoop.rval; ast.push($whileLoop.rval);} //# while
-    | forLoop delimiter                     { ast.push($forLoop.rval); } //# for
-    | ifStatement delimiter                 { ast.push($ifStatement.rval); } //# branch
-    | defineFunction delimiter              { ast.push($defineFunction.rval);} //# fndef
-    | 'break' delimiter                     { ast.push(new BreakStatement());} //#break
-    | 'continue' delimiter                  { ast.push(new ContinueStatement()); } //#continue
-    | 'halt' delimiter                      { ast.push(new HaltStatement()); } //#halt
-    | 'return' expression delimiter         { ast.push(new ReturnStatement($expression.rval));} //#returnExpression
-    | 'return' delimiter                    { ast.push(new ReturnStatement());} //#returnVoid
+    : block                         { $rval = $block.rval;}
+    | whileLoop                     { $rval = $whileLoop.rval;} //# while
+    | forLoop                       { $rval = $forLoop.rval; } //# for
+    | ifStatement                   { $rval = $ifStatement.rval; } //# branch
+    | defineFunction                { $rval = $defineFunction.rval;} //# fndef
+    | 'break'                       { $rval = new BreakStatement();} //#break
+    | 'continue'                    { $rval = new ContinueStatement(); } //#continue
+    | 'halt'                        { $rval = new HaltStatement(); } //#halt
+    | 'return' expression           { $rval = new ReturnStatement($expression.rval);} //#returnExpression
+    | 'return'                      { $rval = new ReturnStatement();} //#returnVoid
     // expression statements are printed on execution
-    | expression delimiter                  { $rval = $expression.rval; ast.push($rval); }
+    | expression                    { $rval = $expression.rval;}
     ;
 
 expression returns [Expression rval]
@@ -47,13 +51,19 @@ expression returns [Expression rval]
     | variable operatorAssignment4 expression    { $rval = new ExpressionAssignment(new ExpressionVariable($variable.text), $operatorAssignment4.text, $expression.rval); }
     ;
 
+/*
 statementList returns [List<Statement> rval]
     : statement delimiter                   { $rval = new LinkedList<Statement>(); $rval.add($statement.rval); }
     | statement delimiter statementList     { $rval = $statementList.rval; $rval.add($statement.rval); }
+    | delimiter { $rval = new LinkedList<Statement>(); $rval.add(new BlankStatement()); }
+    ;
+    */
+statementList returns [List<Statement> rval]
+    : (statement delimiter+)* { $rval = new LinkedList<Statement>(); }
     ;
 
 block returns [Block rval]
-    : '{' ('\n')* statementList? '}' { $rval = new Block($statementList.rval); }
+    : '{' '\n'* (statementList) '\n'* '}' { $rval = new Block($statementList.rval); }
     ;
 
 whileLoop returns [WhileLoop rval]
@@ -65,11 +75,11 @@ forLoop returns [ForLoop rval]
     ;
 
 ifStatement returns [IfStatement rval]
-    : 'if' '(' condition ')' '\n'* trueBranch=statement ('else' '\n'* falseBranch=statement)?                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
+    : 'if' '(' condition ')' delimiter* trueBranch=statement ('else' '\n'* falseBranch=statement)?                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
     ;
 
 defineFunction returns [FunctionDefinition rval]
-    : 'define' fname '(' (parameters)? ')' '\n'* block                 { $rval = new FunctionDefinition($fname.text, $parameters.rval, $block.rval); }
+    : 'define' fname '(' (parameters)? ')' delimiter* block                 { $rval = new FunctionDefinition($fname.text, $parameters.rval, $block.rval); }
     ;
 
 condition returns [Condition rval]
@@ -116,14 +126,13 @@ booleanBinaryOperator2: '||' ;
 variable: ID;
 fname: ID;
 parameters returns [List<Expression> rval]
-    : NUM               { $rval = new LinkedList<>(); $rval.add(new ExpressionConstant(Double.parseDouble($NUM.text))); }
-    | ID                { $rval = new LinkedList<>(); $rval.add(new ExpressionVariable($ID.text));}
-    | ID ',' parameters { $rval = $parameters.rval; $rval.add(new ExpressionVariable($ID.text)); }
-    | NUM ',' parameters { $rval = $parameters.rval; $rval.add(new ExpressionConstant(Double.parseDouble($NUM.text))); }
+    : expression ',' parameters { $rval = $parameters.rval; $rval.add($expression.rval); }
+    | expression               { $rval = new LinkedList<>(); $rval.add($expression.rval); }
     ;
 
 delimiter
-    : (';' | NEWLINE | <EOF>)
+    : ';'
+    | '\n'
     ;
     
 COMMENT: '/*' (.)*? '*/' -> skip;

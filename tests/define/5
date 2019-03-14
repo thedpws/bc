@@ -1,4 +1,0 @@
-define printHello(){
-    print(hello);
-    return;
-}

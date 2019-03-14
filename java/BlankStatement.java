@@ -1,4 +1,7 @@
 public class BlankStatement implements Statement{
+    BlankStatement(){
+        
+    }
     @Override
     public void execute(Environment scope){
 

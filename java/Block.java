@@ -16,4 +16,10 @@ public class Block implements Statement {
             System.out.print("; ");
         }
     }
+
+    public Expression getReturnExpression(){
+        for (Statement s : statements) 
+            if (s instanceof ReturnStatement) return ((ReturnStatement) s).getExpression();
+        return new ExpressionConstant(0);
+    }
 }
