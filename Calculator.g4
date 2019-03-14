@@ -68,8 +68,8 @@ ifStatement returns [IfStatement rval]
     : 'if' '(' condition ')' '\n'* trueBranch=statement ('else' '\n'* falseBranch=statement)?                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
     ;
 
-defineFunction returns [Function rval]
-    : 'define' fname '(' (parameters)? ')' '\n'* block                 { $rval = new Function($fname.text, $parameters.rval, $block.rval); }
+defineFunction returns [DefineFunction rval]
+    : 'define' fname '(' (parameters)? ')' '\n'* block                 { $rval = new DefineFunction($fname.text, $parameters.rval, $block.rval); }
     ;
 
 condition returns [Condition rval]
