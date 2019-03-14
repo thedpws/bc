@@ -7,11 +7,11 @@ public class AST{
     AST(){
         this.statementList = new LinkedList<>();
         this.functions = new HashMap<>();
+        this.globalScope = new Environment();
     }
     void execute(){
-        for(int i = 0; i < statementList.size(); i++){
-            statementList.get(i).execute();
-        }
+        for (Statement s : statementList) 
+            s.execute(globalScope);
     }
     void push(Statement s){
         this.statementList.add(s);

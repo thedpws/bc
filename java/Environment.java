@@ -2,9 +2,9 @@ import java.util.Map;
 import java.util.HashMap;
 /* Differen environment types differ in how they scope.*/
 public class Environment {
-    Map<String, Object> symbolTable;
-    Environment head;
-    GlobalEnvironment global;
+    private Map<String, Object> symbolTable;
+    private Environment head;
+    private GlobalEnvironment global;
 
     public Environment(){
         this.symbolTable = new HashMap<>();

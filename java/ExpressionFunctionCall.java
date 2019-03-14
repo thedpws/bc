@@ -2,24 +2,34 @@ import java.util.*;
 
 public class ExpressionFunctionCall implements Expression {
     String fname;
-    List<Expression> parameters;
+    List<ExpressionVariable> parameters;
     public ExpressionFunctionCall(String fname, List<Expression> parameters){
         this.fname = fname;
         this.parameters = parameters;
     }
 
     @Override
-    public void execute(){
-        System.out.println();
+    public void execute(Environment scope){
+        System.out.println(this.evaluate(scope));
     }
 
     @Override
     public void print(){
-        System.out.println();
+        System.out.printf("%s(%s);%n", fname, parameters);
     }
 
     @Override
     public double evaluate(Environment scope) {
-        return 0;
+        // retrieve the corresponding function
+        Function f = AST.globalScope.getFunction(this.fname);
+
+        // Prepare the parameters
+        List<Double> toPass = new ArrayList<>();
+        for (ExpressionVariable var : this.parameters) {
+            toPass.add(var.evaluate(scope));
+        }
+
+        Expression returnValue = f.run(toPass);
+        return returnValue;
     }
 }
