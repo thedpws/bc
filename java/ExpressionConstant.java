@@ -19,4 +19,9 @@ public class ExpressionConstant implements Expression {
     public double evaluate(Environment scope){
       return this.val;
     }
+
+    @Override
+    public String toString(){
+        return String.format("%f", val);
+    }
 }

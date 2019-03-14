@@ -14,6 +14,7 @@ public class Function{
     }
 
     public double run(List<Double> parameters) {
+        System.out.printf("Running %s(%s)!\n", fname, parameters);
         if (parameters.size() != this.locals.size()) {
             // Wrong number of parameters passed in ...
             System.err.printf("%s was given %d parameters, but expected %d.%n", fname, parameters.size(), locals.size());

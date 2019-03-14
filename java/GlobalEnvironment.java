@@ -1,13 +1,18 @@
+import java.util.*;
 public class GlobalEnvironment extends Environment{
+    public static Map<String, Function> functions;
     public GlobalEnvironment(){
         super();
         this.global = this;
-        // TODO function table
-        //this.functionTable
+        functions = new HashMap<>();
     }
 
     @Override
     public Function getFunction(String id){
-        return null; //TODO function
+        return functions.get(id);
+    }
+
+    public void putFunction(String id, Function f){
+        functions.put(id, f);
     }
 }

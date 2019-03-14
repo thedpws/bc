@@ -3,10 +3,8 @@ import java.util.*;
 public class AST{
     public static GlobalEnvironment globalScope;
     List<Statement> statementList;
-    public static Map<String, Function> functions;
     AST(){
         this.statementList = new LinkedList<>();
-        functions = new HashMap<>();
         globalScope = new GlobalEnvironment();
     }
     void execute(){

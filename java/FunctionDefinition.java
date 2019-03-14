@@ -7,13 +7,13 @@ public class FunctionDefinition implements Statement {
     Block statements;
     FunctionDefinition(String fname, List<ExpressionVariable> params, Block statements){
         this.fname = fname;
-        this. params = params;
+        this.params = params;
         this.statements = statements;
     }
 
     @Override
     public void execute(Environment scope){
-      AST.functions.put(fname, new Function(fname, params, statements));
+      AST.globalScope.putFunction(fname, new Function(fname, params, statements));
     }
     
     @Override
