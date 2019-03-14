@@ -19,6 +19,16 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitProgram(CalculatorParser.ProgramContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#topStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterTopStatement(CalculatorParser.TopStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#topStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitTopStatement(CalculatorParser.TopStatementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#statement}.
 	 * @param ctx the parse tree
 	 */
@@ -38,6 +48,26 @@ public interface CalculatorListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpression(CalculatorParser.ExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#statementList}.
+	 * @param ctx the parse tree
+	 */
+	void enterStatementList(CalculatorParser.StatementListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#statementList}.
+	 * @param ctx the parse tree
+	 */
+	void exitStatementList(CalculatorParser.StatementListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#block}.
+	 * @param ctx the parse tree
+	 */
+	void enterBlock(CalculatorParser.BlockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#block}.
+	 * @param ctx the parse tree
+	 */
+	void exitBlock(CalculatorParser.BlockContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#whileLoop}.
 	 * @param ctx the parse tree
@@ -99,15 +129,35 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitUnaryOperator(CalculatorParser.UnaryOperatorContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#binaryOperator}.
+	 * Enter a parse tree produced by {@link CalculatorParser#binaryOperator1}.
 	 * @param ctx the parse tree
 	 */
-	void enterBinaryOperator(CalculatorParser.BinaryOperatorContext ctx);
+	void enterBinaryOperator1(CalculatorParser.BinaryOperator1Context ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#binaryOperator}.
+	 * Exit a parse tree produced by {@link CalculatorParser#binaryOperator1}.
 	 * @param ctx the parse tree
 	 */
-	void exitBinaryOperator(CalculatorParser.BinaryOperatorContext ctx);
+	void exitBinaryOperator1(CalculatorParser.BinaryOperator1Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#binaryOperator2}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinaryOperator2(CalculatorParser.BinaryOperator2Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#binaryOperator2}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinaryOperator2(CalculatorParser.BinaryOperator2Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#binaryOperator3}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinaryOperator3(CalculatorParser.BinaryOperator3Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#binaryOperator3}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinaryOperator3(CalculatorParser.BinaryOperator3Context ctx);
 	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#operatorAssignment}.
 	 * @param ctx the parse tree
@@ -139,15 +189,25 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitBooleanUnaryOperator(CalculatorParser.BooleanUnaryOperatorContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#booleanBinaryOperator}.
+	 * Enter a parse tree produced by {@link CalculatorParser#booleanBinaryOperator1}.
 	 * @param ctx the parse tree
 	 */
-	void enterBooleanBinaryOperator(CalculatorParser.BooleanBinaryOperatorContext ctx);
+	void enterBooleanBinaryOperator1(CalculatorParser.BooleanBinaryOperator1Context ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#booleanBinaryOperator}.
+	 * Exit a parse tree produced by {@link CalculatorParser#booleanBinaryOperator1}.
 	 * @param ctx the parse tree
 	 */
-	void exitBooleanBinaryOperator(CalculatorParser.BooleanBinaryOperatorContext ctx);
+	void exitBooleanBinaryOperator1(CalculatorParser.BooleanBinaryOperator1Context ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#booleanBinaryOperator2}.
+	 * @param ctx the parse tree
+	 */
+	void enterBooleanBinaryOperator2(CalculatorParser.BooleanBinaryOperator2Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#booleanBinaryOperator2}.
+	 * @param ctx the parse tree
+	 */
+	void exitBooleanBinaryOperator2(CalculatorParser.BooleanBinaryOperator2Context ctx);
 	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#variable}.
 	 * @param ctx the parse tree
@@ -159,15 +219,15 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitVariable(CalculatorParser.VariableContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link CalculatorParser#function}.
+	 * Enter a parse tree produced by {@link CalculatorParser#fname}.
 	 * @param ctx the parse tree
 	 */
-	void enterFunction(CalculatorParser.FunctionContext ctx);
+	void enterFname(CalculatorParser.FnameContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link CalculatorParser#function}.
+	 * Exit a parse tree produced by {@link CalculatorParser#fname}.
 	 * @param ctx the parse tree
 	 */
-	void exitFunction(CalculatorParser.FunctionContext ctx);
+	void exitFname(CalculatorParser.FnameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#parameters}.
 	 * @param ctx the parse tree

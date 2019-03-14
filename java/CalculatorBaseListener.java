@@ -29,6 +29,18 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTopStatement(CalculatorParser.TopStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTopStatement(CalculatorParser.TopStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStatement(CalculatorParser.StatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -48,6 +60,30 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitExpression(CalculatorParser.ExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStatementList(CalculatorParser.StatementListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStatementList(CalculatorParser.StatementListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBlock(CalculatorParser.BlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBlock(CalculatorParser.BlockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -125,13 +161,37 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBinaryOperator(CalculatorParser.BinaryOperatorContext ctx) { }
+	@Override public void enterBinaryOperator1(CalculatorParser.BinaryOperator1Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBinaryOperator(CalculatorParser.BinaryOperatorContext ctx) { }
+	@Override public void exitBinaryOperator1(CalculatorParser.BinaryOperator1Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBinaryOperator2(CalculatorParser.BinaryOperator2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinaryOperator2(CalculatorParser.BinaryOperator2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBinaryOperator3(CalculatorParser.BinaryOperator3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinaryOperator3(CalculatorParser.BinaryOperator3Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -173,13 +233,25 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBooleanBinaryOperator(CalculatorParser.BooleanBinaryOperatorContext ctx) { }
+	@Override public void enterBooleanBinaryOperator1(CalculatorParser.BooleanBinaryOperator1Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBooleanBinaryOperator(CalculatorParser.BooleanBinaryOperatorContext ctx) { }
+	@Override public void exitBooleanBinaryOperator1(CalculatorParser.BooleanBinaryOperator1Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBooleanBinaryOperator2(CalculatorParser.BooleanBinaryOperator2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBooleanBinaryOperator2(CalculatorParser.BooleanBinaryOperator2Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -197,13 +269,13 @@ public class CalculatorBaseListener implements CalculatorListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunction(CalculatorParser.FunctionContext ctx) { }
+	@Override public void enterFname(CalculatorParser.FnameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunction(CalculatorParser.FunctionContext ctx) { }
+	@Override public void exitFname(CalculatorParser.FnameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
