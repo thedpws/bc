@@ -1,1 +1,1 @@
-define square(x) { return x * x; }
+define square(x) { return x * x; };
