@@ -10,6 +10,10 @@ grammar Calculator;
 
 // A program is a list of statements
 program
+@after {
+    ast.print();
+    ast.execute();
+}
     : (topStatement)*
     ;
 
