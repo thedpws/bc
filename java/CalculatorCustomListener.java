@@ -5,6 +5,7 @@ public class CalculatorCustomListener extends CalculatorBaseListener {
     public void exitProgram(CalculatorParser.ProgramContext ctx) {
         System.out.println(ctx.list.getText());
     }
+    
     /*
     @Override
     public void enterIfStatement(CalculatorParser.ProgramContext cts) {

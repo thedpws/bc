@@ -6,7 +6,7 @@
 In this project, you will implement the rest of the bc features (see the specific requirements). The main challenge of this project is the fact that you need to capture symbolic information since the main tasks of this project cannot be implemented using an evaluate-as-you-parse strategy.  In essence, you need to either:
 
 * rely on ANTLRs built-in parse tree generator and implement an evaluator over the parse tree to implement all the language features. Using visitors feature in ANTLR is probably the best
-* to implement your own symbolic representation of the code using actions. Instead of evaluating, you build a symbolic structure (a simpler version of the parse tree is probably preferable). The symbolic structure is usually called an Abstract Syntax Tree (AST (Links to an external site.)Links to an external site.).
+* to implement your own symbolic representation of the code using actions. Instead of evaluating, you build a symbolic structure (a simpler version of the parse tree is probably preferable). The symbolic structure is usually called an Abstract Syntax Tree (AST).
 
 For this project, you need to implement the following (refer to the manual ( https://www.gnu.org/software/bc/manual/html_mono/bc.html )
 

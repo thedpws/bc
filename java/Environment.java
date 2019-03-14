@@ -1,6 +1,6 @@
 import java.util.Map;
 import java.util.HashMap;
-/* Differen environment types differ in how they scope.*/
+/* Different environment types differ in how they scope.*/
 public class Environment {
     Map<String, Object> symbolTable;
     Environment head;
