@@ -54,6 +54,7 @@ statementList returns [List<Statement> rval]
 statementList returns [LinkedList<Statement> rval]
     : (statement delimiter+) statementList { System.out.println("b"); $rval = $statementList.rval; $rval.addFirst($statement.rval); System.out.println("size: " + $rval.size()); }
     | statement delimiter+              { $rval = new LinkedList<Statement>(); $rval.add($statement.rval); System.out.println("size: " + $rval.size()); }
+    | ()                                { $rval = new LinkedList<Statement>(); }
     ;
 
 block returns [Block rval]

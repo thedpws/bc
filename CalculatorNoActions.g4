@@ -54,6 +54,7 @@ statementList
 statementList  
     : (statement delimiter+) statementList {}
     | statement delimiter+              {}
+    | ()                                {}
     ;
 
 block  
