@@ -9,9 +9,10 @@ public class Block implements Statement {
     }
 
     public void execute(Memory scope){
-        for (Statement s : statements){
+        for (scope.pc = 0; scope.pc < statements.size(); scope.pc++){
+            int i = scope.pc;
+            Statement s = statements.get(i);
             s.execute(scope);
-            if (s instanceof ReturnStatement) return;
         }
     }
 
@@ -20,6 +21,7 @@ public class Block implements Statement {
             System.out.println(s.toString() + ";");
     }
 
+    /*
     public Expression getReturnExpression(){
         for (Statement s : statements) 
             if (s instanceof ReturnStatement) {
@@ -29,4 +31,5 @@ public class Block implements Statement {
         System.out.print("No return");
         return new ExpressionConstant(0);
     }
+    */
 }

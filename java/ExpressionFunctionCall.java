@@ -22,13 +22,14 @@ public class ExpressionFunctionCall implements Expression {
     @Override
     public double evaluate(Memory scope) {
         // retrieve the corresponding function
-        Function f = AST.globalScope.getFunction(this.fname);
+        Function f = scope.getFunction(this.fname);
 
         // Prepare the parameters
         List<Double> toPass = new ArrayList<>();
         for (Expression var : this.parameters) {
             toPass.add(var.evaluate(scope));
         }
-        return f.run(toPass);
+        f.run(toPass);
+        return AST.globalScope.register;
     }
 }

@@ -4,6 +4,7 @@ public class HaltStatement implements Statement {
 
     @Override
     public void execute(Memory scope){
+        scope.pc = Integer.MAX_VALUE;
         
     }
 

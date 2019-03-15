@@ -8,7 +8,9 @@ public class AST{
         globalScope = new Memory();
     }
     void execute(){
+        // Set PC to 0. Execute statements.
         for (globalScope.pc = 0; globalScope.pc < statementList.size(); globalScope.pc++){
+            System.out.printf("Global PC: %d\n", globalScope.pc);
             Statement current = statementList.get(globalScope.pc);
             current.execute(globalScope);
         }

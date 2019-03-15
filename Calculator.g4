@@ -1,19 +1,12 @@
 grammar Calculator;
 
-@header {
-    import java.util.*;
-}
+@header { import java.util.*; }
 
-@parser::members { 
-    AST ast = new AST();
-}
+@parser::members { AST ast = new AST(); }
 
 // A program is a list of statements
 program
-@after {
-    ast.print();
-    ast.execute();
-}
+@after { ast.print(); ast.execute(); }
     : (topStatement)*
     ;
 
@@ -88,16 +81,12 @@ condition returns [Condition rval]
     : 'true'                                        { $rval = new ConditionConstant(true); }
     | 'false'                                       { $rval = new ConditionConstant(false); }
     | '(' condition ')'                             { $rval = $condition.rval; }
-    | booleanUnaryOperator condition                { $rval = new ConditionUnary($booleanUnaryOperator.text, $condition.rval);
-                                                    } // !true
-    | lexpr=expression comparisonOperator rexpr=expression      { $rval = new ConditionComparison($lexpr.rval, $comparisonOperator.text, $rexpr.rval);
-                                                    }// i < 0
+    | booleanUnaryOperator condition                { $rval = new ConditionUnary($booleanUnaryOperator.text, $condition.rval); } // !true
+    | lexpr=expression comparisonOperator rexpr=expression      { $rval = new ConditionComparison($lexpr.rval, $comparisonOperator.text, $rexpr.rval); }// i < 0
     | leftCondition=condition booleanBinaryOperator1 rightCondition=condition 
-{ $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator1.text, $rightCondition.rval);
-                                                    }// b1 && b2
+{ $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator1.text, $rightCondition.rval); }// b1 && b2
     | leftCondition=condition booleanBinaryOperator2 rightCondition=condition 
-{ $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator2.text, $rightCondition.rval);
-                                                    }// b1 || b2
+{ $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator2.text, $rightCondition.rval); }// b1 || b2
     ;
 
 unaryOperator
