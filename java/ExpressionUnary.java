@@ -13,7 +13,8 @@ public class ExpressionUnary implements Expression {
 
   @Override
   public void print(){
-    System.out.print(this.unaryOp + this.val.toString());
+    System.out.print(this.unaryOp);
+    this.val.print();
 
   }
 

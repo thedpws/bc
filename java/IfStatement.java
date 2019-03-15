@@ -30,7 +30,13 @@ public class IfStatement implements Statement{
 
     @Override
     public void print() {
-        System.out.println("if ( " + c.toString() + " ) " + s1.toString() + " [ else " + s2.toString() + " ] ");
+        System.out.print("if ( ");
+        this.c.print();
+        System.out.print(" ) ");
+        this.s1.print();
+        System.out.print(" [ else ");
+        this.s2.print();
+        System.out.print(" ] ");
     }
 
 }

@@ -12,8 +12,7 @@ public class Block implements Statement {
     }
     public void print(){
         for(int i = 0; i < statements.size(); i++){
-            statements.get(i).print();
-            System.out.print("; ");
+            System.out.println(statements.get(i).toString() + ";");
         }
     }
 
