@@ -10,8 +10,8 @@ public class ReturnStatement implements Statement {
     @Override
     public void execute(Memory scope){
         scope.setRval(rval.evaluate(scope));
-        // exit the block
-        scope.terminateRoutine();
+        // exit the function
+        scope.exitFunction();
     }
 
     @Override

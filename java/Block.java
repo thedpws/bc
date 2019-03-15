@@ -8,7 +8,10 @@ public class Block implements Statement {
         this.statements = statements;
     }
 
+    Statement initial;
+
     public void execute(Memory scope){
+        if (this.initial != null) initial.execute(scope);
         for (scope.pc = 0; scope.pc < statements.size(); scope.pc++){
             int i = scope.pc;
             Statement s = statements.get(i);
@@ -19,6 +22,19 @@ public class Block implements Statement {
     public void print(){
         for (Statement s : statements)
             System.out.println(s.toString() + ";");
+    }
+
+    public void toWhile(Condition c){
+        // if (!c) break;
+        Statement s = new IfStatement(new ConditionUnary("!", c), new BreakStatement());
+        statements.add(0, s);
+    }
+
+    public void toFor(Statement initial, Condition c, Statement inc){
+        this.initial = initial;
+        Statement ifs = new IfStatement(new ConditionUnary("!", c), new BreakStatement());
+        statements.add(0, ifs);
+        statements.add(0, inc);
     }
 
     /*

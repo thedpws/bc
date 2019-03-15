@@ -62,11 +62,13 @@ block returns [Block rval]
     ;
 
 whileLoop returns [WhileLoop rval]
-    : 'while' '(' condition ')' '\n'* statement   { $rval = new WhileLoop($condition.rval, $statement.rval); }
+    : 'while' '(' condition ')' '\n'* block   { $rval = new WhileLoop($condition.rval, $block.rval); }
+    | 'while' '(' condition ')' '\n'* statement { List<Statement> statements = new LinkedList<>(); statements.add($statement.rval); $rval = new WhileLoop($condition.rval, new Block(statements)); }
     ;
 
 forLoop returns [ForLoop rval]
-    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    { $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, $statement.rval); }
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  block    { $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, $block.rval); }
+    | 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    { List<Statement> statements = new LinkedList<>(); statements.add($statement.rval); Block block = new Block(statements); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, block); }
     ;
 
 ifStatement returns [IfStatement rval]
