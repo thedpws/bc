@@ -9,16 +9,27 @@ public class Block implements Statement {
     }
 
     public void execute(Memory scope){
-        for (scope.pc = 0; scope.pc < statements.size(); scope.pc++){
-            int i = scope.pc;
-            Statement s = statements.get(i);
+        // execute the statements
+        // init pc to 0. 
+        // remove pc from stack after block ends
+        for (scope.enterBlock(); scope.getPC() < statements.size(); scope.incCounter()){
+            Statement s = statements.get(scope.getPC());
             s.execute(scope);
         }
+        scope.exitBlock();
     }
 
     public void print(){
         for (Statement s : statements)
             System.out.println(s.toString() + ";");
+    }
+
+    public void enterBlock(){
+
+    }
+
+    public void exitBlock(){
+
     }
 
     /*

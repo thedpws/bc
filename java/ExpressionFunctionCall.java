@@ -30,6 +30,6 @@ public class ExpressionFunctionCall implements Expression {
             toPass.add(var.evaluate(scope));
         }
         f.run(toPass);
-        return AST.globalScope.register;
+        return AST.globalScope.returnVal;
     }
 }

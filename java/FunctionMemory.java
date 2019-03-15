@@ -1,13 +1,14 @@
 
-public class SubMemory extends Memory {
+public class FunctionMemory extends Memory {
 
     private Memory head;
 
-    public SubMemory(Memory head){
+    public FunctionMemory
+(Memory head){
         super();
         this.head = head;
         // DO NOT USE THIS REGISTER
-        this.register = -1;
+        this.returnVal = -1;
     }
 
     @Override

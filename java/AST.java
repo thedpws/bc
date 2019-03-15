@@ -9,9 +9,9 @@ public class AST{
     }
     void execute(){
         // Set PC to 0. Execute statements.
-        for (globalScope.pc = 0; globalScope.pc < statementList.size(); globalScope.pc++){
-            System.out.printf("Global PC: %d\n", globalScope.pc);
-            Statement current = statementList.get(globalScope.pc);
+        for (globalScope.enterBlock(); globalScope.getPC() < statementList.size(); globalScope.incCounter()){
+            System.out.printf("Global PC: %d\n", globalScope.getPC());
+            Statement current = statementList.get(globalScope.getPC());
             current.execute(globalScope);
         }
     }

@@ -13,9 +13,11 @@ public class ForLoop implements Statement{
 
     @Override
     public void execute(Memory scope){
-        for(s1.execute(scope); c.evaluate(scope); s2.execute(scope)){
-            s3.execute(scope);
+        scope.enterBlock();
+        for(this.s1.execute(scope); this.c.evaluate(scope); this.s2.execute(scope)){
+            this.s3.execute(scope);
         }
+        scope.exitBlock();
     }
     @Override
     public void print(){

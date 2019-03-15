@@ -4,7 +4,10 @@ public class HaltStatement implements Statement {
 
     @Override
     public void execute(Memory scope){
-        scope.pc = Integer.MAX_VALUE;
+        while(!scope.pc.empty()){
+            scope.exitBlock();
+        }
+    //    scope.pc = Integer.MAX_VALUE;
         
     }
 

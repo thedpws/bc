@@ -3,12 +3,14 @@ import java.util.*;
 public class Memory {
     protected Map<String, Object> symbolTable;
     private Map<String, Function> functions;
-    public int pc;
-    protected double register;
+    //public Stack<Integer> pc;
+    public Stack<ProgramCounter> pc;
+    protected double returnVal;
     
     public Memory(){
         this.symbolTable = new HashMap<>();
         this.functions = new HashMap<>();
+        this.pc = new Stack<>();
     }
 
     final void putSymbol(String key, Object val){
@@ -36,10 +38,35 @@ public class Memory {
     }
 
     public void setRval(double d){
-        register = d;
+        returnVal = d;
     }
 
+    //Entering and exiting non-function
+    public void enterBlock(){
+        pc.push(new ProgramCounter(false));
+    }
+    public void exitBlock(){
+        pc.pop();
+    }
+
+    //Entering and exit function
+    public void enterFunction(){
+        pc.push(new ProgramCounter(true));
+    }
     public void terminateRoutine(){
-        pc = Integer.MAX_VALUE - 1;
+        while(!pc.pop().isFunction) {}
+    }
+
+    public void resetCounter(){
+        pc.pop();
+        this.enterBlock();
+    }
+
+    public void incCounter(){
+        pc.peek().counter++;
+    }
+
+    public int getPC(){
+        return pc.peek().counter;
     }
 }

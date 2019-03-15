@@ -1,7 +1,5 @@
 // Generated from Calculator.g4 by ANTLR 4.7.2
-
-    import java.util.*;
-
+ import java.util.*; 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -114,9 +112,7 @@ public class CalculatorParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-	 
-	    AST ast = new AST();
-
+	 AST ast = new AST(); 
 	public CalculatorParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
@@ -166,10 +162,7 @@ public class CalculatorParser extends Parser {
 			}
 			}
 			_ctx.stop = _input.LT(-1);
-
-			    ast.print();
-			    ast.execute();
-
+			 ast.print(); ast.execute(); 
 		}
 		catch (RecognitionException re) {
 			_localctx.exception = re;
@@ -1348,8 +1341,7 @@ public class CalculatorParser extends Parser {
 				((ConditionContext)_localctx).booleanUnaryOperator = booleanUnaryOperator();
 				setState(308);
 				((ConditionContext)_localctx).condition = condition(4);
-				 ((ConditionContext)_localctx).rval =  new ConditionUnary((((ConditionContext)_localctx).booleanUnaryOperator!=null?_input.getText(((ConditionContext)_localctx).booleanUnaryOperator.start,((ConditionContext)_localctx).booleanUnaryOperator.stop):null), ((ConditionContext)_localctx).condition.rval);
-				                                                    
+				 ((ConditionContext)_localctx).rval =  new ConditionUnary((((ConditionContext)_localctx).booleanUnaryOperator!=null?_input.getText(((ConditionContext)_localctx).booleanUnaryOperator.start,((ConditionContext)_localctx).booleanUnaryOperator.stop):null), ((ConditionContext)_localctx).condition.rval); 
 				}
 				break;
 			case 5:
@@ -1360,8 +1352,7 @@ public class CalculatorParser extends Parser {
 				((ConditionContext)_localctx).comparisonOperator = comparisonOperator();
 				setState(313);
 				((ConditionContext)_localctx).rexpr = expression(0);
-				 ((ConditionContext)_localctx).rval =  new ConditionComparison(((ConditionContext)_localctx).lexpr.rval, (((ConditionContext)_localctx).comparisonOperator!=null?_input.getText(((ConditionContext)_localctx).comparisonOperator.start,((ConditionContext)_localctx).comparisonOperator.stop):null), ((ConditionContext)_localctx).rexpr.rval);
-				                                                    
+				 ((ConditionContext)_localctx).rval =  new ConditionComparison(((ConditionContext)_localctx).lexpr.rval, (((ConditionContext)_localctx).comparisonOperator!=null?_input.getText(((ConditionContext)_localctx).comparisonOperator.start,((ConditionContext)_localctx).comparisonOperator.stop):null), ((ConditionContext)_localctx).rexpr.rval); 
 				}
 				break;
 			}
@@ -1389,8 +1380,7 @@ public class CalculatorParser extends Parser {
 						((ConditionContext)_localctx).booleanBinaryOperator1 = booleanBinaryOperator1();
 						setState(320);
 						((ConditionContext)_localctx).rightCondition = ((ConditionContext)_localctx).condition = condition(3);
-						 ((ConditionContext)_localctx).rval =  new ConditionBinary(((ConditionContext)_localctx).leftCondition.rval, (((ConditionContext)_localctx).booleanBinaryOperator1!=null?_input.getText(((ConditionContext)_localctx).booleanBinaryOperator1.start,((ConditionContext)_localctx).booleanBinaryOperator1.stop):null), ((ConditionContext)_localctx).rightCondition.rval);
-						                                                              
+						 ((ConditionContext)_localctx).rval =  new ConditionBinary(((ConditionContext)_localctx).leftCondition.rval, (((ConditionContext)_localctx).booleanBinaryOperator1!=null?_input.getText(((ConditionContext)_localctx).booleanBinaryOperator1.start,((ConditionContext)_localctx).booleanBinaryOperator1.stop):null), ((ConditionContext)_localctx).rightCondition.rval); 
 						}
 						break;
 					case 2:
@@ -1405,8 +1395,7 @@ public class CalculatorParser extends Parser {
 						((ConditionContext)_localctx).booleanBinaryOperator2 = booleanBinaryOperator2();
 						setState(325);
 						((ConditionContext)_localctx).rightCondition = ((ConditionContext)_localctx).condition = condition(2);
-						 ((ConditionContext)_localctx).rval =  new ConditionBinary(((ConditionContext)_localctx).leftCondition.rval, (((ConditionContext)_localctx).booleanBinaryOperator2!=null?_input.getText(((ConditionContext)_localctx).booleanBinaryOperator2.start,((ConditionContext)_localctx).booleanBinaryOperator2.stop):null), ((ConditionContext)_localctx).rightCondition.rval);
-						                                                              
+						 ((ConditionContext)_localctx).rval =  new ConditionBinary(((ConditionContext)_localctx).leftCondition.rval, (((ConditionContext)_localctx).booleanBinaryOperator2!=null?_input.getText(((ConditionContext)_localctx).booleanBinaryOperator2.start,((ConditionContext)_localctx).booleanBinaryOperator2.stop):null), ((ConditionContext)_localctx).rightCondition.rval); 
 						}
 						break;
 					}

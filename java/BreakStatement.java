@@ -7,7 +7,7 @@ public class BreakStatement implements Statement {
 
     @Override
     public void execute(Memory scope){
-        
+        scope.terminateRoutine();
     }
 
     @Override

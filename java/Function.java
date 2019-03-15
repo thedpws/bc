@@ -21,7 +21,7 @@ public class Function{
             System.err.printf("%s was given %d parameters, but expected %d.%n", fname, parameters.size(), locals.size());
         }
 
-        Memory localScope = new SubMemory(AST.globalScope);
+        Memory localScope = new FunctionMemory(AST.globalScope);
 
         // Store parameters as local variables
         for (int i=0; i<locals.size(); i++){
