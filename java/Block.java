@@ -8,7 +8,7 @@ public class Block implements Statement {
         this.statements = statements;
     }
 
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         for (Statement s : statements){
             s.execute(scope);
             if (s instanceof ReturnStatement) return;

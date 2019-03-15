@@ -16,7 +16,7 @@ public class IfStatement implements Statement{
     }
 
     @Override
-    public void execute(Environment scope) {
+    public void execute(Memory scope) {
         if(c.evaluate(scope)){
             s1.execute(scope);
         }

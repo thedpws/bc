@@ -6,7 +6,7 @@ public class ExpressionVariable implements Expression {
     }
     
     @Override
-    public void execute(Environment scope){
+    public void execute(Memory scope){
       System.out.println(this.evaluate(scope));
     }
 
@@ -16,7 +16,7 @@ public class ExpressionVariable implements Expression {
     }
 
     @Override
-    public double evaluate(Environment scope){
+    public double evaluate(Memory scope){
       return scope.getDouble(varId);
     }
 }

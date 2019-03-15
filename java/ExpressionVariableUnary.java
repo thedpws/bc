@@ -11,7 +11,7 @@ public class ExpressionVariableUnary implements Expression {
     }
 
     @Override
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         System.out.println(this.var.evaluate(scope));                   //May need to fix later
     }
   
@@ -28,7 +28,7 @@ public class ExpressionVariableUnary implements Expression {
     }
   
     @Override
-    public double evaluate(Environment scope){
+    public double evaluate(Memory scope){
       if(preUnaryOp != null && !preUnaryOp.isEmpty()){
           // ++i
           if(preUnaryOp == "++"){

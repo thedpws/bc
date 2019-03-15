@@ -6,7 +6,7 @@ public class ExpressionConstant implements Expression {
     }
 
     @Override
-    public void execute(Environment scope) {
+    public void execute(Memory scope) {
       System.out.println(this.val);
     }
 
@@ -16,7 +16,7 @@ public class ExpressionConstant implements Expression {
     }
 
     @Override
-    public double evaluate(Environment scope){
+    public double evaluate(Memory scope){
       return this.val;
     }
 

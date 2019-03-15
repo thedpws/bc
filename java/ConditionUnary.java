@@ -7,7 +7,7 @@ public class ConditionUnary implements Condition{
   }
 
   @Override
-  public void execute(Environment scope){
+  public void execute(Memory scope){
       System.out.print(this.evaluate(scope));
   }
 
@@ -18,7 +18,7 @@ public class ConditionUnary implements Condition{
   }
 
   @Override
-  public boolean evaluate(Environment scope){
+  public boolean evaluate(Memory scope){
       if(this.unaryOp == "!"){
           return !(this.condition.evaluate(scope));
       }

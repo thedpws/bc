@@ -5,7 +5,7 @@ public class WhileLoop implements Statement{
         this.c = c;
         this.s = s;
     }
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         while(c.evaluate(scope)){
             s.execute(scope);
         }

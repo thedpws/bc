@@ -10,7 +10,7 @@ public class ExpressionBinary implements Expression {
         this.rightExpression = rightExpression;   
     }
     @Override
-    public void execute(Environment scope) {
+    public void execute(Memory scope) {
         System.out.println(this.evaluate(scope));
     }
   
@@ -22,7 +22,7 @@ public class ExpressionBinary implements Expression {
     }
   
     @Override
-    public double evaluate(Environment scope) {
+    public double evaluate(Memory scope) {
         switch(op){
             case "^":
                 return Math.pow(this.leftExpression.evaluate(scope), this.rightExpression.evaluate(scope));

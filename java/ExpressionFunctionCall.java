@@ -9,7 +9,7 @@ public class ExpressionFunctionCall implements Expression {
     }
 
     @Override
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         System.out.println(this.evaluate(scope));
     }
 
@@ -20,7 +20,7 @@ public class ExpressionFunctionCall implements Expression {
     }
 
     @Override
-    public double evaluate(Environment scope) {
+    public double evaluate(Memory scope) {
         // retrieve the corresponding function
         Function f = AST.globalScope.getFunction(this.fname);
 

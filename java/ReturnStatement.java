@@ -8,8 +8,9 @@ public class ReturnStatement implements Statement {
     }
 
     @Override
-    public void execute(Environment scope){
-
+    public void execute(Memory scope){
+        scope.register = new ExpressionConstant(this.rval.evaluate(scope));
+        //scope.pc = Integer.MAX_VALUE;
     }
 
     @Override

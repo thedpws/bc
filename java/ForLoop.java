@@ -12,7 +12,7 @@ public class ForLoop implements Statement{
     }
 
     @Override
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         for(s1.execute(scope); c.evaluate(scope); s2.execute(scope)){
             s3.execute(scope);
         }

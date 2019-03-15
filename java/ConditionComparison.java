@@ -10,7 +10,7 @@ public class ConditionComparison implements Condition {
     }
 
     @Override
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         System.out.println(this.evaluate(scope));
     }
 
@@ -22,7 +22,7 @@ public class ConditionComparison implements Condition {
     }
 
     @Override
-    public boolean evaluate(Environment scope){
+    public boolean evaluate(Memory scope){
         switch(comparisonOp){
             case ">":
                 if(this.leftExpression.evaluate(scope) > this.rightExpression.evaluate(scope)){

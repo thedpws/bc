@@ -5,7 +5,7 @@ public class ConditionVariable implements Condition{
     this.varId = varId;
   }
   @Override
-  public void execute(Environment scope){
+  public void execute(Memory scope){
     System.out.print(this.evaluate(scope));
   }
 
@@ -15,7 +15,7 @@ public class ConditionVariable implements Condition{
   }
 
   @Override
-  public boolean evaluate(Environment scope){
+  public boolean evaluate(Memory scope){
     return scope.getBoolean(this.varId);
   }
 }

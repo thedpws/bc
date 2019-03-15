@@ -10,7 +10,7 @@ public class ExpressionAssignment implements Expression {
     }
 
     @Override
-    public void execute(Environment scope) {
+    public void execute(Memory scope) {
       
     }
 
@@ -22,7 +22,7 @@ public class ExpressionAssignment implements Expression {
     }
 
     @Override
-    public double evaluate(Environment scope){
+    public double evaluate(Memory scope){
         switch(assignOp){
             case "^=":
                 scope.putSymbol(this.var.toString(), Math.pow(scope.getDouble(this.var.toString()), this.val.evaluate(scope)));

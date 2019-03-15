@@ -7,7 +7,7 @@ public class ExpressionUnary implements Expression {
   }
 
   @Override
-  public void execute(Environment scope){
+  public void execute(Memory scope){
     System.out.println(evaluate(scope));
   }
 
@@ -19,7 +19,7 @@ public class ExpressionUnary implements Expression {
   }
 
   @Override
-  public double evaluate(Environment scope){
+  public double evaluate(Memory scope){
     if(this.unaryOp == "-"){
       return (-1 * scope.getDouble(val.toString()));
     }

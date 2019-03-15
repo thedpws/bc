@@ -1,3 +1,3 @@
 public interface Expression extends Statement{
-    double evaluate(Environment scope);
+    double evaluate(Memory scope);
 }

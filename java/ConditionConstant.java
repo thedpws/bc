@@ -6,7 +6,7 @@ public class ConditionConstant implements Condition{
     }
 
     @Override
-    public void execute(Environment scope){
+    public void execute(Memory scope){
         System.out.println(this.b);
     }
 
@@ -16,7 +16,7 @@ public class ConditionConstant implements Condition{
     }
 
     @Override
-    public boolean evaluate(Environment scope){
+    public boolean evaluate(Memory scope){
         return this.b;
     }
 }
