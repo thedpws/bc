@@ -15,8 +15,6 @@ public class AST{
         this.statementList.add(s);
     }
     void print(){
-        for(int i = 0; i < statementList.size(); i++){
-            statementList.get(i).print();
-        }
+        for (Statement s : statementList) s.print();
     }
 }

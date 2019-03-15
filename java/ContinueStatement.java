@@ -11,6 +11,6 @@ public class ContinueStatement implements Statement {
 
     @Override
     public void print(){
-        
+        System.out.print("Continue.");       
     }
 }

@@ -19,7 +19,7 @@ public class ExpressionVariableUnary implements Expression {
     public void print(){
         if(postUnaryOp != null && !postUnaryOp.isEmpty()){
           this.var.print();
-          System.out.println(this.postUnaryOp);
+          System.out.print(this.postUnaryOp);
         }
         else if(preUnaryOp != null && !postUnaryOp.isEmpty()){
           System.out.print(this.preUnaryOp);

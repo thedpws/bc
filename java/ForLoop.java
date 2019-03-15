@@ -19,6 +19,12 @@ public class ForLoop implements Statement{
     }
     @Override
     public void print(){
-        System.out.print("for ( " + s1.toString() + "; " + c.toString() + "; " + s2.toString() + " ) " + s3.toString());
+        System.out.print("For.");
+        s1.print();
+        c.print();
+        s2.print();
+        s3.print();
+
+        //System.out.print("for ( " + s1.toString() + "; " + c.toString() + "; " + s2.toString() + " ) " + s3.toString());
     }
 }

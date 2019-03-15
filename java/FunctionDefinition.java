@@ -13,11 +13,15 @@ public class FunctionDefinition implements Statement {
 
     @Override
     public void execute(Environment scope){
+        System.out.println("FunctionDefinition: Put function into global scope");
       AST.globalScope.putFunction(fname, new Function(fname, params, statements));
     }
     
     @Override
     public void print(){
         
+        System.out.printf("Define %s.", fname);
+        for (ExpressionVariable param : params) param.print();
+        statements.print();
     }
 }

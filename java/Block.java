@@ -1,25 +1,32 @@
 import java.util.*;
 
 public class Block implements Statement {
+
     List<Statement> statements;
+
     Block(List<Statement> statements){
-        this.statements = new LinkedList<>();
+        this.statements = statements;
     }
+
     public void execute(Environment scope){
-        for(int i = 0; i < statements.size(); i++){
-            statements.get(i).execute(scope);
+        for (Statement s : statements){
+            s.execute(scope);
+            if (s instanceof ReturnStatement) return;
         }
     }
+
     public void print(){
-        for(int i = 0; i < statements.size(); i++){
-            statements.get(i).print();
-            System.out.print("; ");
-        }
+        System.out.print("Block");
+        for (Statement s : statements) s.print();
     }
 
     public Expression getReturnExpression(){
         for (Statement s : statements) 
-            if (s instanceof ReturnStatement) return ((ReturnStatement) s).getExpression();
+            if (s instanceof ReturnStatement) {
+                System.out.print("Found return");
+                return ((ReturnStatement) s).getExpression();
+            }
+        System.out.print("No return");
         return new ExpressionConstant(0);
     }
 }

@@ -8,14 +8,12 @@ public class IfStatement implements Statement{
         this.s1 = s1;
         this.s2 = s2 == null ? new BlankStatement() : s2;
     }
-    /*
     IfStatement(Condition c, Statement s){
         BlankStatement bStatement = new BlankStatement();
         this.c = c;
         this.s1 = s;
         this.s2 = bStatement;
     }
-    */
 
     @Override
     public void execute(Environment scope) {
@@ -30,7 +28,10 @@ public class IfStatement implements Statement{
 
     @Override
     public void print() {
-        System.out.println("if ( " + c.toString() + " ) " + s1.toString() + " [ else " + s2.toString() + " ] ");
+        System.out.println("If Statement.");
+        c.print();
+        s1.print();
+        //s2.print(); System.out.println("if ( " + c.toString() + " ) " + s1.toString() + " [ else " + s2.toString() + " ] ");
     }
 
 }

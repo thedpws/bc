@@ -1,6 +1,7 @@
 import java.util.*;
 public class GlobalEnvironment extends Environment{
     public static Map<String, Function> functions;
+    public static Stack<Environment> environments;
     public GlobalEnvironment(){
         super();
         this.global = this;

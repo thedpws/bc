@@ -16,7 +16,10 @@ public class ExpressionBinary implements Expression {
   
     @Override
     public void print() {
-        System.out.println(leftExpression.toString() + op + rightExpression.toString());
+        leftExpression.print();
+        System.out.print(op);
+        rightExpression.print();
+        //System.out.println(leftExpression.toString() + op + rightExpression.toString());
     }
   
     @Override
@@ -33,7 +36,9 @@ public class ExpressionBinary implements Expression {
             case "-":
                 return (this.leftExpression.evaluate(scope) - this.rightExpression.evaluate(scope));
             default:
+                System.out.println("bitch");
                 return 0;                                                               
+
         }
     }
   }

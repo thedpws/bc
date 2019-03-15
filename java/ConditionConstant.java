@@ -12,7 +12,7 @@ public class ConditionConstant implements Condition{
 
     @Override
     public void print(){
-        System.out.println(this.b);
+        System.out.print(this.b);
     }
 
     @Override

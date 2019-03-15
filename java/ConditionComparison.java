@@ -16,7 +16,10 @@ public class ConditionComparison implements Condition {
 
     @Override
     public void print(){
-        System.out.println(this.leftExpression.toString() + comparisonOp + this.rightExpression.toString());
+        leftExpression.print();
+        System.out.print(comparisonOp);
+        rightExpression.print();
+        //System.out.println(this.leftExpression.toString() + comparisonOp + this.rightExpression.toString());
     }
 
     @Override
@@ -42,7 +45,12 @@ public class ConditionComparison implements Condition {
                     return true;
                 }
                 return false;
+            case "==":
+                return leftExpression.evaluate(scope) == rightExpression.evaluate(scope);
+            case "!=":
+                return leftExpression.evaluate(scope) != rightExpression.evaluate(scope);
             default:
+                System.out.println("oopsie!");
                 return false;                   //Shouldn't be reached
         }
     }

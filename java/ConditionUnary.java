@@ -13,7 +13,8 @@ public class ConditionUnary implements Condition{
 
   @Override
   public void print(){
-      System.out.print(this.unaryOp + this.condition.toString());
+      System.out.print(this.unaryOp);
+      condition.print();
   }
 
   @Override

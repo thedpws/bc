@@ -28,7 +28,7 @@ statement returns [Statement rval]
     | 'break'                       { $rval = new BreakStatement();} //#break
     | 'continue'                    { $rval = new ContinueStatement(); } //#continue
     | 'halt'                        { $rval = new HaltStatement(); } //#halt
-    | 'return' expression           { $rval = new ReturnStatement($expression.rval);} //#returnExpression
+    | 'return' expression           { System.out.println(" return babe "); $rval = new ReturnStatement($expression.rval);} //#returnExpression
     | 'return'                      { $rval = new ReturnStatement();} //#returnVoid
     // expression statements are printed on execution
     | expression                    { $rval = $expression.rval;}
@@ -58,8 +58,9 @@ statementList returns [List<Statement> rval]
     | delimiter { $rval = new LinkedList<Statement>(); $rval.add(new BlankStatement()); }
     ;
     */
-statementList returns [List<Statement> rval]
-    : (statement delimiter+)* { $rval = new LinkedList<Statement>(); }
+statementList returns [LinkedList<Statement> rval]
+    : (statement delimiter+) statementList { System.out.println("b"); $rval = $statementList.rval; $rval.addFirst($statement.rval); System.out.println("size: " + $rval.size()); }
+    | statement delimiter+              { $rval = new LinkedList<Statement>(); $rval.add($statement.rval); System.out.println("size: " + $rval.size()); }
     ;
 
 block returns [Block rval]
@@ -75,7 +76,8 @@ forLoop returns [ForLoop rval]
     ;
 
 ifStatement returns [IfStatement rval]
-    : 'if' '(' condition ')' delimiter* trueBranch=statement ('else' '\n'* falseBranch=statement)?                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
+    : 'if' '(' condition ')' delimiter* trueBranch=statement 'else' '\n'* falseBranch=statement                   { $rval = new IfStatement($condition.rval, $trueBranch.rval, $falseBranch.rval); }
+    | 'if' '(' condition ')' delimiter* trueBranch=statement                  { $rval = new IfStatement($condition.rval, $trueBranch.rval); }
     ;
 
 defineFunction returns [FunctionDefinition rval]
@@ -125,13 +127,13 @@ booleanBinaryOperator2: '||' ;
 
 variable: ID;
 fname: ID;
-parameters returns [List<Expression> rval]
-    : expression ',' parameters { $rval = $parameters.rval; $rval.add($expression.rval); }
+parameters returns [LinkedList<Expression> rval]
+    : expression ',' parameters { $rval = $parameters.rval; $rval.addFirst($expression.rval); }
     | expression               { $rval = new LinkedList<>(); $rval.add($expression.rval); }
     ;
 
-defParameters returns [List<ExpressionVariable> rval]
-    : variable ',' defParameters { $rval = $defParameters.rval; $rval.add(new ExpressionVariable($variable.text)); }
+defParameters returns [LinkedList<ExpressionVariable> rval]
+    : variable ',' defParameters { $rval = $defParameters.rval; $rval.addFirst(new ExpressionVariable($variable.text)); }
     | variable               { $rval = new LinkedList<>(); $rval.add(new ExpressionVariable($variable.text)); }
     ;
 delimiter

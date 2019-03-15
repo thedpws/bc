@@ -8,6 +8,6 @@ public class BlankStatement implements Statement{
     }
     @Override
     public void print(){
-        
+        System.out.print("blank");       
     }
 }

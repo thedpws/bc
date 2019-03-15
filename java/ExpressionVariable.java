@@ -12,7 +12,7 @@ public class ExpressionVariable implements Expression {
 
     @Override
     public void print(){
-      System.out.println(varId);
+      System.out.print(varId);
     }
 
     @Override

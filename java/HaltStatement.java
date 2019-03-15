@@ -9,6 +9,7 @@ public class HaltStatement implements Statement {
 
     @Override
     public void print(){
+        System.out.println("Halt.");
         
     }
 }

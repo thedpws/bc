@@ -12,7 +12,7 @@ public class ExpressionConstant implements Expression {
 
     @Override
     public void print() {
-      System.out.println(this.val);
+      System.out.print(this.val);
     }
 
     @Override

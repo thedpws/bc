@@ -11,6 +11,8 @@ public class WhileLoop implements Statement{
         }
     }
     public void print(){
-        System.out.println("while ( " + c.toString() + " ) " + s.toString());
+        System.out.println("WhileLoop");
+        c.print();
+        s.print();
     }
 }

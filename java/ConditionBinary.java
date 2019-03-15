@@ -32,7 +32,12 @@ public class ConditionBinary implements Condition {
 
     @Override
     public void print(){
+        leftCondition.print();
+        System.out.print(binaryOp);
+        rightCondition.print();
+        /*
         System.out.println(leftCondition.toString() + binaryOp + rightCondition.toString());
+        */
     }
 
     @Override

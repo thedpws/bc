@@ -15,7 +15,8 @@ public class ExpressionFunctionCall implements Expression {
 
     @Override
     public void print(){
-        System.out.printf("%s(%s);%n", fname, parameters);
+        System.out.print(fname);
+        for (Expression e : parameters) e.print();
     }
 
     @Override

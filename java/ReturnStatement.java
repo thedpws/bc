@@ -14,7 +14,8 @@ public class ReturnStatement implements Statement {
 
     @Override
     public void print(){
-        
+        System.out.println("Return.");
+        rval.print();
     }
 	public Expression getExpression() {
 		return this.rval;
