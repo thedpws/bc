@@ -11,22 +11,6 @@ public class ConditionBinary implements Condition {
     
     @Override
     public void execute(Environment scope){
-      // if(binaryOp == "&&"){
-      //   if(this.leftCondition.evaluate() && this.rightCondition.evaluate()){
-      //       System.out.println("true");
-      //   }
-      //   else{
-      //       System.out.println("false");
-      //   }
-      // }
-      // else if(binaryOp == "||"){
-      //     if(this.leftCondition.evaluate() || this.rightCondition.evaluate()){
-      //         System.out.println("true");
-      //     }
-      //     else{
-      //         System.out.println("false");
-      //     }
-      // }
         System.out.println(this.evaluate(scope));
     }
 
@@ -35,24 +19,15 @@ public class ConditionBinary implements Condition {
         leftCondition.print();
         System.out.print(binaryOp);
         rightCondition.print();
-        /*
-        System.out.println(leftCondition.toString() + binaryOp + rightCondition.toString());
-        */
     }
 
     @Override
     public boolean evaluate(Environment scope){
        if(binaryOp == "&&"){
-          if(this.leftCondition.evaluate(scope) && this.rightCondition.evaluate(scope)){
-              return true;
-          }
-          return false;
+          return (this.leftCondition.evaluate(scope) && this.rightCondition.evaluate(scope)) ? true : false;
        }
        else if(binaryOp == "||"){
-          if(this.leftCondition.evaluate(scope) || this.rightCondition.evaluate(scope)){
-            return true;
-          }
-          return false;
+          return (this.leftCondition.evaluate(scope) || this.rightCondition.evaluate(scope)) ? true : false;
        }
        return false;          //Shouldn't be reached
     }

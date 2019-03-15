@@ -19,7 +19,6 @@ public class ExpressionBinary implements Expression {
         leftExpression.print();
         System.out.print(op);
         rightExpression.print();
-        //System.out.println(leftExpression.toString() + op + rightExpression.toString());
     }
   
     @Override

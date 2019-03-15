@@ -17,7 +17,7 @@ public class ExpressionAssignment implements Expression {
     @Override
     public void print() {
         var.print();
-        System.out.print(this.assignOp);
+        System.out.print(assignOp);
         val.print();
     }
 

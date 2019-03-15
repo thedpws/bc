@@ -13,14 +13,14 @@ public class ConditionUnary implements Condition{
 
   @Override
   public void print(){
-      System.out.print(this.unaryOp);
+      System.out.print(unaryOp);
       condition.print();
   }
 
   @Override
   public boolean evaluate(Environment scope){
       if(this.unaryOp == "!"){
-          return !this.condition.evaluate(scope);
+          return !(this.condition.evaluate(scope));
       }
       else{
           return this.condition.evaluate(scope);

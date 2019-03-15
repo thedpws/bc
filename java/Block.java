@@ -16,8 +16,8 @@ public class Block implements Statement {
     }
 
     public void print(){
-        System.out.print("Block");
-        for (Statement s : statements) s.print();
+        for (Statement s : statements)
+            System.out.println(s.toString() + ";");
     }
 
     public Expression getReturnExpression(){

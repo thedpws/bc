@@ -19,7 +19,6 @@ public class ConditionComparison implements Condition {
         leftExpression.print();
         System.out.print(comparisonOp);
         rightExpression.print();
-        //System.out.println(this.leftExpression.toString() + comparisonOp + this.rightExpression.toString());
     }
 
     @Override
