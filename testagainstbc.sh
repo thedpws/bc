@@ -3,6 +3,12 @@ alias antlr4='java -jar /usr/local/lib/antlr-4.7.2-complete.jar'
 # Compile
 antlr4 Calculator.g4 -o java && javac -Xlint:deprecation -cp java:$CLASSPATH ./java/Driver.java -d java/out
 
+mkdir -p out
+for dir in $(ls tests)
+do
+    mkdir -p out/$dir
+done
+
 # Run
 for testfilepath in $(cd tests && ls ./*/* && cd ..)
 do
