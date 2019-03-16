@@ -30,7 +30,6 @@ statement
 
 expression  
     : NUM                                   {}
-    | fname '(' ')'                 {}
     | fname '(' parameters ')'          {}
     | variable                              {}
     | '(' expression ')'                    {}

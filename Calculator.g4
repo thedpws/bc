@@ -20,7 +20,7 @@ statement returns [Statement rval]
     | defineFunction                { $rval = $defineFunction.rval;} //# fndef
     | 'break'                       { $rval = new BreakStatement();} //#break
     | 'continue'                    { $rval = new ContinueStatement(); } //#continue
-    | 'halt'                        { $rval = new HaltStatement(); } //#halt
+    | ('halt'|'quit')               { $rval = new HaltStatement(); } //#halt
     | 'return' expression           { $rval = new ReturnStatement($expression.rval);} //#returnExpression
     | 'return'                      { $rval = new ReturnStatement();} //#returnVoid
     // expression statements are printed on execution
@@ -30,6 +30,7 @@ statement returns [Statement rval]
 
 expression returns [Expression rval]
     : NUM                                   { $rval = new ExpressionConstant(Double.parseDouble($NUM.text)); }
+    | fname '(' ')'                 { $rval = new ExpressionFunctionCall($fname.text, new LinkedList<Expression>()); }
     | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
     | variable                              { $rval = new ExpressionVariable($variable.text); }
     | '(' expression ')'                    { $rval = $expression.rval; }

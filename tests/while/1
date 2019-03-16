@@ -2,5 +2,5 @@ while (true) {
     i++;
     halt;
     break;
-    continue;
+    quit;
 }
