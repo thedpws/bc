@@ -12,7 +12,7 @@ public class ExpressionVariableUnary implements Expression {
 
     @Override
     public void execute(Memory scope){
-        System.out.println(this.evaluate(scope));
+        System.out.println(this.evaluate(scope));    
     }
   
     @Override
