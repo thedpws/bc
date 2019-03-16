@@ -1,48 +1,88 @@
 open Core
 
+(*
 type sExpr = 
     | Atom of string
     | List of sExpr list
-
-type expr = 
-    | Num of float
-    | Var of string
-    | Op1 of string*expr
-    | Op2 of string*expr*expr
-    | Fct of string * expr list
+*)
+type expression = 
+    | AssignmentExpression of string * string * expression
+    | BinaryExpression of expression * string * expression
+    | FnCallExpression of string * expression list
+    | ConstantExpression of float
+    | PostUnaryExpression of expression * string
+    | PreUnaryExpression of string * expression
+    | VariableExpression of string
+(* let evalAssignment (varId: string) (env:) *)
+type condition =
+    | BinaryCondition of condition * string * condition
+    | ComparisonCondition of expression * string * expression
+    | ConstantCondition of bool
+    | UnaryCondition of string * condition
 
 type statement = 
-    | Assign of string*expr
-    | Return of expr
-    | Expr of expr
-    | If of expr*statement list * statement list
-    | While of expr*statement list
-    | For of statement*expr*statement*statement list
-    | FctDef of string * string list * statement list 
+    | Blank
+    | Block of statement list
+    | Break
+    | Condition of condition
+    | Continue
+    | Expression of expression
+    | FnDefinition of string * string list * statement list
+    | ForLoop of statement * condition * statement * statement
+    | IfStatement of condition * statement * statement
+    | Quit
+    | Return of expression
+    | WhileLoop of condition * statement
 
-type block = statement list 
+type program = 
+    | Program of statement list
+    | None
+
 
 type env = N of float (* complete *)
 
-type envQueue = env list
+(* https://ocaml.org/learn/tutorials/map.html *)
+type envList = env list
 
-let varEval (_v: string) (_q:envQueue): float  = 0.0  
+let evaluateExpression (_e: expression) (_q:envList): float  = 0.0
 
-let evalExpr (_e: expr) (_q:envQueue): float  = 0.0
 
 (* Test for expression *)
 let%expect_test "evalNum" = 
-    evalExpr (Num 10.0) [] |>
+    evaluateExpression (Num 10.0) [] |>
     printf "%F";
     [%expect {| 10. |}]
 
-let evalCode (_code: block) (_q:envQueue): unit = 
+let evalCode (_code: block) (_q:envList): unit = 
     (* crate new environment *)
     (* user fold_left  *)
     (* pop the local environment *)
     print_endline "Not implemented"
 
-let evalStatement (s: statement) (q:envQueue): envQueue =
+let rec execute (s: statement) (q:env list): env list =
+    match s with
+        | Blank -> execute ss q
+        | Block(b) -> foldl execute b
+        | Break -> q (* stop execution; do not recurse *)
+        | Condition(c) -> print_endline evaluateCondition c
+        | Continue -> continue q
+        | Expression(e) -> print_endline evaluateExpression e
+        | FnDefinition(fname, params, instrs) -> (* compose the function struct and store in memory *)
+        | ForLoop(s1, c, s2, s3) ->
+        | ...
+
+let rec evaluateExpression (e: expression) (q:env list): float =
+    match e with
+        | AssignmentExpression(var, op, expr) ->
+        | BinaryExpression(expr1, op, expr2) -> 
+        | FnCallExpression(fn, params) -> 
+        | ...
+
+let rec evaluateCondition (c: condition) (q:env list): bool = 
+    match c with
+        | ...
+(*
+let evalStatement (s: statement) (q:envList): envList =
     match s with 
         | Assign(_v, _e) -> (* eval e and store in v *) q
         | If(e, codeT, codeF) -> 
@@ -53,7 +93,7 @@ let evalStatement (s: statement) (q:envQueue): envQueue =
                     evalCode codeF q
             ;q
         | _ -> q (*ignore *)
-
+*)
 
 (* 
     v = 10; 
