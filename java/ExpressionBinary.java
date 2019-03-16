@@ -31,12 +31,13 @@ public class ExpressionBinary implements Expression {
                 return (this.leftExpression.evaluate(scope) * this.rightExpression.evaluate(scope));
             case "/":
                 return (this.leftExpression.evaluate(scope) / this.rightExpression.evaluate(scope));
+            case "%":
+                return (this.leftExpression.evaluate(scope) % this.rightExpression.evaluate(scope));
             case "+":
                 return (this.leftExpression.evaluate(scope) + this.rightExpression.evaluate(scope));
             case "-":
                 return (this.leftExpression.evaluate(scope) - this.rightExpression.evaluate(scope));
             default:
-                System.out.println("bitch");
                 return 0;                                                               
 
         }

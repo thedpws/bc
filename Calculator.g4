@@ -30,6 +30,7 @@ statement returns [Statement rval]
 
 expression returns [Expression rval]
     : NUM                                   { $rval = new ExpressionConstant(Double.parseDouble($NUM.text)); }
+    | libCall '(' expression ')'        { $rval = new ExpressionLibCall($libCall.text, $expression.rval); }
     | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
     | variable                              { $rval = new ExpressionVariable($variable.text); }
     | '(' expression ')'                    { $rval = $expression.rval; }
@@ -91,6 +92,10 @@ condition returns [Condition rval]
 { $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator1.text, $rightCondition.rval); }// b1 && b2
     | leftCondition=condition booleanBinaryOperator2 rightCondition=condition 
 { $rval = new ConditionBinary($leftCondition.rval, $booleanBinaryOperator2.text, $rightCondition.rval); }// b1 || b2
+    ;
+
+libCall
+    : ('s' | 'c' | 'l' | 'e' | 'sqrt')
     ;
 
 unaryOperator
