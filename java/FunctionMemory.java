@@ -18,7 +18,7 @@ public class FunctionMemory extends Memory {
 
     @Override
     public Double getDouble(String key){
-        System.out.printf("FM.getDouble(%s) returns %s%n", key, (Double)symbolTable.getOrDefault(key, head.getDouble(key)));
+        //System.out.printf("FM.getDouble(%s) returns %s%n", key, (Double)symbolTable.getOrDefault(key, head.getDouble(key)));
         return (Double) symbolTable.getOrDefault(key, head.getDouble(key));
     }
 

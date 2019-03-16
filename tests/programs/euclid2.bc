@@ -1,17 +1,13 @@
 1
 define e (a, b) 
 {
-    while (b != 0) 
-    { 
+    if (b == 0) return a;
         if (a > b) {
             a = a-b;
         } else {
             b = b-a;
         }
-    }
-    return a;
+    return e(a, b);
 }
-
-define e(a, b) { return b; }
 
 e(10, 15) /* gcd(10,15) = 5 -> 5 */

@@ -1,5 +1,6 @@
+import java.io.*;
 import java.util.*;
-
+import java.lang.*;
 public class Block implements Statement {
 
     List<Statement> statements;
@@ -11,20 +12,26 @@ public class Block implements Statement {
     Statement initial;
 
     public void execute(Memory scope){
-        if (this.initial != null) initial.execute(scope);
-        // execute the statements
-
-        // init pc to 0. 
-        // remove pc from stack after block ends
         int depth = scope.enterBlock();
+        if (isForLoop()) {
+            initial.execute(scope);
+            scope.incCounter();
+        }
+        // init pc to 0. 
         for (; scope.getPC() < statements.size(); scope.incCounter()){
-            //System.out.println("Block! PC is " + scope.getPC());
             Statement s = statements.get(scope.getPC());
-            //System.out.printf("Block executing %s\n", s);
-            //s.print();
+            System.out.printf("\nFrame %d\tInstruction %d\tBlock executing %s\n", scope.pc.size(), scope.getPC(), s);
+            //For loop: don't print when executing the inner statements.
+            if (isForLoop() && scope.getPC() == 0){
+                PrintStream stdout = System.out;
+                System.setOut(new PrintStream(new NullOutputStream()));
+                s.execute(scope);
+                System.setOut(stdout);
+                continue;
+            }            
+
             s.execute(scope);
         }
-
         scope.exitBlock(depth);
     }
 
@@ -37,6 +44,7 @@ public class Block implements Statement {
         // if (!c) break;
         Statement s = new IfStatement(new ConditionUnary("!", c), new BreakStatement());
         statements.add(0, s);
+        statements.add(new ContinueStatement());
     }
 
     public void toFor(Statement initial, Condition c, Statement inc){
@@ -44,17 +52,10 @@ public class Block implements Statement {
         Statement ifs = new IfStatement(new ConditionUnary("!", c), new BreakStatement());
         statements.add(0, ifs);
         statements.add(0, inc);
+        statements.add(new ContinueStatement());
     }
 
-    /*
-    public Expression getReturnExpression(){
-        for (Statement s : statements) 
-            if (s instanceof ReturnStatement) {
-                System.out.print("Found return");
-                return ((ReturnStatement) s).getExpression();
-            }
-        System.out.print("No return");
-        return new ExpressionConstant(0);
+    private boolean isForLoop(){
+        return this.initial != null;
     }
-    */
 }

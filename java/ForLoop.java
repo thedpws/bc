@@ -12,6 +12,7 @@ public class ForLoop implements Statement{
         this.c = c.toString();
         this.s2 = s2.toString();
         this.s3 = s3;
+        //System.out.println("$$$$$$$");
         this.s3.toFor(s1, c, s2);
     }
 

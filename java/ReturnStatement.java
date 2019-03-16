@@ -12,7 +12,7 @@ public class ReturnStatement implements Statement {
         scope.setRval(rval.evaluate(scope));
         //System.out.println("\t\tSetting Rval to " + rval.evaluate(scope));
         //System.out.println("\t\tExpression was");
-        rval.print();
+        //rval.print();
         scope.exitFunction();
     }
 

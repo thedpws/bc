@@ -15,7 +15,7 @@ public class Function{
 
     // Run the routine. Store any return values in the register.
     public void run(List<Double> parameters) {
-        System.out.printf("Running %s(%s)!\n", fname, parameters);
+        //System.out.printf("Running %s(%s)!\n", fname, parameters);
         if (parameters.size() != this.locals.size()) {
             // Wrong number of parameters passed in ...
             System.err.printf("%s was given %d parameters, but expected %d.%n", fname, parameters.size(), locals.size());

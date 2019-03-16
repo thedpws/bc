@@ -13,7 +13,7 @@ public class FunctionDefinition implements Statement {
 
     @Override
     public void execute(Memory scope){
-        System.out.println("FunctionDefinition: Put function into global scope");
+        //System.out.println("FunctionDefinition: Put function into global scope");
       AST.globalScope.putFunction(fname, new Function(fname, params, statements));
     }
     

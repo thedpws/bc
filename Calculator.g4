@@ -6,7 +6,7 @@ grammar Calculator;
 
 // A program is a list of statements
 program
-@after { ast.print(); ast.execute(); }
+@after { System.out.println("\nAST:"); ast.print(); System.out.println("\nExecution:"); ast.execute(); }
     : (topStatement)*
     ;
 

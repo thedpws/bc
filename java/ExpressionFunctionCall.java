@@ -27,11 +27,11 @@ public class ExpressionFunctionCall implements Expression {
         // Prepare the parameters
         List<Double> toPass = new ArrayList<>();
         for (Expression var : this.parameters) {
-            System.out.println("Parameter " + var.evaluate(scope));
+            //System.out.println("Parameter " + var.evaluate(scope));
             toPass.add(var.evaluate(scope));
         }
         f.run(toPass);
-        System.out.println("Rval is..." + scope.getRval());
+        //System.out.println("Rval is..." + scope.getRval());
         return scope.getRval();
     }
 }

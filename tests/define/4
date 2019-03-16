@@ -1,3 +1,4 @@
 define print(x){
-    print(x);
-};
+    x
+}
+print(9);

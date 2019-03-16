@@ -69,9 +69,6 @@ public class Memory {
         pc.push(new ProgramCounter(true));
     }
     public void exitFunction(){
-<<<<<<< HEAD
-        while(!pc.pop().isFunction) {}
-=======
         //System.out.println("ExitFunction");
         Stack<ProgramCounter> stack = new Stack<>();
         
@@ -85,16 +82,16 @@ public class Memory {
         while (!stack.isEmpty()) pc.push(stack.pop());
         pc.pop();
         //while(!pc.pop().isFunction) {}
->>>>>>> d584616051f2aaf5da8a3e1da208e4c6a04b95b2
     }
 
     public void resetCounter(){
-        pc.peek().counter = 0;
+        pc.peek().counter = -1;
         /*
         pc.pop();
         this.enterBlock();
         */
     }
+
 
     public void incCounter(){
         pc.peek().counter++;
