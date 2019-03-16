@@ -30,7 +30,8 @@ statement returns [Statement rval]
 
 expression returns [Expression rval]
     : NUM                                   { $rval = new ExpressionConstant(Double.parseDouble($NUM.text)); }
-    | libCall '(' expression ')'        { $rval = new ExpressionLibCall($libCall.text, $expression.rval); }
+    | readCall '(' ')'                  { $rval = new ExpressionLibCall($readCall.text, null); }
+    | libCall '(' parameters ')'        { $rval = new ExpressionLibCall($libCall.text, $parameters.rval); }
     | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
     | variable                              { $rval = new ExpressionVariable($variable.text); }
     | '(' expression ')'                    { $rval = $expression.rval; }
@@ -95,7 +96,10 @@ condition returns [Condition rval]
     ;
 
 libCall
-    : ('s' | 'c' | 'l' | 'e' | 'sqrt')
+    : ('s' | 'c' | 'l' | 'e' | 'sqrt' | 'read')
+    ;
+readCall
+    : ('read')
     ;
 
 unaryOperator
