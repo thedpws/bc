@@ -18,6 +18,7 @@ public class FunctionMemory extends Memory {
 
     @Override
     public Double getDouble(String key){
+        System.out.printf("FM.getDouble(%s) returns %s%n", key, (Double)symbolTable.getOrDefault(key, head.getDouble(key)));
         return (Double) symbolTable.getOrDefault(key, head.getDouble(key));
     }
 
@@ -35,4 +36,49 @@ public class FunctionMemory extends Memory {
     public void setRval(double d){
         head.setRval(d);
     }
+
+    @Override
+    public double getRval(){
+        return head.getRval();
+    }
+
+    @Override
+    public int enterBlock(){
+        return head.enterBlock();
+    }
+
+    @Override
+    public void exitBlock(){
+        head.exitBlock();
+    }
+    @Override
+    public void exitBlock(int depth){
+        head.exitBlock(depth);
+    }
+
+    @Override
+    public void enterFunction(){
+        head.enterFunction();
+    }
+
+    @Override
+    public void exitFunction(){
+        head.exitFunction();
+    }
+
+    @Override
+    public void resetCounter(){
+        head.resetCounter();
+    }
+
+    @Override
+    public void incCounter(){
+        head.incCounter();
+    }
+
+    @Override
+    public int getPC(){
+        return head.getPC();
+    }
+
 }

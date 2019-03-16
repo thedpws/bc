@@ -23,6 +23,7 @@ public class ExpressionBinary implements Expression {
   
     @Override
     public double evaluate(Memory scope) {
+        //System.out.printf("Evaluating binop! %s %s %s!\n", this.leftExpression.evaluate(scope), op, this.rightExpression.evaluate(scope));
         switch(op){
             case "^":
                 return Math.pow(this.leftExpression.evaluate(scope), this.rightExpression.evaluate(scope));

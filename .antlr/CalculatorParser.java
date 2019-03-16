@@ -1,4 +1,4 @@
-// Generated from Calculator.g4 by ANTLR 4.7.2
+// Generated from /Users/joeylu/Documents/VSCode/BC-P2/COP4020-P2/Calculator.g4 by ANTLR 4.7.1
  import java.util.*; 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class CalculatorParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -33,40 +33,30 @@ public class CalculatorParser extends Parser {
 		RULE_operatorAssignment4 = 18, RULE_comparisonOperator = 19, RULE_booleanUnaryOperator = 20, 
 		RULE_booleanBinaryOperator1 = 21, RULE_booleanBinaryOperator2 = 22, RULE_variable = 23, 
 		RULE_fname = 24, RULE_parameters = 25, RULE_defParameters = 26, RULE_delimiter = 27;
-	private static String[] makeRuleNames() {
-		return new String[] {
-			"program", "topStatement", "statement", "expression", "statementList", 
-			"block", "whileLoop", "forLoop", "ifStatement", "defineFunction", "condition", 
-			"unaryOperator", "binaryOperator1", "binaryOperator2", "binaryOperator3", 
-			"operatorAssignment1", "operatorAssignment2", "operatorAssignment3", 
-			"operatorAssignment4", "comparisonOperator", "booleanUnaryOperator", 
-			"booleanBinaryOperator1", "booleanBinaryOperator2", "variable", "fname", 
-			"parameters", "defParameters", "delimiter"
-		};
-	}
-	public static final String[] ruleNames = makeRuleNames();
+	public static final String[] ruleNames = {
+		"program", "topStatement", "statement", "expression", "statementList", 
+		"block", "whileLoop", "forLoop", "ifStatement", "defineFunction", "condition", 
+		"unaryOperator", "binaryOperator1", "binaryOperator2", "binaryOperator3", 
+		"operatorAssignment1", "operatorAssignment2", "operatorAssignment3", "operatorAssignment4", 
+		"comparisonOperator", "booleanUnaryOperator", "booleanBinaryOperator1", 
+		"booleanBinaryOperator2", "variable", "fname", "parameters", "defParameters", 
+		"delimiter"
+	};
 
-	private static String[] makeLiteralNames() {
-		return new String[] {
-			null, "'break'", "'continue'", "'halt'", "'return'", "'('", "')'", "'{'", 
-			"'\n'", "'}'", "'while'", "'for'", "';'", "'if'", "'else'", "'define'", 
-			"'true'", "'false'", "'++'", "'--'", "'-'", "'+'", "'^'", "'*'", "'/'", 
-			"'%'", "'^='", "'*='", "'/='", "'%='", "'+='", "'-='", "'='", "'<'", 
-			"'<='", "'=='", "'!='", "'>='", "'>'", "'!'", "'&&'", "'||'", "','", 
-			null, "'quit'"
-		};
-	}
-	private static final String[] _LITERAL_NAMES = makeLiteralNames();
-	private static String[] makeSymbolicNames() {
-		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, "COMMENT", "QUIT", "ID", "NUM", 
-			"WS", "NEWLINE"
-		};
-	}
-	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
+	private static final String[] _LITERAL_NAMES = {
+		null, "'break'", "'continue'", "'halt'", "'return'", "'('", "')'", "'{'", 
+		"'\n'", "'}'", "'while'", "'for'", "';'", "'if'", "'else'", "'define'", 
+		"'true'", "'false'", "'++'", "'--'", "'-'", "'+'", "'^'", "'*'", "'/'", 
+		"'%'", "'^='", "'*='", "'/='", "'%='", "'+='", "'-='", "'='", "'<'", "'<='", 
+		"'=='", "'!='", "'>='", "'>'", "'!'", "'&&'", "'||'", "','", null, "'quit'"
+	};
+	private static final String[] _SYMBOLIC_NAMES = {
+		null, null, null, null, null, null, null, null, null, null, null, null, 
+		null, null, null, null, null, null, null, null, null, null, null, null, 
+		null, null, null, null, null, null, null, null, null, null, null, null, 
+		null, null, null, null, null, null, null, "COMMENT", "QUIT", "ID", "NUM", 
+		"WS", "NEWLINE"
+	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -117,7 +107,6 @@ public class CalculatorParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
-
 	public static class ProgramContext extends ParserRuleContext {
 		public List<TopStatementContext> topStatement() {
 			return getRuleContexts(TopStatementContext.class);
@@ -129,14 +118,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_program; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterProgram(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitProgram(this);
-		}
 	}
 
 	public final ProgramContext program() throws RecognitionException {
@@ -190,14 +171,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_topStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterTopStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitTopStatement(this);
-		}
 	}
 
 	public final TopStatementContext topStatement() throws RecognitionException {
@@ -267,14 +240,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitStatement(this);
-		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -355,7 +320,7 @@ public class CalculatorParser extends Parser {
 				match(T__3);
 				setState(92);
 				((StatementContext)_localctx).expression = expression(0);
-				 ((StatementContext)_localctx).rval =  new ReturnStatement(((StatementContext)_localctx).expression.rval);
+				 System.out.println(" return babe "); ((StatementContext)_localctx).rval =  new ReturnStatement(((StatementContext)_localctx).expression.rval);
 				}
 				break;
 			case 10:
@@ -448,14 +413,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expression; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterExpression(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitExpression(this);
-		}
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -683,14 +640,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statementList; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterStatementList(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitStatementList(this);
-		}
 	}
 
 	public final StatementListContext statementList() throws RecognitionException {
@@ -730,7 +679,7 @@ public class CalculatorParser extends Parser {
 				}
 				setState(179);
 				((StatementListContext)_localctx).statementList = statementList();
-				((StatementListContext)_localctx).rval =  ((StatementListContext)_localctx).statementList.rval; _localctx.rval.addFirst(((StatementListContext)_localctx).statement.rval);  
+				 System.out.println("b"); ((StatementListContext)_localctx).rval =  ((StatementListContext)_localctx).statementList.rval; _localctx.rval.addFirst(((StatementListContext)_localctx).statement.rval); System.out.println("size: " + _localctx.rval.size()); 
 				}
 				break;
 			case 2:
@@ -758,7 +707,7 @@ public class CalculatorParser extends Parser {
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 				} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
-				 ((StatementListContext)_localctx).rval =  new LinkedList<Statement>(); _localctx.rval.add(((StatementListContext)_localctx).statement.rval);  
+				 ((StatementListContext)_localctx).rval =  new LinkedList<Statement>(); _localctx.rval.add(((StatementListContext)_localctx).statement.rval); System.out.println("size: " + _localctx.rval.size()); 
 				}
 				break;
 			case 3:
@@ -792,14 +741,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_block; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBlock(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBlock(this);
-		}
 	}
 
 	public final BlockContext block() throws RecognitionException {
@@ -880,14 +821,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_whileLoop; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterWhileLoop(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitWhileLoop(this);
-		}
 	}
 
 	public final WhileLoopContext whileLoop() throws RecognitionException {
@@ -994,14 +927,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_forLoop; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterForLoop(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitForLoop(this);
-		}
 	}
 
 	public final ForLoopContext forLoop() throws RecognitionException {
@@ -1071,7 +996,7 @@ public class CalculatorParser extends Parser {
 				}
 				setState(259);
 				((ForLoopContext)_localctx).block = block();
-				 if (((ForLoopContext)_localctx).expr1.rval == null) ((ForLoopContext)_localctx).expr1.rval = new BlankStatement(); if (((ForLoopContext)_localctx).expr2.rval == null) ((ForLoopContext)_localctx).expr2.rval = new ConditionConstant(false); if (((ForLoopContext)_localctx).expr3.rval == null) ((ForLoopContext)_localctx).expr3.rval = new BlankStatement(); ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, ((ForLoopContext)_localctx).block.rval); 
+				 ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, ((ForLoopContext)_localctx).block.rval); 
 				}
 				break;
 			case 2:
@@ -1133,7 +1058,7 @@ public class CalculatorParser extends Parser {
 				}
 				setState(282);
 				((ForLoopContext)_localctx).statement = statement();
-				 if (((ForLoopContext)_localctx).expr1.rval == null) ((ForLoopContext)_localctx).expr1.rval = new BlankStatement();  if (((ForLoopContext)_localctx).expr2.rval == null) ((ForLoopContext)_localctx).expr2.rval = new ConditionConstant(false); if (((ForLoopContext)_localctx).expr3.rval == null) ((ForLoopContext)_localctx).expr3.rval = new BlankStatement(); List<Statement> statements = new LinkedList<>(); statements.add(((ForLoopContext)_localctx).statement.rval); Block block = new Block(statements); ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, block); 
+				 List<Statement> statements = new LinkedList<>(); statements.add(((ForLoopContext)_localctx).statement.rval); Block block = new Block(statements); ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, block); 
 				}
 				break;
 			}
@@ -1173,14 +1098,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ifStatement; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterIfStatement(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitIfStatement(this);
-		}
 	}
 
 	public final IfStatementContext ifStatement() throws RecognitionException {
@@ -1306,14 +1223,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_defineFunction; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterDefineFunction(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitDefineFunction(this);
-		}
 	}
 
 	public final DefineFunctionContext defineFunction() throws RecognitionException {
@@ -1410,14 +1319,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_condition; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterCondition(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitCondition(this);
-		}
 	}
 
 	public final ConditionContext condition() throws RecognitionException {
@@ -1551,14 +1452,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_unaryOperator; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterUnaryOperator(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitUnaryOperator(this);
-		}
 	}
 
 	public final UnaryOperatorContext unaryOperator() throws RecognitionException {
@@ -1596,14 +1489,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_binaryOperator1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBinaryOperator1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBinaryOperator1(this);
-		}
 	}
 
 	public final BinaryOperator1Context binaryOperator1() throws RecognitionException {
@@ -1632,14 +1517,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_binaryOperator2; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBinaryOperator2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBinaryOperator2(this);
-		}
 	}
 
 	public final BinaryOperator2Context binaryOperator2() throws RecognitionException {
@@ -1677,14 +1554,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_binaryOperator3; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBinaryOperator3(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBinaryOperator3(this);
-		}
 	}
 
 	public final BinaryOperator3Context binaryOperator3() throws RecognitionException {
@@ -1722,14 +1591,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_operatorAssignment1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterOperatorAssignment1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitOperatorAssignment1(this);
-		}
 	}
 
 	public final OperatorAssignment1Context operatorAssignment1() throws RecognitionException {
@@ -1758,14 +1619,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_operatorAssignment2; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterOperatorAssignment2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitOperatorAssignment2(this);
-		}
 	}
 
 	public final OperatorAssignment2Context operatorAssignment2() throws RecognitionException {
@@ -1803,14 +1656,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_operatorAssignment3; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterOperatorAssignment3(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitOperatorAssignment3(this);
-		}
 	}
 
 	public final OperatorAssignment3Context operatorAssignment3() throws RecognitionException {
@@ -1848,14 +1693,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_operatorAssignment4; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterOperatorAssignment4(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitOperatorAssignment4(this);
-		}
 	}
 
 	public final OperatorAssignment4Context operatorAssignment4() throws RecognitionException {
@@ -1884,14 +1721,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_comparisonOperator; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterComparisonOperator(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitComparisonOperator(this);
-		}
 	}
 
 	public final ComparisonOperatorContext comparisonOperator() throws RecognitionException {
@@ -1929,14 +1758,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_booleanUnaryOperator; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBooleanUnaryOperator(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBooleanUnaryOperator(this);
-		}
 	}
 
 	public final BooleanUnaryOperatorContext booleanUnaryOperator() throws RecognitionException {
@@ -1965,14 +1786,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_booleanBinaryOperator1; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBooleanBinaryOperator1(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBooleanBinaryOperator1(this);
-		}
 	}
 
 	public final BooleanBinaryOperator1Context booleanBinaryOperator1() throws RecognitionException {
@@ -2001,14 +1814,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_booleanBinaryOperator2; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterBooleanBinaryOperator2(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitBooleanBinaryOperator2(this);
-		}
 	}
 
 	public final BooleanBinaryOperator2Context booleanBinaryOperator2() throws RecognitionException {
@@ -2038,14 +1843,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_variable; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterVariable(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitVariable(this);
-		}
 	}
 
 	public final VariableContext variable() throws RecognitionException {
@@ -2075,14 +1872,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_fname; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterFname(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitFname(this);
-		}
 	}
 
 	public final FnameContext fname() throws RecognitionException {
@@ -2120,14 +1909,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_parameters; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterParameters(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitParameters(this);
-		}
 	}
 
 	public final ParametersContext parameters() throws RecognitionException {
@@ -2184,14 +1965,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_defParameters; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterDefParameters(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitDefParameters(this);
-		}
 	}
 
 	public final DefParametersContext defParameters() throws RecognitionException {
@@ -2239,14 +2012,6 @@ public class CalculatorParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_delimiter; }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).enterDelimiter(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof CalculatorListener ) ((CalculatorListener)listener).exitDelimiter(this);
-		}
 	}
 
 	public final DelimiterContext delimiter() throws RecognitionException {

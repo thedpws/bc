@@ -11,16 +11,21 @@ public class Block implements Statement {
     Statement initial;
 
     public void execute(Memory scope){
-
+        if (this.initial != null) initial.execute(scope);
         // execute the statements
+
         // init pc to 0. 
         // remove pc from stack after block ends
-        if (this.initial != null) initial.execute(scope);
-        for (scope.enterBlock(); scope.getPC() < statements.size(); scope.incCounter()){
+        int depth = scope.enterBlock();
+        for (; scope.getPC() < statements.size(); scope.incCounter()){
+            //System.out.println("Block! PC is " + scope.getPC());
             Statement s = statements.get(scope.getPC());
+            //System.out.printf("Block executing %s\n", s);
+            //s.print();
             s.execute(scope);
         }
-        scope.exitBlock();
+
+        scope.exitBlock(depth);
     }
 
     public void print(){

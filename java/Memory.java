@@ -3,7 +3,6 @@ import java.util.*;
 public class Memory {
     protected Map<String, Object> symbolTable;
     private Map<String, Function> functions;
-    //public Stack<Integer> pc;
     public Stack<ProgramCounter> pc;
     protected double returnVal;
     
@@ -41,25 +40,60 @@ public class Memory {
         returnVal = d;
     }
 
-    //Entering and exiting non-function
-    public void enterBlock(){
-        pc.push(new ProgramCounter(false));
+    public double getRval(){
+        return this.returnVal;
     }
+
+    //Entering and exiting non-function
+    public int enterBlock(){
+        //System.out.println("EnterBlock");
+        pc.push(new ProgramCounter(false));
+        return pc.size();
+    }
+    public void exitBlock(int depth){
+        while (!pc.isEmpty() && pc.size() >= depth) exitBlock();
+    }
+
     public void exitBlock(){
+        //System.out.println("ExitBlock");
         pc.pop();
+    }
+
+    public void terminateBlock(){
+        pc.peek().counter = Integer.MAX_VALUE - 1;
     }
 
     //Entering and exit function
     public void enterFunction(){
+        //System.out.println("EnterFunction");
         pc.push(new ProgramCounter(true));
     }
     public void exitFunction(){
+<<<<<<< HEAD
         while(!pc.pop().isFunction) {}
+=======
+        //System.out.println("ExitFunction");
+        Stack<ProgramCounter> stack = new Stack<>();
+        
+        while (!pc.peek().isFunction) {
+            ProgramCounter p = pc.pop();
+            p.counter = Integer.MAX_VALUE - 2;
+            stack.push(p);
+        }
+        pc.peek().counter = Integer.MAX_VALUE - 2;
+        //the function pc
+        while (!stack.isEmpty()) pc.push(stack.pop());
+        pc.pop();
+        //while(!pc.pop().isFunction) {}
+>>>>>>> d584616051f2aaf5da8a3e1da208e4c6a04b95b2
     }
 
     public void resetCounter(){
+        pc.peek().counter = 0;
+        /*
         pc.pop();
         this.enterBlock();
+        */
     }
 
     public void incCounter(){
