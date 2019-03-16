@@ -23,7 +23,7 @@ public class ExpressionLibCall implements Expression {
     public double evaluate(Memory scope) {
         switch (name){
             case "s": return Math.sin(parameter.evaluate(scope));
-            case "c": return Math.sin(parameter.evaluate(scope));
+            case "c": return Math.cos(parameter.evaluate(scope));
             case "l": return Math.log(parameter.evaluate(scope));
             case "e": return Math.exp(parameter.evaluate(scope));
             case "sqrt": return Math.sqrt(parameter.evaluate(scope));
