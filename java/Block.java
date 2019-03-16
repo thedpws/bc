@@ -20,7 +20,7 @@ public class Block implements Statement {
         // init pc to 0. 
         for (; scope.getPC() < statements.size(); scope.incCounter()){
             Statement s = statements.get(scope.getPC());
-            System.out.printf("\nFrame %d\tInstruction %d\tBlock executing %s\n", scope.pc.size(), scope.getPC(), s);
+            //System.out.printf("Frame %d\tInstruction %d\tBlock executing %s\n", scope.pc.size(), scope.getPC(), s);
             //For loop: don't print when executing the inner statements.
             if (isForLoop() && scope.getPC() == 0){
                 PrintStream stdout = System.out;

@@ -81,4 +81,9 @@ public class FunctionMemory extends Memory {
         return head.getPC();
     }
 
+    @Override
+    public void terminateBlock(){
+        head.terminateBlock();
+    }
+
 }

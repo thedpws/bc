@@ -46,8 +46,8 @@ public class Memory {
 
     //Entering and exiting non-function
     public int enterBlock(){
-        //System.out.println("EnterBlock");
         pc.push(new ProgramCounter(false));
+        //System.out.printf("EnterBlock %d%n", pc.size());
         return pc.size();
     }
     public void exitBlock(int depth){
@@ -55,7 +55,7 @@ public class Memory {
     }
 
     public void exitBlock(){
-        //System.out.println("ExitBlock");
+        //System.out.printf("ExitBlock %d%n", pc.size());
         pc.pop();
     }
 
@@ -65,11 +65,11 @@ public class Memory {
 
     //Entering and exit function
     public void enterFunction(){
-        //System.out.println("EnterFunction");
         pc.push(new ProgramCounter(true));
+        //System.out.printf("EnterFunction %d%n", pc.size());
     }
     public void exitFunction(){
-        //System.out.println("ExitFunction");
+        //System.out.printf("ExitFunction %d%n", pc.size());
         Stack<ProgramCounter> stack = new Stack<>();
         
         while (!pc.peek().isFunction) {
