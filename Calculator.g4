@@ -24,6 +24,7 @@ statement returns [Statement rval]
     | 'return' expression           { $rval = new ReturnStatement($expression.rval);} //#returnExpression
     | 'return'                      { $rval = new ReturnStatement();} //#returnVoid
     // expression statements are printed on execution
+    | condition                     { $rval = $condition.rval; }
     | expression                    { $rval = $expression.rval;}
     ;
 
