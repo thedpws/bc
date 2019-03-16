@@ -6,7 +6,8 @@ public class ContinueStatement implements Statement {
 
     @Override
     public void execute(Memory scope){
-        
+        // Set PC to 0.
+        scope.resetCounter();
     }
 
     @Override

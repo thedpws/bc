@@ -11,7 +11,7 @@ public class ExpressionAssignment implements Expression {
 
     @Override
     public void execute(Memory scope) {
-      
+        System.out.print(this.evaluate(scope));
     }
 
     @Override
@@ -23,29 +23,28 @@ public class ExpressionAssignment implements Expression {
 
     @Override
     public double evaluate(Memory scope){
-        switch(assignOp){
-            case "^=":
-                scope.putSymbol(this.var.toString(), Math.pow(scope.getDouble(this.var.toString()), this.val.evaluate(scope)));
-                break;
-            case "*=":
-                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) * this.val.evaluate(scope));
-                break;
-            case "/=":
-                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) / this.val.evaluate(scope));
-                break;
-            case "+=":
-                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) + this.val.evaluate(scope));
-                break;
-            case "-=":
-                scope.putSymbol(this.var.toString(), scope.getDouble(this.var.toString()) - this.val.evaluate(scope));
-                break;
-            case "=":
-                scope.putSymbol(this.var.toString(), this.val.evaluate(scope));
-                break;
-            default:
-                break;
-
+        if(this.assignOp.equals("^=")){
+            scope.putSymbol(this.var.getId(), Math.pow(scope.getDouble(this.var.getId()), this.val.evaluate(scope)));
         }
-        return scope.getDouble(this.var.toString());
+        else if(this.assignOp.equals("*=")){
+            scope.putSymbol(this.var.getId(), scope.getDouble(this.var.getId()) * this.val.evaluate(scope));
+        }
+        else if(this.assignOp.equals("/=")){
+            scope.putSymbol(this.var.getId(), scope.getDouble(this.var.getId()) / this.val.evaluate(scope));
+        }
+        else if(this.assignOp.equals("%=")){
+            scope.putSymbol(this.var.getId(), scope.getDouble(this.var.getId()) % this.val.evaluate(scope));
+        }
+        else if(this.assignOp.equals("+=")){
+            scope.putSymbol(this.var.getId(), scope.getDouble(this.var.getId()) + this.val.evaluate(scope));
+        }
+        else if(this.assignOp.equals("-=")){
+            scope.putSymbol(this.var.getId(), scope.getDouble(this.var.getId()) - this.val.evaluate(scope));
+        }
+        else if(this.assignOp.equals("=")){
+            scope.putSymbol(this.var.getId(), this.val.evaluate(scope));
+        }
+
+        return scope.getDouble(this.var.getId());
     }
   }

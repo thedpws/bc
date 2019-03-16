@@ -23,10 +23,10 @@ public class ConditionBinary implements Condition {
 
     @Override
     public boolean evaluate(Memory scope){
-       if(binaryOp == "&&"){
+       if(binaryOp.equals("&&")){
           return (this.leftCondition.evaluate(scope) && this.rightCondition.evaluate(scope)) ? true : false;
        }
-       else if(binaryOp == "||"){
+       else if(binaryOp.equals("||")){
           return (this.leftCondition.evaluate(scope) || this.rightCondition.evaluate(scope)) ? true : false;
        }
        return false;          //Shouldn't be reached

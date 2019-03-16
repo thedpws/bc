@@ -19,4 +19,7 @@ public class ExpressionVariable implements Expression {
     public double evaluate(Memory scope){
       return scope.getDouble(varId);
     }
+    public String getId(){
+      return this.varId;
+    }
 }

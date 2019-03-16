@@ -1,0 +1,14 @@
+/* random stuff */
+
+i = sqrt(5)
+i               /* √5 */
+j += sqrt(i)
+j               /* √√5 */
+j^2             /* √5 */
+i^2             /* 5 */
+
+myvariable = 10
+myvariable      /* 10 */
+myvariable -= 1
+myvariable      /* 9 */
+quit

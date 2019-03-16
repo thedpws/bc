@@ -12,7 +12,7 @@ public class ExpressionVariableUnary implements Expression {
 
     @Override
     public void execute(Memory scope){
-        System.out.println(this.var.evaluate(scope));                   //May need to fix later
+        System.out.println(this.evaluate(scope));    
     }
   
     @Override
@@ -21,7 +21,7 @@ public class ExpressionVariableUnary implements Expression {
           this.var.print();
           System.out.print(this.postUnaryOp);
         }
-        else if(preUnaryOp != null && !postUnaryOp.isEmpty()){
+        else if(preUnaryOp != null && !preUnaryOp.isEmpty()){
           System.out.print(this.preUnaryOp);
           this.var.print();
         }
@@ -31,27 +31,26 @@ public class ExpressionVariableUnary implements Expression {
     public double evaluate(Memory scope){
       if(preUnaryOp != null && !preUnaryOp.isEmpty()){
           // ++i
-          if(preUnaryOp == "++"){
-            scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) + 1);
-            return scope.getDouble(var.toString());
+          if(preUnaryOp.equals("++")){
+            scope.putSymbol(this.var.getId(), (scope.getDouble(this.var.getId()) + 1));
+            return scope.getDouble(this.var.getId());
           }
           // --i
-          else if(preUnaryOp == "--"){
-            scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) - 1);
-            return scope.getDouble(var.toString());
+          else if(preUnaryOp.equals("--")){
+            scope.putSymbol(this.var.getId(), (scope.getDouble(this.var.getId()) - 1));
+            return scope.getDouble(this.var.getId());
           }
       }
-
       else if(postUnaryOp != null && !postUnaryOp.isEmpty()){
         // i++
-        if(postUnaryOp == "++"){
-          scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) + 1);
-          return scope.getDouble(var.toString()) - 1;
+        if(postUnaryOp.equals("++")){
+          scope.putSymbol(this.var.getId(), (scope.getDouble(this.var.getId()) + 1));
+          return scope.getDouble(var.getId()) - 1;
         }
         // i--
-        else if(postUnaryOp == "--"){
-          scope.putSymbol(this.var.toString(), scope.getDouble(var.toString()) - 1);
-          return scope.getDouble(var.toString()) + 1;
+        else if(postUnaryOp.equals("--")){
+          scope.putSymbol(this.var.getId(), (scope.getDouble(this.var.getId()) - 1));
+          return scope.getDouble(this.var.getId()) + 1;
         }
       }
       return 0;

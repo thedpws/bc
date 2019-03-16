@@ -19,7 +19,7 @@ public class ConditionUnary implements Condition{
 
   @Override
   public boolean evaluate(Memory scope){
-      if(this.unaryOp == "!"){
+      if(this.unaryOp.equals("!")){
           return !(this.condition.evaluate(scope));
       }
       else{

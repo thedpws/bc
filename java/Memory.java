@@ -53,7 +53,7 @@ public class Memory {
     public void enterFunction(){
         pc.push(new ProgramCounter(true));
     }
-    public void terminateRoutine(){
+    public void exitFunction(){
         while(!pc.pop().isFunction) {}
     }
 

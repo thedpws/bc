@@ -54,6 +54,7 @@ statementList
 statementList  
     : (statement delimiter+) statementList {}
     | statement delimiter+              {}
+    | ()                                {}
     ;
 
 block  
@@ -61,11 +62,13 @@ block
     ;
 
 whileLoop  
-    : 'while' '(' condition ')' '\n'* statement   {}
+    : 'while' '(' condition ')' '\n'* block   {}
+    | 'while' '(' condition ')' '\n'* statement {}
     ;
 
 forLoop  
-    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    {}
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  block    {}
+    | 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    {}
     ;
 
 ifStatement  
