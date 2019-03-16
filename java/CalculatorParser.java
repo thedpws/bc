@@ -355,7 +355,7 @@ public class CalculatorParser extends Parser {
 				match(T__3);
 				setState(92);
 				((StatementContext)_localctx).expression = expression(0);
-				 System.out.println(" return babe "); ((StatementContext)_localctx).rval =  new ReturnStatement(((StatementContext)_localctx).expression.rval);
+				 ((StatementContext)_localctx).rval =  new ReturnStatement(((StatementContext)_localctx).expression.rval);
 				}
 				break;
 			case 10:
@@ -730,7 +730,7 @@ public class CalculatorParser extends Parser {
 				}
 				setState(179);
 				((StatementListContext)_localctx).statementList = statementList();
-				 System.out.println("b"); ((StatementListContext)_localctx).rval =  ((StatementListContext)_localctx).statementList.rval; _localctx.rval.addFirst(((StatementListContext)_localctx).statement.rval); System.out.println("size: " + _localctx.rval.size()); 
+				((StatementListContext)_localctx).rval =  ((StatementListContext)_localctx).statementList.rval; _localctx.rval.addFirst(((StatementListContext)_localctx).statement.rval);  
 				}
 				break;
 			case 2:
@@ -758,7 +758,7 @@ public class CalculatorParser extends Parser {
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 				} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
-				 ((StatementListContext)_localctx).rval =  new LinkedList<Statement>(); _localctx.rval.add(((StatementListContext)_localctx).statement.rval); System.out.println("size: " + _localctx.rval.size()); 
+				 ((StatementListContext)_localctx).rval =  new LinkedList<Statement>(); _localctx.rval.add(((StatementListContext)_localctx).statement.rval);  
 				}
 				break;
 			case 3:
@@ -1071,7 +1071,7 @@ public class CalculatorParser extends Parser {
 				}
 				setState(259);
 				((ForLoopContext)_localctx).block = block();
-				 ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, ((ForLoopContext)_localctx).block.rval); 
+				 if (((ForLoopContext)_localctx).expr1.rval == null) ((ForLoopContext)_localctx).expr1.rval = new BlankStatement(); if (((ForLoopContext)_localctx).expr2.rval == null) ((ForLoopContext)_localctx).expr2.rval = new ConditionConstant(false); if (((ForLoopContext)_localctx).expr3.rval == null) ((ForLoopContext)_localctx).expr3.rval = new BlankStatement(); ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, ((ForLoopContext)_localctx).block.rval); 
 				}
 				break;
 			case 2:
@@ -1133,7 +1133,7 @@ public class CalculatorParser extends Parser {
 				}
 				setState(282);
 				((ForLoopContext)_localctx).statement = statement();
-				 List<Statement> statements = new LinkedList<>(); statements.add(((ForLoopContext)_localctx).statement.rval); Block block = new Block(statements); ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, block); 
+				 if (((ForLoopContext)_localctx).expr1.rval == null) ((ForLoopContext)_localctx).expr1.rval = new BlankStatement();  if (((ForLoopContext)_localctx).expr2.rval == null) ((ForLoopContext)_localctx).expr2.rval = new ConditionConstant(false); if (((ForLoopContext)_localctx).expr3.rval == null) ((ForLoopContext)_localctx).expr3.rval = new BlankStatement(); List<Statement> statements = new LinkedList<>(); statements.add(((ForLoopContext)_localctx).statement.rval); Block block = new Block(statements); ((ForLoopContext)_localctx).rval =  new ForLoop(((ForLoopContext)_localctx).expr1.rval, ((ForLoopContext)_localctx).expr2.rval, ((ForLoopContext)_localctx).expr3.rval, block); 
 				}
 				break;
 			}

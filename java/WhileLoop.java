@@ -4,7 +4,8 @@ public class WhileLoop implements Statement{
     WhileLoop(Condition c, Block b){
         this.condition = c.toString();
         this.block = b.toString();
-        this.b = b.toWhile(c);
+        this.b = b;
+        this.b.toWhile(c);
     }
     public void execute(Memory scope){
         b.execute(scope);

@@ -21,7 +21,7 @@ statement returns [Statement rval]
     | 'break'                       { $rval = new BreakStatement();} //#break
     | 'continue'                    { $rval = new ContinueStatement(); } //#continue
     | 'halt'                        { $rval = new HaltStatement(); } //#halt
-    | 'return' expression           { System.out.println(" return babe "); $rval = new ReturnStatement($expression.rval);} //#returnExpression
+    | 'return' expression           { $rval = new ReturnStatement($expression.rval);} //#returnExpression
     | 'return'                      { $rval = new ReturnStatement();} //#returnVoid
     // expression statements are printed on execution
     | expression                    { $rval = $expression.rval;}
@@ -52,8 +52,8 @@ statementList returns [List<Statement> rval]
     ;
     */
 statementList returns [LinkedList<Statement> rval]
-    : (statement delimiter+) statementList { System.out.println("b"); $rval = $statementList.rval; $rval.addFirst($statement.rval); System.out.println("size: " + $rval.size()); }
-    | statement delimiter+              { $rval = new LinkedList<Statement>(); $rval.add($statement.rval); System.out.println("size: " + $rval.size()); }
+    : (statement delimiter+) statementList {$rval = $statementList.rval; $rval.addFirst($statement.rval);  }
+    | statement delimiter+              { $rval = new LinkedList<Statement>(); $rval.add($statement.rval);  }
     | ()                                { $rval = new LinkedList<Statement>(); }
     ;
 
@@ -67,8 +67,8 @@ whileLoop returns [WhileLoop rval]
     ;
 
 forLoop returns [ForLoop rval]
-    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  block    { $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, $block.rval); }
-    | 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    { List<Statement> statements = new LinkedList<>(); statements.add($statement.rval); Block block = new Block(statements); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, block); }
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  block    { if ($expr1.rval == null) $expr1.rval = new BlankStatement(); if ($expr2.rval == null) $expr2.rval = new ConditionConstant(false); if ($expr3.rval == null) $expr3.rval = new BlankStatement(); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, $block.rval); }
+    | 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    { if ($expr1.rval == null) $expr1.rval = new BlankStatement();  if ($expr2.rval == null) $expr2.rval = new ConditionConstant(false); if ($expr3.rval == null) $expr3.rval = new BlankStatement(); List<Statement> statements = new LinkedList<>(); statements.add($statement.rval); Block block = new Block(statements); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, block); }
     ;
 
 ifStatement returns [IfStatement rval]

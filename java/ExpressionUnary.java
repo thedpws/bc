@@ -21,7 +21,7 @@ public class ExpressionUnary implements Expression {
   @Override
   public double evaluate(Memory scope){
     if(this.unaryOp == "-"){
-      return (-1 * scope.getDouble(val.toString()));
+      return (-1 * this.val.evaluate(scope));
     }
     return 0;
   }

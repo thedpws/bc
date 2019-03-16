@@ -11,7 +11,7 @@ public class ExpressionAssignment implements Expression {
 
     @Override
     public void execute(Memory scope) {
-      
+        System.out.print(this.evaluate(scope));
     }
 
     @Override

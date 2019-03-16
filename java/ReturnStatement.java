@@ -10,13 +10,15 @@ public class ReturnStatement implements Statement {
     @Override
     public void execute(Memory scope){
         scope.setRval(rval.evaluate(scope));
-        // exit the function
+        //System.out.println("\t\tSetting Rval to " + rval.evaluate(scope));
+        //System.out.println("\t\tExpression was");
+        rval.print();
         scope.exitFunction();
     }
 
     @Override
     public void print(){
-        System.out.println("Return.");
+        System.out.print("Return.");
         rval.print();
     }
 	public Expression getExpression() {
