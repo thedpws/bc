@@ -7,14 +7,14 @@ type map = pair list
 (* string -> map -> float *)
 let rec get key map = 
     match map with
-        | Pair(k, v)::tail -> if key = k then v else get key tail
+        | KVPair(k, v)::tail -> if key = k then v else get key tail
         | [] -> 0.0
 
 (* string -> float -> map -> map *)
 let rec put key value map = 
     match map with
-        | Pair(k, v)::tail -> if (key = k) then Pair(key, value)::tail else Pair(k, v) :: (put key value tail)
-        | [] -> [Pair(key, value)]
+        | KVPair(k, v)::tail -> if (key = k) then KVPair(key, value)::tail else KVPair(k, v) :: (put key value tail)
+        | [] -> [KVPair(key, value)]
 
 (* ------Test Map ------*)
 let mymap = []
