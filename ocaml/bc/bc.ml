@@ -85,37 +85,44 @@ type env = map
 type envList = env list
 
 (* Gets symbol from stack of environments *)
-let rec getSymbol (k:string) (q:envList): float =
+let rec getSymbolGlobal (key: string) (q:envList): float =
     match q with
-        | qq::qs -> if has k qq then get k qq else getSymbol k qs
-        | [] -> 0.0
+    | env::[] -> get key env
+    | env::envs -> getSymbolGlobal key envs
+    | [] -> 0.0
+
+let getSymbol (key:string) (q:envList): float =
+    match q with
+    | qq::qs -> if has key qq then get key qq else getSymbolGlobal key q
+    | [] -> 0.0
 
 
 (* Notes about environments... *)
 (* new environments are created only on function enter *)
 (* 1 global scope. Other scopes are function scopes *)
 (* lookup symbol -> check local scope *)
-(* not in local scope -> check next scope *)
+(* not in local scope -> fetch from global scope *)
 (* not in global scope -> 0 *)
 
 (* A note about parameters: they are put into the new scope. This allows recursion. New scope may still access variables of older scopes (but not with same name as parameters) *)
 
-let rec hasSymbol (key:string) (q:envList): bool =
-    match q with
-    | qq::qs -> has key qq || hasSymbol key qs
-    | [] -> false
 
-(* Putting a symbol -> replace in containing scope. else put in topmost scope *)
-let rec putSymbol (key:string) (value: float) (q:envList): envList = 
+(* Putting a symbol -> replace in current scope (params). else put in global scope*)
+let rec putSymbolGlobal (key:string) (value:float) (q:envList): envList =
+    match q with
+    | env::[] -> [put key value env]
+    | env::envs -> env::(putSymbolGlobal key value envs)
+    | [] -> [put key value []]
+
+
+let putSymbol (key:string) (value: float) (q:envList): envList = 
     match q with
     | qq::qs -> 
-        (* In current enviro -> replace here *)
+        (* In current enviro (param) -> replace here *)
         if has key qq then (put key value qq)::qs
-        (* In tail -> replace in tail *)
-        else if hasSymbol key qs then qq::(putSymbol key value qs)
-        (* -> add to current enviro *)
-        else (put key value qq)::qs
-    | [] -> [[KVPair(key, value)]]
+        (* -> add to global enviro *)
+        else putSymbolGlobal key value q
+    | [] -> [put key value []]
 
 let pushEnvironment (q:envList): envList = []::q
 let popEnvironment (q:envList): envList = 
@@ -123,7 +130,7 @@ let popEnvironment (q:envList): envList =
     | qq::qs -> qs
     | [] -> print_endline "EMPTY STACK ERROR!"; exit 1
 
-(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.
+(* Testing the Logic of environment: passing. TODO: turn into dune tests. 
 (* print functions *)
 let print_kvpair kv =
     match kv with
@@ -139,36 +146,47 @@ let rec print_envlist q =
     | [] -> print_endline ""
 (* end print functions *)
 let myEnvironments = []
-(* put creates new enviro *)
+(* GET0: Get gets from local environment. Else from global*)
+(* [(i, 0)] ; [(i, 1)] ; [(i, 2)] *) (* Expected: 0 *)
+let myEnvironments = [[KVPair("i", 0.0)] ; [KVPair("i", 1.0)] ; [KVPair("i", 2.0)] ]
+let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline
+(* GET1: Get gets from global when not in local*)
+(* [] ; [(i, 1)] ; [(i, 2)] *) (* Expected: 2 *)
+let myEnvironments = [[] ; [KVPair("i", 1.0)] ; [KVPair("i", 2.0)] ]
+let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline
+(* GET2: Not in local or global, get -> 0.0 *)
+(* [ [] ; [(i,1)] ; [] ] *) (* Expected: 0.0 *)
+let myEnvironments = [ [] ; [KVPair("i", 1.0)] ; [] ]
+let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline
+(* GET3: Handles empty environment list *)
+(* [] *) (* Expected 0.0 *)
+let _ = getSymbol "i" [] |> string_of_float |> print_endline
+
+(* PUT0: put creates new enviro *)
+(* [] *) (* Expected: [ [(i, 0.0)] ] *)
+let myEnvironments = []
 let myEnvironments = putSymbol "i" 0.0 myEnvironments
-let test e = print_envlist e
-let _ = test myEnvironments
-(* put replaces in current enviro *)
+let _ = print_envlist myEnvironments
+
+(* PUT_LOCAL: Put replaces if in local scope *)
+(* [ [(i,0)] [(i,0)] ] *) (* Expected [ [(i,1)] [(i,0)] ] *)
+let myEnvironments = [ [KVPair("i", 0.0)] ; [KVPair("i", 0.0)] ]
 let myEnvironments = putSymbol "i" 1.0 myEnvironments
-let _ = test myEnvironments
-(* Push new enviro *)
-let myEnvironments = pushEnvironment myEnvironments
-let _ = test myEnvironments
-(* put replaces existent vars in lower scopes *)
-let myEnvironments = putSymbol "i" 2.0 myEnvironments
-let _ = test myEnvironments
-(* put puts nonexistent vars in topmost scope *)
-let myEnvironments = putSymbol "j" 0.0 myEnvironments
-let _ = test myEnvironments
-(* get gets first occurrence of var *)
-let myEnvironments = [KVPair("i", 1.0)]::myEnvironments
-let _ = test myEnvironments
-let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline(* 1.0 *)
-(* put replaces first occurrence of var *)
+let _ = print_envlist myEnvironments
+
+(* PUT_GLOBAL1: Put places in global if not in local scope *)
+(* [ [] [] [] ] *) (* Expected [ [] [] [(i,0)] ] *)
+let myEnvironments = [ [] ; [] ; [] ]
 let myEnvironments = putSymbol "i" 0.0 myEnvironments
-let _ = test myEnvironments
-(* put puts in topmost enviro *)
-let myEnvironments = putSymbol "k" 0.0 myEnvironments
-let _ = test myEnvironments
-(* pop pops topmost enviro *)
-let myEnvironments = popEnvironment myEnvironments
-let _ = test myEnvironments
+let _ = print_envlist myEnvironments
+
+(* PUT_GLOBAL2 Put replaces in global if not in local scope *)
+(* [ [] [] [(i,0)] ] *) (* Expected [ [] [] [(i,1)] ] *)
+let myEnvironments = [ [] ; [] ; [KVPair("i", 0.0)] ]
+let myEnvironments = putSymbol "i" 1.0 myEnvironments
+let _ = print_envlist myEnvironments
 *)
+
 
 (* Notes for functions: a function has a list of statements *)
 type fn = string * string list * statement list
