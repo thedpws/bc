@@ -20,7 +20,7 @@ let rec has key map: bool =
         | KVPair(k, v)::tail -> key = k || has key tail
         | [] -> false
 
-(* ------Test Map ------
+(* ------Test Map -------
 let mymap = []
 let main _ = get "pi" mymap |> string_of_float |> print_endline
 let _ = main() (* 0.0 *)
