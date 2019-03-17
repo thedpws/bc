@@ -1,8 +1,7 @@
 open Core
 
-let environment = [];
-type pair = Pair of string * float
-type map = pair list
+type kvpair = KVPair of string * float
+type map = kvpair list
 
 (* string -> map -> float *)
 let rec get key map = 
@@ -15,6 +14,11 @@ let rec put key value map =
     match map with
         | KVPair(k, v)::tail -> if (key = k) then KVPair(key, value)::tail else KVPair(k, v) :: (put key value tail)
         | [] -> [KVPair(key, value)]
+
+let rec has key map: bool = 
+    match map with
+        | KVPair(k, v)::tail -> key = k || has key tail
+        | [] -> false
 
 (* ------Test Map ------*)
 let mymap = []
@@ -75,11 +79,16 @@ type program =
     | None
 
 
-type env = N of float (* complete *)
+type env = map
 
 (* https://ocaml.org/learn/tutorials/map.html *)
 type envList = env list
 
+(*
+let getSymbol (k:string) (q:envList): float =
+    match q with
+        | qq::qs -> (* check the first env for the symbol *)
+                *)
 
 
 
