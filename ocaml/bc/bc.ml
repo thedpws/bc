@@ -1,35 +1,48 @@
 open Core
 
-let environment = [];
-type pair = Pair of string * float
-type map = pair list
+type kvpair = KVPair of string * float
+type map = kvpair list
 
 (* string -> map -> float *)
 let rec get key map = 
     match map with
-        | Pair(k, v)::tail -> if key = k then v else get key tail
+        | KVPair(k, v)::tail -> if key = k then v else get key tail
         | [] -> 0.0
 
 (* string -> float -> map -> map *)
 let rec put key value map = 
     match map with
-        | Pair(k, v)::tail -> if (key = k) then Pair(key, value)::tail else Pair(k, v) :: (put key value tail)
-        | [] -> [Pair(key, value)]
+        | KVPair(k, v)::tail -> if (key = k) then KVPair(key, value)::tail else KVPair(k, v) :: (put key value tail)
+        | [] -> [KVPair(key, value)]
 
-(* ------Test Map ------*)
+let rec has key map: bool = 
+    match map with
+        | KVPair(k, v)::tail -> key = k || has key tail
+        | [] -> false
+
+(* ------Test Map ------
 let mymap = []
 let main _ = get "pi" mymap |> string_of_float |> print_endline
 let _ = main() (* 0.0 *)
 
+(* put *)
 let mymap = put "pi" 3.14 mymap
 
+(* get *)
 let main _ = get "pi" mymap |> string_of_float |> print_endline
 let _ = main() (* 3.14 *)
 
+(* get nonexistent -> 0 *)
 let main _ = get "pip" mymap |> string_of_float |> print_endline
 let _ = main() (* 0.0 *)
 
-(* ------End Test Map ------*)
+(* overwrite previous value *)
+let mymap = put "pi" 6.28 mymap
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 6.28 *)
+
+
+------End Test Map ------*)
 
 type expression = 
     | AssignmentExpression of string * string * expression
@@ -66,12 +79,99 @@ type program =
     | None
 
 
-type env = N of float (* complete *)
+type env = map
 
 (* https://ocaml.org/learn/tutorials/map.html *)
 type envList = env list
 
+(* Gets symbol from stack of environments *)
+let rec getSymbol (k:string) (q:envList): float =
+    match q with
+        | qq::qs -> if has k qq then get k qq else getSymbol k qs
+        | [] -> 0.0
 
+
+(* Notes about environments... *)
+(* new environments are created only on function enter *)
+(* 1 global scope. Other scopes are function scopes *)
+(* lookup symbol -> check local scope *)
+(* not in local scope -> check next scope *)
+(* not in global scope -> 0 *)
+
+(* A note about parameters: they are put into the new scope. This allows recursion. New scope may still access variables of older scopes (but not with same name as parameters) *)
+
+let rec hasSymbol (key:string) (q:envList): bool =
+    match q with
+    | qq::qs -> has key qq || hasSymbol key qs
+    | [] -> false
+
+(* Putting a symbol -> replace in containing scope. else put in topmost scope *)
+let rec putSymbol (key:string) (value: float) (q:envList): envList = 
+    match q with
+    | qq::qs -> 
+        (* In current enviro -> replace here *)
+        if has key qq then (put key value qq)::qs
+        (* In tail -> replace in tail *)
+        else if hasSymbol key qs then qq::(putSymbol key value qs)
+        (* -> add to current enviro *)
+        else (put key value qq)::qs
+    | [] -> [[KVPair(key, value)]]
+
+let pushEnvironment (q:envList): envList = []::q
+let popEnvironment (q:envList): envList = 
+    match q with 
+    | qq::qs -> qs
+    | [] -> print_endline "EMPTY STACK ERROR!"; exit 1
+
+(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.
+(* print functions *)
+let print_kvpair kv =
+    match kv with
+    | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
+    | _ -> ()
+let rec print_env e =
+    match e with
+    | kv::kvs -> print_kvpair kv; print_env kvs
+    | [] -> ()
+let rec print_envlist q =
+    match q with
+    | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
+    | [] -> print_endline ""
+(* end print functions *)
+let myEnvironments = []
+(* put creates new enviro *)
+let myEnvironments = putSymbol "i" 0.0 myEnvironments
+let test e = print_envlist e
+let _ = test myEnvironments
+(* put replaces in current enviro *)
+let myEnvironments = putSymbol "i" 1.0 myEnvironments
+let _ = test myEnvironments
+(* Push new enviro *)
+let myEnvironments = pushEnvironment myEnvironments
+let _ = test myEnvironments
+(* put replaces existent vars in lower scopes *)
+let myEnvironments = putSymbol "i" 2.0 myEnvironments
+let _ = test myEnvironments
+(* put puts nonexistent vars in topmost scope *)
+let myEnvironments = putSymbol "j" 0.0 myEnvironments
+let _ = test myEnvironments
+(* get gets first occurrence of var *)
+let myEnvironments = [KVPair("i", 1.0)]::myEnvironments
+let _ = test myEnvironments
+let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline(* 1.0 *)
+(* put replaces first occurrence of var *)
+let myEnvironments = putSymbol "i" 0.0 myEnvironments
+let _ = test myEnvironments
+(* put puts in topmost enviro *)
+let myEnvironments = putSymbol "k" 0.0 myEnvironments
+let _ = test myEnvironments
+(* pop pops topmost enviro *)
+let myEnvironments = popEnvironment myEnvironments
+let _ = test myEnvironments
+*)
+
+(* Notes for functions: a function has a list of statements *)
+type fn = string * string list * statement list
 
 
 let evalCode (_code: statement) (_q:envList): unit = 
