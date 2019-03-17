@@ -1,0 +1,2 @@
+(** @canonical Bc.Bc2 *)
+module Bc2 = Bc__Bc2
