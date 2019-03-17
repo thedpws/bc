@@ -180,9 +180,9 @@ let evalCode (_code: statement) (_q:envList): unit =
     (* pop the local environment *)
     print_endline "Not implemented"
 
-let rec evaluateExpression (e: expression) (q:env list) (m: pair list): float =
+let rec evaluateExpression (e: expression) (q:env list) (m: map): float =
     match e with
-        | AssignmentExpression(var, op, expr) -> (* STILL NEED TO FIX *)
+        | AssignmentExpression(var, op, expr) ->
             (
                 match op with
                 | "^=" -> 
@@ -225,7 +225,7 @@ let rec evaluateExpression (e: expression) (q:env list) (m: pair list): float =
             )
         | FnCallExpression(fn, params)  -> 0.0
         | ConstantExpression(flt) -> flt
-        | PostUnaryExpression(var, unaryOp) -> (* STILL NEED TO FIX*)
+        | PostUnaryExpression(var, unaryOp) ->
             (
                 match unaryOp with
                 | "++" -> 
@@ -238,7 +238,7 @@ let rec evaluateExpression (e: expression) (q:env list) (m: pair list): float =
                     get var m +. 1.0
                 | _ -> get var m
             )
-        | PreUnaryExpression(unaryOp, var) -> (* STILL NEED TO FIX*)
+        | PreUnaryExpression(unaryOp, var) -> 
             (
                 match unaryOp with 
                 | "++" ->
@@ -254,7 +254,7 @@ let rec evaluateExpression (e: expression) (q:env list) (m: pair list): float =
         | VariableExpression(var) -> get var m
         | _ -> 0.0
 
-let rec evaluateCondition (c: condition) (q:env list) (m: pair list): bool = 
+let rec evaluateCondition (c: condition) (q:env list) (m: map): bool = 
     match c with
         | BinaryCondition(cond1, op, cond2) -> 
             (
@@ -288,7 +288,7 @@ let continue q = q
     [%expect {| 10. |}] *)
 
 (* maybe q can hold information on whether a block / function need stop execution *)
-let rec execute (s::ss: statement list) (q:env list) (m: pair list): env list =
+let rec execute (s::ss: statement list) (q:env list) (m: map): env list =
     match s with
         | Blank     ->  execute ss q m
         | Block(b)  ->  execute ss q m
