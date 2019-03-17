@@ -19,6 +19,7 @@ type condition =
     | ComparisonCondition of expression * string * expression
     | ConstantCondition of bool
     | UnaryCondition of string * condition
+    | VariableCondition of string
 
 type statement = 
     | Blank
@@ -61,13 +62,53 @@ let evalCode (_code: statement) (_q:envList): unit =
 
 let rec evaluateExpression (e: expression) (q:env list): float =
     match e with
-        | AssignmentExpression(var, op, expr) -> 0.0
-        | BinaryExpression(expr1, op, expr2) -> 0.0
+        | AssignmentExpression(var, op, expr) -> (* STILL NEED TO FIX *)
+            match op with
+                | "^=" -> (evaluateExpression var q)
+                | "*=" -> (evaluateExpression var q)
+                | "/=" -> (evaluateExpression var q)
+                | "%=" -> (evaluateExpression var q)
+                | "+=" -> (evaluateExpression var q)
+                | "-=" -> (evaluateExpression var q)
+        | BinaryExpression(expr1, op, expr2) -> 
+            match op with
+                | "^" -> ((evaluateExpression expr1 q) ** (evaluateExpression expr2 q))
+                | "*" -> ((evaluateExpression expr1 q) *. (evaluateExpression expr2 q))
+                | "/" -> ((evaluateExpression expr1 q) /. (evaluateExpression expr2 q))
+                | "%" -> ((evaluateExpression expr1 q) mod (evaluateExpression expr2 q))
+                | "+" -> ((evaluateExpression expr1 q) +. (evaluateExpression expr2 q))
+                | "-" -> ((evaluateExpression expr1 q) -. (evaluateExpression expr2 q))
         | FnCallExpression(fn, params) -> 0.0
+        | ConstantExpression(flt) -> flt
+        | PostUnaryExpression(expr, unaryOp) -> (* STILL NEED TO FIX*)
+            match unaryOp with
+                | "++" -> (evaluateExpression expr q) +. 1.0
+                | "--" -> (evaluateExpression expr q) -. 1.0
+        | PreUnaryExpression(unaryOp, expr) -> (* STILL NEED TO FIX*)
+            match unaryOp with 
+                | "++" -> (evaluateExpression expr q) +. 1.0
+                | "--" -> (evaluateExpression expr q) -. 1.0
+        | VariableExpression(var) -> 0.0(* Lookup variable and return *)
         | _ -> 0.0
 
 let rec evaluateCondition (c: condition) (q:env list): bool = 
     match c with
+        | BinaryCondition(cond1, binaryOp, cond2) -> 
+            match str with
+                | "&&" -> ((evaluateCondition cond1 q) && (evaluateCondition cond2))
+                | "||" -> ((evaluateCondition cond1 q) || (evaluateCondition cond2))
+                | _ -> true
+        | ComparisonCondition(expr1, comparisonOp, expr2) -> 
+            match comparisonOp with
+                | "==" -> ((evaluateCondition cond1 q) == (evaluateCondition cond2))
+                | ">" -> ((evaluateCondition cond1 q) > (evaluateCondition cond2))
+                | "<" -> ((evaluateCondition cond1 q) < (evaluateCondition cond2))
+                | ">=" -> ((evaluateCondition cond1 q) >= (evaluateCondition cond2))
+                | "<=" -> ((evaluateCondition cond1 q) <= (evaluateCondition cond2))
+                | "!=" -> ((evaluateCondition cond1 q) != (evaluateCondition cond2))
+                | _ -> true
+        | ConstantCondition(boolean) -> boolean
+        | UnaryCondition(unaryOp, cond) -> (!(evaluateCondition cond q))
         | _ -> true
 
 let continue q = q;
