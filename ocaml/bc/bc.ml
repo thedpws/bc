@@ -85,44 +85,37 @@ type env = map
 type envList = env list
 
 (* Gets symbol from stack of environments *)
-let rec getSymbolGlobal (key: string) (q:envList): float =
+let rec getSymbol (k:string) (q:envList): float =
     match q with
-    | env::[] -> get key env
-    | env::envs -> getSymbolGlobal key envs
-    | [] -> 0.0
-
-let getSymbol (key:string) (q:envList): float =
-    match q with
-    | qq::qs -> if has key qq then get key qq else getSymbolGlobal key q
-    | [] -> 0.0
+        | qq::qs -> if has k qq then get k qq else getSymbol k qs
+        | [] -> 0.0
 
 
 (* Notes about environments... *)
 (* new environments are created only on function enter *)
 (* 1 global scope. Other scopes are function scopes *)
 (* lookup symbol -> check local scope *)
-(* not in local scope -> fetch from global scope *)
+(* not in local scope -> check next scope *)
 (* not in global scope -> 0 *)
 
 (* A note about parameters: they are put into the new scope. This allows recursion. New scope may still access variables of older scopes (but not with same name as parameters) *)
 
-
-(* Putting a symbol -> replace in current scope (params). else put in global scope*)
-let rec putSymbolGlobal (key:string) (value:float) (q:envList): envList =
+let rec hasSymbol (key:string) (q:envList): bool =
     match q with
-    | env::[] -> [put key value env]
-    | env::envs -> env::(putSymbolGlobal key value envs)
-    | [] -> [put key value []]
+    | qq::qs -> has key qq || hasSymbol key qs
+    | [] -> false
 
-
-let putSymbol (key:string) (value: float) (q:envList): envList = 
+(* Putting a symbol -> replace in containing scope. else put in topmost scope *)
+let rec putSymbol (key:string) (value: float) (q:envList): envList = 
     match q with
     | qq::qs -> 
-        (* In current enviro (param) -> replace here *)
+        (* In current enviro -> replace here *)
         if has key qq then (put key value qq)::qs
-        (* -> add to global enviro *)
-        else putSymbolGlobal key value q
-    | [] -> [put key value []]
+        (* In tail -> replace in tail *)
+        else if hasSymbol key qs then qq::(putSymbol key value qs)
+        (* -> add to current enviro *)
+        else (put key value qq)::qs
+    | [] -> [[KVPair(key, value)]]
 
 let pushEnvironment (q:envList): envList = []::q
 let popEnvironment (q:envList): envList = 
@@ -130,7 +123,7 @@ let popEnvironment (q:envList): envList =
     | qq::qs -> qs
     | [] -> print_endline "EMPTY STACK ERROR!"; exit 1
 
-(* Testing the Logic of environment: passing. TODO: turn into dune tests. 
+(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.
 (* print functions *)
 let print_kvpair kv =
     match kv with
@@ -146,47 +139,36 @@ let rec print_envlist q =
     | [] -> print_endline ""
 (* end print functions *)
 let myEnvironments = []
-(* GET0: Get gets from local environment. Else from global*)
-(* [(i, 0)] ; [(i, 1)] ; [(i, 2)] *) (* Expected: 0 *)
-let myEnvironments = [[KVPair("i", 0.0)] ; [KVPair("i", 1.0)] ; [KVPair("i", 2.0)] ]
-let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline
-(* GET1: Get gets from global when not in local*)
-(* [] ; [(i, 1)] ; [(i, 2)] *) (* Expected: 2 *)
-let myEnvironments = [[] ; [KVPair("i", 1.0)] ; [KVPair("i", 2.0)] ]
-let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline
-(* GET2: Not in local or global, get -> 0.0 *)
-(* [ [] ; [(i,1)] ; [] ] *) (* Expected: 0.0 *)
-let myEnvironments = [ [] ; [KVPair("i", 1.0)] ; [] ]
-let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline
-(* GET3: Handles empty environment list *)
-(* [] *) (* Expected 0.0 *)
-let _ = getSymbol "i" [] |> string_of_float |> print_endline
-
-(* PUT0: put creates new enviro *)
-(* [] *) (* Expected: [ [(i, 0.0)] ] *)
-let myEnvironments = []
+(* put creates new enviro *)
 let myEnvironments = putSymbol "i" 0.0 myEnvironments
-let _ = print_envlist myEnvironments
-
-(* PUT_LOCAL: Put replaces if in local scope *)
-(* [ [(i,0)] [(i,0)] ] *) (* Expected [ [(i,1)] [(i,0)] ] *)
-let myEnvironments = [ [KVPair("i", 0.0)] ; [KVPair("i", 0.0)] ]
+let test e = print_envlist e
+let _ = test myEnvironments
+(* put replaces in current enviro *)
 let myEnvironments = putSymbol "i" 1.0 myEnvironments
-let _ = print_envlist myEnvironments
-
-(* PUT_GLOBAL1: Put places in global if not in local scope *)
-(* [ [] [] [] ] *) (* Expected [ [] [] [(i,0)] ] *)
-let myEnvironments = [ [] ; [] ; [] ]
+let _ = test myEnvironments
+(* Push new enviro *)
+let myEnvironments = pushEnvironment myEnvironments
+let _ = test myEnvironments
+(* put replaces existent vars in lower scopes *)
+let myEnvironments = putSymbol "i" 2.0 myEnvironments
+let _ = test myEnvironments
+(* put puts nonexistent vars in topmost scope *)
+let myEnvironments = putSymbol "j" 0.0 myEnvironments
+let _ = test myEnvironments
+(* get gets first occurrence of var *)
+let myEnvironments = [KVPair("i", 1.0)]::myEnvironments
+let _ = test myEnvironments
+let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline(* 1.0 *)
+(* put replaces first occurrence of var *)
 let myEnvironments = putSymbol "i" 0.0 myEnvironments
-let _ = print_envlist myEnvironments
-
-(* PUT_GLOBAL2 Put replaces in global if not in local scope *)
-(* [ [] [] [(i,0)] ] *) (* Expected [ [] [] [(i,1)] ] *)
-let myEnvironments = [ [] ; [] ; [KVPair("i", 0.0)] ]
-let myEnvironments = putSymbol "i" 1.0 myEnvironments
-let _ = print_envlist myEnvironments
+let _ = test myEnvironments
+(* put puts in topmost enviro *)
+let myEnvironments = putSymbol "k" 0.0 myEnvironments
+let _ = test myEnvironments
+(* pop pops topmost enviro *)
+let myEnvironments = popEnvironment myEnvironments
+let _ = test myEnvironments
 *)
-
 
 (* Notes for functions: a function has a list of statements *)
 type fn = string * string list * statement list
@@ -198,47 +180,47 @@ let evalCode (_code: statement) (_q:envList): unit =
     (* pop the local environment *)
     print_endline "Not implemented"
 
-let rec evaluateExpression (e: expression) (q:env list) (m: map): float =
+let rec evaluateExpression (e: expression) (q:env list): float =
     match e with
         | AssignmentExpression(var, op, expr) ->
             (
                 match op with
                 | "^=" -> 
-                    let newVal = (get var m) ** (evaluateExpression expr q m) in
-                    let m = put var newVal m in
-                    get var m
+                    let newVal = (getSymbol var q) ** (evaluateExpression expr q) in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
                 | "*=" -> 
-                    let newVal = (get var m) *. (evaluateExpression expr q m) in
-                    let m = put var newVal m in
-                    get var m
+                    let newVal = (getSymbol var q) *. (evaluateExpression expr q) in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
                 | "/=" ->
-                    let newVal = (get var m) /. (evaluateExpression expr q m) in
-                    let m = put var newVal m in
-                    get var m
+                    let newVal = (getSymbol var q) /. (evaluateExpression expr q) in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
                 (* | "%=" -> 
-                    let newVal = (get var m) mod (evaluateExpression expr q) in
-                    put var newVal m 
-                    get var m *)
+                    let newVal = (getSymbol var q) mod (evaluateExpression expr q) in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q *)
                 | "+=" -> 
-                    let newVal = (get var m) +. (evaluateExpression expr q m) in
-                    let m = put var newVal m in
-                    get var m
+                    let newVal = (getSymbol var q) +. (evaluateExpression expr q) in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
                 | "-=" ->
-                    let newVal = (get var m) -. (evaluateExpression expr q m) in
-                    let m = put var newVal m in
-                    get var m
+                    let newVal = (getSymbol var q) -. (evaluateExpression expr q) in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
                 | _ -> 0.0
             )
 
         | BinaryExpression(expr1, op, expr2) -> 
             (
                 match op with
-                | "^" -> ((evaluateExpression expr1 q m) ** (evaluateExpression expr2 q m))
-                | "*" -> ((evaluateExpression expr1 q m) *. (evaluateExpression expr2 q m))
-                | "/" -> ((evaluateExpression expr1 q m) /. (evaluateExpression expr2 q m))
-                (*| "%" -> ((evaluateExpression expr1 q m) mod (evaluateExpression expr2 q m))*)
-                | "+" -> ((evaluateExpression expr1 q m) +. (evaluateExpression expr2 q m))
-                | "-" -> ((evaluateExpression expr1 q m) -. (evaluateExpression expr2 q m))
+                | "^" -> ((evaluateExpression expr1 q) ** (evaluateExpression expr2 q))
+                | "*" -> ((evaluateExpression expr1 q) *. (evaluateExpression expr2 q))
+                | "/" -> ((evaluateExpression expr1 q) /. (evaluateExpression expr2 q))
+                (*| "%" -> ((evaluateExpression expr1 q) mod (evaluateExpression expr2 q))*)
+                | "+" -> ((evaluateExpression expr1 q) +. (evaluateExpression expr2 q))
+                | "-" -> ((evaluateExpression expr1 q) -. (evaluateExpression expr2 q))
                 | _   -> 0.0
             )
         | FnCallExpression(fn, params)  -> 0.0
@@ -247,53 +229,53 @@ let rec evaluateExpression (e: expression) (q:env list) (m: map): float =
             (
                 match unaryOp with
                 | "++" -> 
-                    let newVal = (get var m) +. 1.0 in
-                    let m = put var newVal m in
-                    get var m -. 1.0
+                    let newVal = (getSymbol var q) +. 1.0 in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q -. 1.0
                 | "--" ->
-                    let newVal = (get var m) -. 1.0 in
-                    let m = put var newVal m in
-                    get var m +. 1.0
-                | _ -> get var m
+                    let newVal = (getSymbol var q) -. 1.0 in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q +. 1.0
+                | _ -> getSymbol var q
             )
         | PreUnaryExpression(unaryOp, var) -> 
             (
                 match unaryOp with 
                 | "++" ->
-                    let newVal = (get var m) +. 1.0 in
-                    let m = put var newVal m in
-                    get var m
+                    let newVal = (getSymbol var q) +. 1.0 in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
                 | "--" -> 
-                    let newVal = (get var m) -. 1.0 in
-                    let m = put var newVal m in
-                    get var m
-                | _ -> get var m
+                    let newVal = (getSymbol var q) -. 1.0 in
+                    let q = putSymbol var newVal q in
+                    getSymbol var q
+                | _ -> getSymbol var q
             )
-        | VariableExpression(var) -> get var m
+        | VariableExpression(var) -> get var q
         | _ -> 0.0
 
-let rec evaluateCondition (c: condition) (q:env list) (m: map): bool = 
+let rec evaluateCondition (c: condition) (q:env list): bool = 
     match c with
         | BinaryCondition(cond1, op, cond2) -> 
             (
                 match op with
-                | "&&" -> ((evaluateCondition cond1 q m) && (evaluateCondition cond2 q m))
-                | "||" -> ((evaluateCondition cond1 q m) || (evaluateCondition cond2 q m))
+                | "&&" -> ((evaluateCondition cond1 q) && (evaluateCondition cond2 q))
+                | "||" -> ((evaluateCondition cond1 q) || (evaluateCondition cond2 q))
                 | _    -> true
             )
         | ComparisonCondition(expr1, op, expr2) -> 
             (
                 match op with
-                | "=="  -> ((evaluateExpression expr1 q m) =  (evaluateExpression expr2 q m))
-                | ">"   -> ((evaluateExpression expr1 q m) >   (evaluateExpression expr2 q m))
-                | "<"   -> ((evaluateExpression expr1 q m) <   (evaluateExpression expr2 q m))
-                | ">="  -> ((evaluateExpression expr1 q m) >=  (evaluateExpression expr2 q m))
-                | "<="  -> ((evaluateExpression expr1 q m) <=  (evaluateExpression expr2 q m))
-                | "!="  -> not ((evaluateExpression expr1 q m) =  (evaluateExpression expr2 q m))
+                | "=="  -> ((evaluateExpression expr1 q) =  (evaluateExpression expr2 q))
+                | ">"   -> ((evaluateExpression expr1 q) >   (evaluateExpression expr2 q))
+                | "<"   -> ((evaluateExpression expr1 q) <   (evaluateExpression expr2 q))
+                | ">="  -> ((evaluateExpression expr1 q) >=  (evaluateExpression expr2 q))
+                | "<="  -> ((evaluateExpression expr1 q) <=  (evaluateExpression expr2 q))
+                | "!="  -> not ((evaluateExpression expr1 q) =  (evaluateExpression expr2 q))
                 | _     -> true
             )
         | ConstantCondition(boolean) -> boolean
-        | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q m))
+        | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q))
         | _ -> true
 
 
@@ -306,35 +288,35 @@ let continue q = q
     [%expect {| 10. |}] *)
 
 (* maybe q can hold information on whether a block / function need stop execution *)
-let rec execute (s::ss: statement list) (q:env list) (m: map): env list =
+let rec execute (s::ss: statement list) (q:env list): env list =
     match s with
-        | Blank     ->  execute ss q m
-        | Block(b)  ->  execute ss q m
+        | Blank     ->  execute ss q
+        | Block(b)  ->  execute ss
         | Break     ->  q (* stop execution; do not recurse *)
-        | Condition(c)  ->  evaluateCondition c q m |> string_of_bool |> print_endline; execute ss q m
+        | Condition(c)  ->  evaluateCondition c q m |> string_of_bool |> print_endline; execute ss q
         | Continue  ->  continue q
-        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q m) ); execute ss q m
-        | FnDefinition(fname, params, instrs)   ->  execute ss q m(* compose the function struct and store in memory *)
-        | ForLoop(s1, c, s2, s3)    ->  execute ss q m
+        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q m) ); execute ss q
+        | FnDefinition(fname, params, instrs)   ->  execute ss q(* compose the function struct and store in memory *)
+        | ForLoop(s1, c, s2, s3)    ->  execute ss q
                 (*
-                execute [s1] q m;
-            while evaluateCondition c q m
+                execute [s1] q;
+            while evaluateCondition c q
             do
-                execute s3 q m;
-                execute s2 q m
+                execute s3 q;
+                execute s2 q
             done;
-            execute ss q m;
+            execute ss q;
             *)
         | IfStatement(c, s1, s2)    ->  
-            if evaluateCondition c q m
-            then execute (s1::ss) q m
-            else execute (s2::ss) q m
+            if evaluateCondition c q
+            then execute (s1::ss) q
+            else execute (s2::ss) q
         | Quit  ->  exit 0
         | Return(rval)  ->  q
         | WhileLoop(c, st)   -> 
-                if evaluateCondition c q m
-                then execute (st::s::ss) q m
-                else execute ss q m
+                if evaluateCondition c q
+                then execute (st::s::ss) q
+                else execute ss q
         | _     ->  q
 
 
