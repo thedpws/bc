@@ -49,8 +49,8 @@ type expression =
     | BinaryExpression of expression * string * expression
     | FnCallExpression of string * expression list
     | ConstantExpression of float
-    | PostUnaryExpression of expression * string
-    | PreUnaryExpression of string * expression
+    | PostUnaryExpression of string * string
+    | PreUnaryExpression of string * string
     | VariableExpression of string
 (* let evalAssignment (varId: string) (env:) *)
 type condition =
@@ -198,109 +198,143 @@ let evalCode (_code: statement) (_q:envList): unit =
     (* pop the local environment *)
     print_endline "Not implemented"
 
-let rec evaluateExpression (e: expression) (q:env list): float =
+let rec evaluateExpression (e: expression) (q:env list) (m: map): float =
     match e with
-        | AssignmentExpression(var, op, expr) -> (* STILL NEED TO FIX *)
+        | AssignmentExpression(var, op, expr) ->
             (
                 match op with
-                | "^=" -> (evaluateExpression expr q)
-                | "*=" -> (evaluateExpression expr q)
-                | "/=" -> (evaluateExpression expr q)
-                | "%=" -> (evaluateExpression expr q)
-                | "+=" -> (evaluateExpression expr q)
-                | "-=" -> (evaluateExpression expr q)
+                | "^=" -> 
+                    let newVal = (get var m) ** (evaluateExpression expr q m) in
+                    let m = put var newVal m in
+                    get var m
+                | "*=" -> 
+                    let newVal = (get var m) *. (evaluateExpression expr q m) in
+                    let m = put var newVal m in
+                    get var m
+                | "/=" ->
+                    let newVal = (get var m) /. (evaluateExpression expr q m) in
+                    let m = put var newVal m in
+                    get var m
+                (* | "%=" -> 
+                    let newVal = (get var m) mod (evaluateExpression expr q) in
+                    put var newVal m 
+                    get var m *)
+                | "+=" -> 
+                    let newVal = (get var m) +. (evaluateExpression expr q m) in
+                    let m = put var newVal m in
+                    get var m
+                | "-=" ->
+                    let newVal = (get var m) -. (evaluateExpression expr q m) in
+                    let m = put var newVal m in
+                    get var m
+                | _ -> 0.0
             )
 
         | BinaryExpression(expr1, op, expr2) -> 
             (
                 match op with
-                | "^" -> ((evaluateExpression expr1 q) ** (evaluateExpression expr2 q))
-                | "*" -> ((evaluateExpression expr1 q) *. (evaluateExpression expr2 q))
-                | "/" -> ((evaluateExpression expr1 q) /. (evaluateExpression expr2 q))
-                (*| "%" -> ((evaluateExpression expr1 q) mod (evaluateExpression expr2 q))*)
-                | "+" -> ((evaluateExpression expr1 q) +. (evaluateExpression expr2 q))
-                | "-" -> ((evaluateExpression expr1 q) -. (evaluateExpression expr2 q))
+                | "^" -> ((evaluateExpression expr1 q m) ** (evaluateExpression expr2 q m))
+                | "*" -> ((evaluateExpression expr1 q m) *. (evaluateExpression expr2 q m))
+                | "/" -> ((evaluateExpression expr1 q m) /. (evaluateExpression expr2 q m))
+                (*| "%" -> ((evaluateExpression expr1 q m) mod (evaluateExpression expr2 q m))*)
+                | "+" -> ((evaluateExpression expr1 q m) +. (evaluateExpression expr2 q m))
+                | "-" -> ((evaluateExpression expr1 q m) -. (evaluateExpression expr2 q m))
+                | _   -> 0.0
             )
         | FnCallExpression(fn, params)  -> 0.0
         | ConstantExpression(flt) -> flt
-        | PostUnaryExpression(expr, unaryOp) -> (* STILL NEED TO FIX*)
+        | PostUnaryExpression(var, unaryOp) ->
             (
                 match unaryOp with
-                | "++" -> (evaluateExpression expr q) +. 1.0
-                | "--" -> (evaluateExpression expr q) -. 1.0
+                | "++" -> 
+                    let newVal = (get var m) +. 1.0 in
+                    let m = put var newVal m in
+                    get var m -. 1.0
+                | "--" ->
+                    let newVal = (get var m) -. 1.0 in
+                    let m = put var newVal m in
+                    get var m +. 1.0
+                | _ -> get var m
             )
-        | PreUnaryExpression(unaryOp, expr) -> (* STILL NEED TO FIX*)
+        | PreUnaryExpression(unaryOp, var) -> 
             (
                 match unaryOp with 
-                | "++" -> (evaluateExpression expr q) +. 1.0
-                | "--" -> (evaluateExpression expr q) -. 1.0
+                | "++" ->
+                    let newVal = (get var m) +. 1.0 in
+                    let m = put var newVal m in
+                    get var m
+                | "--" -> 
+                    let newVal = (get var m) -. 1.0 in
+                    let m = put var newVal m in
+                    get var m
+                | _ -> get var m
             )
-        | VariableExpression(var) -> 0.0(* Lookup variable and return *)
+        | VariableExpression(var) -> get var m
         | _ -> 0.0
 
-let rec evaluateCondition (c: condition) (q:env list): bool = 
+let rec evaluateCondition (c: condition) (q:env list) (m: map): bool = 
     match c with
         | BinaryCondition(cond1, op, cond2) -> 
             (
                 match op with
-                | "&&" -> ((evaluateCondition cond1 q) && (evaluateCondition cond2 q))
-                | "||" -> ((evaluateCondition cond1 q) || (evaluateCondition cond2 q))
-                | _ -> true
+                | "&&" -> ((evaluateCondition cond1 q m) && (evaluateCondition cond2 q m))
+                | "||" -> ((evaluateCondition cond1 q m) || (evaluateCondition cond2 q m))
+                | _    -> true
             )
         | ComparisonCondition(expr1, op, expr2) -> 
             (
                 match op with
-                | "=="  -> ((evaluateExpression expr1 q) ==  (evaluateExpression expr2 q))
-                | ">"   -> ((evaluateExpression expr1 q) >   (evaluateExpression expr2 q))
-                | "<"   -> ((evaluateExpression expr1 q) <   (evaluateExpression expr2 q))
-                | ">="  -> ((evaluateExpression expr1 q) >=  (evaluateExpression expr2 q))
-                | "<="  -> ((evaluateExpression expr1 q) <=  (evaluateExpression expr2 q))
-                | "!="  -> ((evaluateExpression expr1 q) !=  (evaluateExpression expr2 q))
-                | _ -> true
+                | "=="  -> ((evaluateExpression expr1 q m) =  (evaluateExpression expr2 q m))
+                | ">"   -> ((evaluateExpression expr1 q m) >   (evaluateExpression expr2 q m))
+                | "<"   -> ((evaluateExpression expr1 q m) <   (evaluateExpression expr2 q m))
+                | ">="  -> ((evaluateExpression expr1 q m) >=  (evaluateExpression expr2 q m))
+                | "<="  -> ((evaluateExpression expr1 q m) <=  (evaluateExpression expr2 q m))
+                | "!="  -> not ((evaluateExpression expr1 q m) =  (evaluateExpression expr2 q m))
+                | _     -> true
             )
         | ConstantCondition(boolean) -> boolean
-        | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q))
+        | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q m))
         | _ -> true
 
 
 let continue q = q
 
 (* Test for expression *)
-let%expect_test "evalConstantExpression" = 
+(* let%expect_test "evalConstantExpression" = 
     evaluateExpression (ConstantExpression 10.0) [] |>
     printf "%F";
-    [%expect {| 10. |}]
+    [%expect {| 10. |}] *)
 
 (* maybe q can hold information on whether a block / function need stop execution *)
-let rec execute (s::ss: statement list) (q:env list): env list =
+let rec execute (s::ss: statement list) (q:env list) (m: map): env list =
     match s with
-        | Blank     ->  execute ss q
-        | Block(b)  ->  execute ss q
+        | Blank     ->  execute ss q m
+        | Block(b)  ->  execute ss q m
         | Break     ->  q (* stop execution; do not recurse *)
-        | Condition(c)  ->  evaluateCondition c q |> string_of_bool |> print_endline; execute ss q
+        | Condition(c)  ->  evaluateCondition c q m |> string_of_bool |> print_endline; execute ss q m
         | Continue  ->  continue q
-        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q) ); execute ss q
-        | FnDefinition(fname, params, instrs)   ->  execute ss q(* compose the function struct and store in memory *)
-        | ForLoop(s1, c, s2, s3)    ->  execute ss q
+        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q m) ); execute ss q m
+        | FnDefinition(fname, params, instrs)   ->  execute ss q m(* compose the function struct and store in memory *)
+        | ForLoop(s1, c, s2, s3)    ->  execute ss q m
                 (*
-                execute [s1] q;
-            while evaluateCondition c q
+                execute [s1] q m;
+            while evaluateCondition c q m
             do
-                execute s3 q;
-                execute s2 q
+                execute s3 q m;
+                execute s2 q m
             done;
-            execute ss q;
+            execute ss q m;
             *)
         | IfStatement(c, s1, s2)    ->  
-            if evaluateCondition c q 
-            then execute (s1::ss) q
-            else execute (s2::ss) q
+            if evaluateCondition c q m
+            then execute (s1::ss) q m
+            else execute (s2::ss) q m
         | Quit  ->  exit 0
         | Return(rval)  ->  q
         | WhileLoop(c, st)   -> 
-                if evaluateCondition c q
-                then execute (st::s::ss) q
-                else execute ss q
+                if evaluateCondition c q m
+                then execute (st::s::ss) q m
+                else execute ss q m
         | _     ->  q
 
 
