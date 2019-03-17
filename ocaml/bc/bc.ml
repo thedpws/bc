@@ -45,7 +45,6 @@ type env = N of float (* complete *)
 (* https://ocaml.org/learn/tutorials/map.html *)
 type envList = env list
 
-let evaluateExpression (_e: expression) (_q:envList): float  = 0.0
 
 
 (* Test for expression *)
@@ -78,7 +77,7 @@ let rec evaluateExpression (e: expression) (q:env list): float =
                 | "%" -> ((evaluateExpression expr1 q) mod (evaluateExpression expr2 q))
                 | "+" -> ((evaluateExpression expr1 q) +. (evaluateExpression expr2 q))
                 | "-" -> ((evaluateExpression expr1 q) -. (evaluateExpression expr2 q))
-        | FnCallExpression(fn, params) -> 0.0
+        | FnCallExpression(fn, params)  -> 0.0
         | ConstantExpression(flt) -> flt
         | PostUnaryExpression(expr, unaryOp) -> (* STILL NEED TO FIX*)
             match unaryOp with
@@ -100,16 +99,17 @@ let rec evaluateCondition (c: condition) (q:env list): bool =
                 | _ -> true
         | ComparisonCondition(expr1, comparisonOp, expr2) -> 
             match comparisonOp with
-                | "==" -> ((evaluateCondition cond1 q) == (evaluateCondition cond2))
-                | ">" -> ((evaluateCondition cond1 q) > (evaluateCondition cond2))
-                | "<" -> ((evaluateCondition cond1 q) < (evaluateCondition cond2))
-                | ">=" -> ((evaluateCondition cond1 q) >= (evaluateCondition cond2))
-                | "<=" -> ((evaluateCondition cond1 q) <= (evaluateCondition cond2))
-                | "!=" -> ((evaluateCondition cond1 q) != (evaluateCondition cond2))
+                | "=="  -> ((evaluateExpression expr1 q) ==  (evaluateExpression expr2 q))
+                | ">"   -> ((evaluateExpression expr1 q) >   (evaluateExpression expr2 q))
+                | "<"   -> ((evaluateExpression expr1 q) <   (evaluateExpression expr2 q))
+                | ">="  -> ((evaluateExpression expr1 q) >=  (evaluateExpression expr2 q))
+                | "<="  -> ((evaluateExpression expr1 q) <=  (evaluateExpression expr2 q))
+                | "!="  -> ((evaluateExpression expr1 q) !=  (evaluateExpression expr2 q))
                 | _ -> true
         | ConstantCondition(boolean) -> boolean
-        | UnaryCondition(unaryOp, cond) -> (!(evaluateCondition cond q))
+        | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q))
         | _ -> true
+
 
 let continue q = q;
 
