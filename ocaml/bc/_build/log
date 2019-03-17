@@ -1,0 +1,8 @@
+# dune runtest
+# OCAMLPARAM: unset
+$ /usr/bin/getconf _NPROCESSORS_ONLN > /var/folders/y1/g9rsvcvn2z739szscb_8ds2m0000gn/T/dune77ddb1.output 2> /dev/null
+$ /usr/local/bin/ocamlc.opt -config > /var/folders/y1/g9rsvcvn2z739szscb_8ds2m0000gn/T/dune07069d.output
+$ (cd _build/default && .ppx/ee93aa23970957971ccb6244b7dba29b/ppx.exe --cookie 'library-name="bc"' -o bc.pp.ml --impl bc.ml -corrected-suffix .ppx-corrected -diff-cmd - -dump-ast)
+> File "bc.ml", line 200, characters 6-6:
+> Error: Syntax error
+[1]
