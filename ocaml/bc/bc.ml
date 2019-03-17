@@ -21,13 +21,22 @@ let mymap = []
 let main _ = get "pi" mymap |> string_of_float |> print_endline
 let _ = main() (* 0.0 *)
 
+(* put *)
 let mymap = put "pi" 3.14 mymap
 
+(* get *)
 let main _ = get "pi" mymap |> string_of_float |> print_endline
 let _ = main() (* 3.14 *)
 
+(* get nonexistent -> 0 *)
 let main _ = get "pip" mymap |> string_of_float |> print_endline
 let _ = main() (* 0.0 *)
+
+(* overwrite previous value *)
+let mymap = put "pi" 6.28 mymap
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 6.28 *)
+
 
 (* ------End Test Map ------*)
 
