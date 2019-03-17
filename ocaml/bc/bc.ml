@@ -1,11 +1,36 @@
 open Core
 
-module Table = Map.Make(String)
-(*
-type sExpr = 
-    | Atom of string
-    | List of sExpr list
-*)
+let environment = [];
+type pair = Pair of string * float
+type map = pair list
+
+(* string -> map -> float *)
+let rec get key map = 
+    match map with
+        | Pair(k, v)::tail -> if key = k then v else get key tail
+        | [] -> 0.0
+
+(* string -> float -> map -> map *)
+let rec put key value map = 
+    match map with
+        | Pair(k, v)::tail -> if (key = k) then Pair(key, value)::tail else Pair(k, v) :: (put key value tail)
+        | [] -> [Pair(key, value)]
+
+(* ------Test Map ------*)
+let mymap = []
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 0.0 *)
+
+let mymap = put "pi" 3.14 mymap
+
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 3.14 *)
+
+let main _ = get "pip" mymap |> string_of_float |> print_endline
+let _ = main() (* 0.0 *)
+
+(* ------End Test Map ------*)
+
 type expression = 
     | AssignmentExpression of string * string * expression
     | BinaryExpression of expression * string * expression
