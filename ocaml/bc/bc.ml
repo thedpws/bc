@@ -39,7 +39,7 @@ type program =
     | None
 
 (* ############ Function interface ############# *)
-type ftype = string * string list * statement list
+type ftype = string list * statement list
 (* ############ End function interface ############# *)
 
 
@@ -48,7 +48,7 @@ type kvpair =
     | KVPair of string * float
     | KFPair of string * ftype
 type map = kvpair list
-let nullfn = ("", [], [])
+let nullfn = ([], [])
 
 (* Map functions *)
 let rec get (key:string) (map:map): float = 
@@ -76,7 +76,7 @@ let rec putFn (key:string) (fn:ftype) (map:map): map =
     match map with
     | KFPair(k, f)::tail -> 
             if (key=k) then KFPair(key, fn)::tail else KFPair(k,f) :: (putFn key fn tail)
-    | _::tail -> putFn key fn tail
+    | head::tail -> head::(putFn key fn tail)
     | [] -> [KFPair(key, fn)]
 
 let rec has (key:string) (map:map): bool = 
@@ -122,10 +122,10 @@ type envList = env list
 (* Scope definition *)
 type scope =
     | Normal of env list
-    | Continue
-    | Return of float * env list
-    | Break
-    | Invalid
+    | ContinueScope
+    | ReturnScope of float * env list
+    | BreakScope
+    | InvalidScope
 
 (* Gets symbol from scope *)
 let rec getSymbolGlobal (key:string) (s:scope): float =
@@ -147,14 +147,14 @@ let rec putSymbolGlobal (key:string) (value:float) (s:scope): scope =
             (
                 match putSymbolGlobal key value (Normal(tail)) with
                 | Normal(map) -> Normal(head::map)
-                | _ -> Invalid
+                | _ -> InvalidScope
             )
-    | _ -> Invalid
+    | _ -> InvalidScope
 let putSymbol (key:string) (value:float) (s:scope): scope =
     match s with
     | Normal(map::tail) -> if has key map then Normal((put key value map)::tail) else putSymbolGlobal key value s
     | Normal([]) -> Normal([put key value []])
-    | _ -> print_endline "Tried to put symbol in abNormal scope!"; Invalid
+    | _ -> print_endline "Tried to put symbol in abNormal scope!"; InvalidScope
 (* Puts function to global scope *)
 let rec putFunction (key:string) (fn:ftype) (s:scope): scope =
     match s with
@@ -163,7 +163,7 @@ let rec putFunction (key:string) (fn:ftype) (s:scope): scope =
             (
                 match putFunction key fn (Normal(tail)) with
                 | Normal(map) -> Normal(head::map)
-                | _ -> Invalid
+                | _ -> InvalidScope
             )
     | Normal([]) -> Normal([putFn key fn []])
 (* Gets function from scope *)
@@ -175,18 +175,18 @@ let rec getFunction (key:string) (s:scope): ftype =
 let pushEnvironment (e:env)(s:scope): scope =
     match s with
     | Normal(es) -> Normal(e::es)
-    | _ -> print_endline "tried to push enviro to emppty scope"; Invalid
+    | _ -> print_endline "tried to push enviro to emppty scope"; InvalidScope
 let popEnvironment (s:scope): scope =
     match s with
     | Normal(e::es) -> Normal(es)
-    | _ -> print_endline "tried to pop enviro from empty scope"; Invalid
+    | _ -> print_endline "tried to pop enviro from empty scope"; InvalidScope
 
-(* ----------------jTesting scope----------------------- *)
+(* ----------------Testing scope-----------------------
 let print_kvpair kv =
     match kv with
     | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
+    | KFPair(k, f) -> "(ƒ_"^k^")" |> print_string
     | _ -> ()
-
 let rec print_env e =
     match e with
     | kv::kvs -> print_kvpair kv; print_env kvs
@@ -199,30 +199,45 @@ let test (s:scope): unit =
     match s with
     | Normal(q) -> print_envlist q
     | Normal([]) -> print_endline "empty enviro"
-    | Invalid -> print_endline "problem"
+    | InvalidScope -> print_endline "problem"
     | _ -> print_endline "other problem"
 
 (* PutSymbol handles an empty environment *)
 let myScope = Normal([])
 let myScope = putSymbol "i" 0.0 myScope
 let _ = test myScope
-
 (* Push creates environment *)
 let newEnviro = [KVPair("j",0.0)]
 let myScope = pushEnvironment newEnviro myScope
 let _ = test myScope
-
 (* PutSymbol replaces parameters *)
 let newEnviro = [KVPair("i", 0.0)]
 let myScope = pushEnvironment newEnviro myScope
 let _ = test myScope
 let myScope = putSymbol "i" 1.0 myScope
 let _ = test myScope (* Expected: replace i in topmost enviro *)
-
 (* PutSymbol inserts into global *)
+let myScope = putSymbol "j" 1.0 myScope
+let _ = test myScope (* Expected: Do not replace j in inner scope. Insert J in global scope *)
+(* PutSymbol replaces in global *)
+let myScope = putSymbol "j" 2.0 myScope
+let _ = test myScope (* Expected: replace J=1 with J=2 *)
 (* All functions go to global scope *)
+let myFunction = (["a";"b"], [
+    Return(VariableExpression("a"))
+])
+let myScope = putFunction "euclid" myFunction myScope
+let _ = test myScope (* Expected: Insert euclid into global scope *)
 (* GetSymbol gets parameters or global *)
-(* -----------------Testing scope----------------------- *)
+let _ = getSymbol "i" myScope |> string_of_float |> print_endline
+let _ = getSymbol "j" myScope |> string_of_float |> print_endline
+(* PopEnviro pops the topmost environment *)
+let myScope = popEnvironment myScope
+let _ = test myScope
+(* PopEnviro throws error on empty stack *)
+let myScope = popEnvironment myScope |> popEnvironment |> popEnvironment
+let _ = test myScope
+ -----------------END Testing scope----------------------- *)
 
 
     
@@ -233,68 +248,6 @@ let _ = test myScope (* Expected: replace i in topmost enviro *)
 (* lookup symbol -> check local scope *)
 (* not in local scope -> check next scope *)
 (* not in global scope -> 0 *)
-
-(* A note about parameters: they are put into the new scope. This allows recursion. New scope may still access variables of older scopes (but not with same name as parameters) *)
-
-let rec hasSymbol (key:string) (q:envList): bool =
-    match q with
-    | qq::qs -> has key qq || hasSymbol key qs
-    | [] -> false
-
-(* Putting a symbol -> replace in containing scope. else put in topmost scope *)
-let rec putSymbol (key:string) (value: float) (q:envList): envList = 
-    match q with
-    | qq::qs -> 
-        (* In current enviro -> replace here *)
-        if has key qq then (put key value qq)::qs
-        (* In tail -> replace in tail *)
-        else if hasSymbol key qs then qq::(putSymbol key value qs)
-        (* -> add to current enviro *)
-        else (put key value qq)::qs
-    | [] -> [[KVPair(key, value)]]
-
-let pushEnvironment (q:envList): envList = []::q
-let popEnvironment (q:envList): envList = 
-    match q with 
-    | qq::qs -> qs
-    | [] -> print_endline "EMPTY STACK ERROR!"; exit 1
-
-(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.*)
-(* print functions *)
-
-    (*
-(* end print functions *)
-let myEnvironments = []
-(* put creates new enviro *)
-let myEnvironments = putSymbol "i" 0.0 myEnvironments
-let test e = print_envlist e
-let _ = test myEnvironments
-(* put replaces in current enviro *)
-let myEnvironments = putSymbol "i" 1.0 myEnvironments
-let _ = test myEnvironments
-(* Push new enviro *)
-let myEnvironments = pushEnvironment myEnvironments
-let _ = test myEnvironments
-(* put replaces existent vars in lower scopes *)
-let myEnvironments = putSymbol "i" 2.0 myEnvironments
-let _ = test myEnvironments
-(* put puts nonexistent vars in topmost scope *)
-let myEnvironments = putSymbol "j" 0.0 myEnvironments
-let _ = test myEnvironments
-(* get gets first occurrence of var *)
-let myEnvironments = [KVPair("i", 1.0)]::myEnvironments
-let _ = test myEnvironments
-let _ = getSymbol "i" myEnvironments |> string_of_float |> print_endline(* 1.0 *)
-(* put replaces first occurrence of var *)
-let myEnvironments = putSymbol "i" 0.0 myEnvironments
-let _ = test myEnvironments
-(* put puts in topmost enviro *)
-let myEnvironments = putSymbol "k" 0.0 myEnvironments
-let _ = test myEnvironments
-(* pop pops topmost enviro *)
-let myEnvironments = popEnvironment myEnvironments
-let _ = test myEnvironments
-*)
 
 
 
