@@ -1,48 +1,8 @@
-open Core
+(*open Core*)
 
-type kvpair = KVPair of string * float
-type map = kvpair list
-
-(* string -> map -> float *)
-let rec get key map = 
-    match map with
-        | KVPair(k, v)::tail -> if key = k then v else get key tail
-        | [] -> 0.0
-
-(* string -> float -> map -> map *)
-let rec put key value map = 
-    match map with
-        | KVPair(k, v)::tail -> if (key = k) then KVPair(key, value)::tail else KVPair(k, v) :: (put key value tail)
-        | [] -> [KVPair(key, value)]
-
-let rec has key map: bool = 
-    match map with
-        | KVPair(k, v)::tail -> key = k || has key tail
-        | [] -> false
-
-(* ------Test Map ------
-let mymap = []
-let main _ = get "pi" mymap |> string_of_float |> print_endline
-let _ = main() (* 0.0 *)
-
-(* put *)
-let mymap = put "pi" 3.14 mymap
-
-(* get *)
-let main _ = get "pi" mymap |> string_of_float |> print_endline
-let _ = main() (* 3.14 *)
-
-(* get nonexistent -> 0 *)
-let main _ = get "pip" mymap |> string_of_float |> print_endline
-let _ = main() (* 0.0 *)
-
-(* overwrite previous value *)
-let mymap = put "pi" 6.28 mymap
-let main _ = get "pi" mymap |> string_of_float |> print_endline
-let _ = main() (* 6.28 *)
+(* Notes for functions: a function has a list of statements *)
 
 
-------End Test Map ------*)
 
 type expression = 
     | AssignmentExpression of string * string * expression
@@ -78,18 +38,194 @@ type program =
     | Program of statement list
     | None
 
+(* ############ Function interface ############# *)
+type ftype = string * string list * statement list
+(* ############ End function interface ############# *)
+
+
+(* ############# Map interface ############### *)
+type kvpair = 
+    | KVPair of string * float
+    | KFPair of string * ftype
+type map = kvpair list
+let nullfn = ("", [], [])
+
+(* Map functions *)
+let rec get (key:string) (map:map): float = 
+    match map with
+    | KVPair(k, v)::tail -> if key = k then v else get key tail
+    | _::tail -> get key tail
+    | [] -> 0.0
+
+let rec getFn (key: string) (map:map): ftype =
+    match map with
+    | KFPair(k, f)::tail -> if k=key then f else getFn key tail
+    | _::tail -> getFn key tail
+    | [] -> nullfn
+
+(* Put: string -> float -> map -> map *)
+let rec put (key:string) (value: float) (map:map): map = 
+    match map with
+    | KVPair(k,v)::tail -> 
+            if (key = k) then KVPair(key, value)::tail else KVPair(k, v) :: (put key value tail)
+    | _::tail -> put key value tail
+    | [] -> [KVPair(key, value)]
+
+(* putFn: string -> function -> map *)
+let rec putFn (key:string) (fn:ftype) (map:map): map =
+    match map with
+    | KFPair(k, f)::tail -> 
+            if (key=k) then KFPair(key, fn)::tail else KFPair(k,f) :: (putFn key fn tail)
+    | _::tail -> putFn key fn tail
+    | [] -> [KFPair(key, fn)]
+
+let rec has (key:string) (map:map): bool = 
+    match map with
+    | KVPair(k, v)::tail -> key = k || has key tail
+    | _::tail -> has key tail
+    | [] -> false
+let rec hasFn (key:string) (map:map): bool =
+    match map with
+    | KFPair(k, f)::tail -> key = k || hasFn key tail
+    | _::tail -> hasFn key tail
+    | [] -> false
+(* ############# End Map interface ############# *)
+
+(* ------Test Map ------ *)
+let mymap = []
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 0.0 *)
+
+(* put *)
+let mymap = put "pi" 3.14 mymap
+
+(* get *)
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 3.14 *)
+
+(* get nonexistent -> 0 *)
+let main _ = get "pip" mymap |> string_of_float |> print_endline
+let _ = main() (* 0.0 *)
+
+(* overwrite previous value *)
+let mymap = put "pi" 6.28 mymap
+let main _ = get "pi" mymap |> string_of_float |> print_endline
+let _ = main() (* 6.28 *)
+
+(*------End Test Map ------*)
+
+
 
 type env = map
-
-(* https://ocaml.org/learn/tutorials/map.html *)
 type envList = env list
 
-(* Gets symbol from stack of environments *)
-let rec getSymbol (k:string) (q:envList): float =
-    match q with
-        | qq::qs -> if has k qq then get k qq else getSymbol k qs
-        | [] -> 0.0
+(* Scope definition *)
+type scope =
+    | Normal of env list
+    | Continue
+    | Return of float * env list
+    | Break
+    | Invalid
 
+(* Gets symbol from scope *)
+let rec getSymbolGlobal (key:string) (s:scope): float =
+    match s with
+    | Normal(map::[]) -> get key map 
+    | Normal(_::tail) -> getSymbolGlobal key (Normal(tail))
+    | _ -> 0.0
+let getSymbol (key:string) (s:scope): float =
+    match s with
+    | Normal(map::_) -> 
+            if has key map then get key map else getSymbolGlobal key s
+    | _ -> 0.0
+
+(* Puts symbol to scope *)
+let rec putSymbolGlobal (key:string) (value:float) (s:scope): scope =
+    match s with
+    | Normal(map::[]) -> Normal([put key value map])
+    | Normal(head::tail) -> 
+            (
+                match putSymbolGlobal key value (Normal(tail)) with
+                | Normal(map) -> Normal(head::map)
+                | _ -> Invalid
+            )
+    | _ -> Invalid
+let putSymbol (key:string) (value:float) (s:scope): scope =
+    match s with
+    | Normal(map::tail) -> if has key map then Normal((put key value map)::tail) else putSymbolGlobal key value s
+    | Normal([]) -> Normal([put key value []])
+    | _ -> print_endline "Tried to put symbol in abNormal scope!"; Invalid
+(* Puts function to global scope *)
+let rec putFunction (key:string) (fn:ftype) (s:scope): scope =
+    match s with
+    | Normal(map::[]) -> Normal([putFn key fn map])
+    | Normal(head::tail) ->
+            (
+                match putFunction key fn (Normal(tail)) with
+                | Normal(map) -> Normal(head::map)
+                | _ -> Invalid
+            )
+    | Normal([]) -> Normal([putFn key fn []])
+(* Gets function from scope *)
+let rec getFunction (key:string) (s:scope): ftype =
+    match s with
+    | Normal(map::[]) -> getFn key map
+    | Normal(_::tail) -> getFunction key (Normal(tail))
+    | _ -> print_endline "getFunction passed invalid scope!"; nullfn
+let pushEnvironment (e:env)(s:scope): scope =
+    match s with
+    | Normal(es) -> Normal(e::es)
+    | _ -> print_endline "tried to push enviro to emppty scope"; Invalid
+let popEnvironment (s:scope): scope =
+    match s with
+    | Normal(e::es) -> Normal(es)
+    | _ -> print_endline "tried to pop enviro from empty scope"; Invalid
+
+(* ----------------jTesting scope----------------------- *)
+let print_kvpair kv =
+    match kv with
+    | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
+    | _ -> ()
+
+let rec print_env e =
+    match e with
+    | kv::kvs -> print_kvpair kv; print_env kvs
+    | [] -> ()
+let rec print_envlist q =
+    match q with
+    | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
+    | [] -> print_endline ""
+let test (s:scope): unit =
+    match s with
+    | Normal(q) -> print_envlist q
+    | Normal([]) -> print_endline "empty enviro"
+    | Invalid -> print_endline "problem"
+    | _ -> print_endline "other problem"
+
+(* PutSymbol handles an empty environment *)
+let myScope = Normal([])
+let myScope = putSymbol "i" 0.0 myScope
+let _ = test myScope
+
+(* Push creates environment *)
+let newEnviro = [KVPair("j",0.0)]
+let myScope = pushEnvironment newEnviro myScope
+let _ = test myScope
+
+(* PutSymbol replaces parameters *)
+let newEnviro = [KVPair("i", 0.0)]
+let myScope = pushEnvironment newEnviro myScope
+let _ = test myScope
+let myScope = putSymbol "i" 1.0 myScope
+let _ = test myScope (* Expected: replace i in topmost enviro *)
+
+(* PutSymbol inserts into global *)
+(* All functions go to global scope *)
+(* GetSymbol gets parameters or global *)
+(* -----------------Testing scope----------------------- *)
+
+
+    
 
 (* Notes about environments... *)
 (* new environments are created only on function enter *)
@@ -123,20 +259,10 @@ let popEnvironment (q:envList): envList =
     | qq::qs -> qs
     | [] -> print_endline "EMPTY STACK ERROR!"; exit 1
 
-(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.
+(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.*)
 (* print functions *)
-let print_kvpair kv =
-    match kv with
-    | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
-    | _ -> ()
-let rec print_env e =
-    match e with
-    | kv::kvs -> print_kvpair kv; print_env kvs
-    | [] -> ()
-let rec print_envlist q =
-    match q with
-    | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
-    | [] -> print_endline ""
+
+    (*
 (* end print functions *)
 let myEnvironments = []
 (* put creates new enviro *)
@@ -170,8 +296,6 @@ let myEnvironments = popEnvironment myEnvironments
 let _ = test myEnvironments
 *)
 
-(* Notes for functions: a function has a list of statements *)
-type fn = string * string list * statement list
 
 
 let evalCode (_code: statement) (_q:envList): unit = 
@@ -180,6 +304,7 @@ let evalCode (_code: statement) (_q:envList): unit =
     (* pop the local environment *)
     print_endline "Not implemented"
 
+    (*
 let rec evaluateExpression (e: expression) (q:env list): float =
     match e with
         | AssignmentExpression(var, op, expr) ->
@@ -442,3 +567,4 @@ let%expect_test "p3" =
         5.      
     |}];
     *)
+*)
