@@ -1,4 +1,4 @@
-open Core
+(*open Core*)
 
 type kvpair = KVPair of string * float
 type map = kvpair list
@@ -85,10 +85,10 @@ type env = map
 type envList = env list
 
 (* Gets symbol from stack of environments *)
-let rec getSymbol (k:string) (q:envList): float =
+let rec getSymbol (k:string) (q:env list): float =
     match q with
-        | qq::qs -> if has k qq then get k qq else getSymbol k qs
-        | [] -> 0.0
+    | qq::qs -> if has k qq then get k qq else getSymbol k qs
+    | [] -> 0.0
 
 
 (* Notes about environments... *)
@@ -123,7 +123,7 @@ let popEnvironment (q:envList): envList =
     | qq::qs -> qs
     | [] -> print_endline "EMPTY STACK ERROR!"; exit 1
 
-(* Testing the Logic of environment: PASSED. TODO: turn into dune tests.
+(* Testing the Logic of environment: PASSED. TODO: turn into dune tests. *)
 (* print functions *)
 let print_kvpair kv =
     match kv with
@@ -138,6 +138,7 @@ let rec print_envlist q =
     | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
     | [] -> print_endline ""
 (* end print functions *)
+(*
 let myEnvironments = []
 (* put creates new enviro *)
 let myEnvironments = putSymbol "i" 0.0 myEnvironments
@@ -171,7 +172,97 @@ let _ = test myEnvironments
 *)
 
 (* Notes for functions: a function has a list of statements *)
-type fn = string * string list * statement list
+(* type fn = string * string list * statement list*)
+type fn = {
+    name : string; 
+    params : string list; 
+    body : statement list}
+
+type scope = {
+    vars : env list;
+    fns : fn list;
+}
+
+
+(* Data about current state *)
+let brokenVar = "$broken"
+let returnedVar = "$returned"
+let rvalVar = "$rval"
+let defaultRval = 0.0
+let notbroken = 0.0
+let broken = 1.0
+let notreturned = 0.0
+let returned = 1.0
+let defaultFnEnv = [KVPair(brokenVar, notbroken); KVPair(returnedVar, notreturned); KVPair(rvalVar, defaultRval)]
+
+let isBroken (s:scope) = (getSymbol brokenVar s.vars) = broken
+let isReturned (s:scope) = (getSymbol returnedVar s.vars) = returned
+
+(* Return rval of topmost enviro *)
+let getRval (s:scope): float =
+    match s.vars with
+    | e::es -> get rvalVar e
+    | [] -> 0.0
+
+let setRval (s:scope) (rval:float): scope = 
+    {vars=putSymbol rvalVar rval s.vars; fns=s.fns}
+
+(* constant *)
+
+    (*
+type scope =
+    (* vars, fns *)
+    | Normal of string list * fn list
+    | Continue of 
+    *)
+
+let rec getFunction (fname: string) (l: fn list): fn = 
+    match l with
+    | f::fs -> if f.name = fname then f else getFunction fname fs
+    | [] -> print_endline ("No such function "^fname); {name="";params=[];body=[]}
+
+(* Enter block. Push new 
+let enterblock
+let exitblock
+*)
+let rec pushparameters (keys: string list) (values: float list) (e:env): env =
+    match keys with
+    | k::ks ->
+            (
+                match values with
+                | v::vs -> KVPair(k, v)::(pushparameters ks vs e)
+                | [] -> print_endline "Error: Not enough parameters!"; exit 1; []
+            )
+    | [] -> e
+
+(* pushes new fn environment onto environment list *)
+let enterfunction (fname: string) (values: float list) (s: scope): scope =
+    let f = getFunction fname s.fns in
+    let newEnv = pushparameters f.params values [] in
+    let newEnv = [newEnv;defaultFnEnv]@s.vars in
+    let newScope = {vars=newEnv::s.vars; fns = s.fns} in
+    runFunction f newScope
+(* Testing: PASSED
+(* Testing pushParameters. Expected: environment with i, a, and b*)
+let keys = ["a" ; "b"]
+let values = [10.0 ; 15.0]
+let myEnvironments = [pushparameters keys values [KVPair("i", 0.0)]]
+let test e = print_envlist e
+let _ = test myEnvironments
+(* More values than params. Expected: same as above *)
+let keys = ["a" ; "b"]
+let values = [10.0 ; 15.0 ; -1.0]
+let myEnvironments = [pushparameters keys values [KVPair("i", 0.0)]]
+let test e = print_envlist e
+let _ = test myEnvironments
+(*  Less values than params. Expected: throw error and exit *)
+let keys = ["a" ; "b"]
+let values = [10.0]
+let myEnvironments = [pushparameters keys values [KVPair("i", 0.0)]]
+let test e = print_envlist e
+let _ = test myEnvironments
+*)
+
 
 
 let evalCode (_code: statement) (_q:envList): unit = 
@@ -251,7 +342,7 @@ let rec evaluateExpression (e: expression) (q:env list): float =
                     getSymbol var q
                 | _ -> getSymbol var q
             )
-        | VariableExpression(var) -> get var q
+        | VariableExpression(var) -> getSymbol var q
         | _ -> 0.0
 
 let rec evaluateCondition (c: condition) (q:env list): bool = 
@@ -291,11 +382,11 @@ let continue q = q
 let rec execute (s::ss: statement list) (q:env list): env list =
     match s with
         | Blank     ->  execute ss q
-        | Block(b)  ->  execute ss
+        | Block(b)  ->  execute ss q
         | Break     ->  q (* stop execution; do not recurse *)
-        | Condition(c)  ->  evaluateCondition c q m |> string_of_bool |> print_endline; execute ss q
+        | Condition(c)  ->  evaluateCondition c q |> string_of_bool |> print_endline; execute ss q
         | Continue  ->  continue q
-        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q m) ); execute ss q
+        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q) ); execute ss q
         | FnDefinition(fname, params, instrs)   ->  execute ss q(* compose the function struct and store in memory *)
         | ForLoop(s1, c, s2, s3)    ->  execute ss q
                 (*
