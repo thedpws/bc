@@ -21,17 +21,22 @@ public class ExpressionFunctionCall implements Expression {
 
     @Override
     public double evaluate(Memory scope) {
+        for (Expression e : parameters){
+            System.out.printf("%s: %f\n", e, e.evaluate(scope));
+        }
         // retrieve the corresponding function
         Function f = scope.getFunction(this.fname);
 
+        double param = 1.111;
         // Prepare the parameters
         List<Double> toPass = new ArrayList<>();
         for (Expression var : this.parameters) {
-            //System.out.println("Parameter " + var.evaluate(scope));
             toPass.add(var.evaluate(scope));
+            param = var.evaluate(scope);
         }
         f.run(toPass);
         //System.out.println("Rval is..." + scope.getRval());
+        System.out.printf("fib(%f) = %f\n", param, scope.getRval());
         return scope.getRval();
     }
 }

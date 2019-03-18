@@ -6,8 +6,8 @@ grammar Calculator;
 
 // A program is a list of statements
 program
-@after { System.out.println("\nAST:"); ast.print(); System.out.println("\nExecution:"); ast.execute(); }
-    : (topStatement)*
+@after { /* System.out.println("\nAST:"); ast.print(); System.out.println("\nExecution:"); */ ast.execute(); }
+    : delimiter* (topStatement)*
     ;
 
 topStatement: statement delimiter+ { ast.push($statement.rval); };
@@ -32,7 +32,8 @@ expression returns [Expression rval]
     : NUM                                   { $rval = new ExpressionConstant(Double.parseDouble($NUM.text)); }
     | readCall '(' ')'                  { $rval = new ExpressionLibCall($readCall.text, null); }
     | libCall '(' parameters ')'        { $rval = new ExpressionLibCall($libCall.text, $parameters.rval); }
-    | fname '(' parameters ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
+    | fname '(' ')'                     { $rval = new ExpressionFunctionCall($fname.text, new LinkedList<Expression>()); }
+    | fname '(' parameters? ')'          { $rval = new ExpressionFunctionCall($fname.text, $parameters.rval); }
     | variable                              { $rval = new ExpressionVariable($variable.text); }
     | '(' expression ')'                    { $rval = $expression.rval; }
     | operand1=expression binaryOperator1 operand2=expression { $rval = new ExpressionBinary($operand1.rval, $binaryOperator1.text, $operand2.rval); }
@@ -70,8 +71,7 @@ whileLoop returns [WhileLoop rval]
     ;
 
 forLoop returns [ForLoop rval]
-    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  block    { if ($expr1.rval == null) $expr1.rval = new BlankStatement(); if ($expr2.rval == null) $expr2.rval = new ConditionConstant(false); if ($expr3.rval == null) $expr3.rval = new BlankStatement(); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, $block.rval); }
-    | 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    { if ($expr1.rval == null) $expr1.rval = new BlankStatement();  if ($expr2.rval == null) $expr2.rval = new ConditionConstant(false); if ($expr3.rval == null) $expr3.rval = new BlankStatement(); List<Statement> statements = new LinkedList<>(); statements.add($statement.rval); Block block = new Block(statements); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, block); }
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    { if ($expr1.rval == null) $expr1.rval = new BlankStatement();  if ($expr2.rval == null) $expr2.rval = new ConditionConstant(false); if ($expr3.rval == null) $expr3.rval = new BlankStatement(); List<Statement> statements = new LinkedList<>(); statements.add($statement.rval); Block block = new Block(statements); $rval = new ForLoop($expr1.rval, $expr2.rval, $expr3.rval, block); }
     ;
 
 ifStatement returns [IfStatement rval]
@@ -80,7 +80,8 @@ ifStatement returns [IfStatement rval]
     ;
 
 defineFunction returns [FunctionDefinition rval]
-    : 'define' fname '(' (defParameters)? ')' delimiter* block                 { $rval = new FunctionDefinition($fname.text, $defParameters.rval, $block.rval); }
+    : 'define' fname '(' ')' delimiter* block                 { $rval = new FunctionDefinition($fname.text, new LinkedList<ExpressionVariable>(), $block.rval); }
+    | 'define' fname '(' (defParameters)? ')' delimiter* block                 { $rval = new FunctionDefinition($fname.text, $defParameters.rval, $block.rval); }
     ;
 
 condition returns [Condition rval]

@@ -7,7 +7,7 @@ grammar CalculatorNoActions;
 // A program is a list of statements
 program
 @after {}
-    : (topStatement)*
+    : delimiter* (topStatement)*
     ;
 
 topStatement: statement delimiter+ {};
@@ -30,8 +30,10 @@ statement
 
 expression  
     : NUM                                   {}
-    | fname '(' ')'                 {}
-    | fname '(' parameters ')'          {}
+    | readCall '(' ')'                  {}
+    | libCall '(' parameters ')'        {}
+    | fname '(' ')'                     {}
+    | fname '(' parameters? ')'          {}
     | variable                              {}
     | '(' expression ')'                    {}
     | operand1=expression binaryOperator1 operand2=expression {}
@@ -69,8 +71,7 @@ whileLoop
     ;
 
 forLoop  
-    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  block    {}
-    | 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    {}
+    : 'for' '(' (expr1=statement)? ';' (expr2=condition)? ';' (expr3=statement)? ')' '\n'*  statement    {}
     ;
 
 ifStatement  
@@ -79,7 +80,8 @@ ifStatement
     ;
 
 defineFunction  
-    : 'define' fname '(' (defParameters)? ')' delimiter* block                 {}
+    : 'define' fname '(' ')' delimiter* block                 {}
+    | 'define' fname '(' (defParameters)? ')' delimiter* block                 {}
     ;
 
 condition  
@@ -92,6 +94,13 @@ condition
 {}// b1 && b2
     | leftCondition=condition booleanBinaryOperator2 rightCondition=condition 
 {}// b1 || b2
+    ;
+
+libCall
+    : ('s' | 'c' | 'l' | 'e' | 'sqrt' | 'read')
+    ;
+readCall
+    : ('read')
     ;
 
 unaryOperator

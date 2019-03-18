@@ -11,6 +11,17 @@ public class FunctionMemory extends Memory {
         this.returnVal = -1;
     }
 
+    public void putParam(String key, Object val){
+        symbolTable.put(key, val);
+    }
+
+    @Override
+    public void putSymbol(String key, Object val){
+        System.out.printf("Putting symbol %s, %f\n", key, (Double) val);
+        System.out.printf("Do we have %s? A: %s!\n", key, hasSymbol(key));
+        if (hasSymbol(key)) symbolTable.put(key, val);
+        else head.putSymbol(key, val);
+    }
     @Override
     public Boolean getBoolean(String key){
         return (Boolean) symbolTable.getOrDefault(key, head.getBoolean(key));

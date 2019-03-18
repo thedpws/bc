@@ -147,6 +147,30 @@ public class CalculatorNoActionsBaseListener implements CalculatorNoActionsListe
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLibCall(CalculatorNoActionsParser.LibCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLibCall(CalculatorNoActionsParser.LibCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterReadCall(CalculatorNoActionsParser.ReadCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitReadCall(CalculatorNoActionsParser.ReadCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterUnaryOperator(CalculatorNoActionsParser.UnaryOperatorContext ctx) { }
 	/**
 	 * {@inheritDoc}

@@ -117,6 +117,26 @@ public interface CalculatorNoActionsListener extends ParseTreeListener {
 	 */
 	void exitCondition(CalculatorNoActionsParser.ConditionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CalculatorNoActionsParser#libCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterLibCall(CalculatorNoActionsParser.LibCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorNoActionsParser#libCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitLibCall(CalculatorNoActionsParser.LibCallContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorNoActionsParser#readCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterReadCall(CalculatorNoActionsParser.ReadCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorNoActionsParser#readCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitReadCall(CalculatorNoActionsParser.ReadCallContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CalculatorNoActionsParser#unaryOperator}.
 	 * @param ctx the parse tree
 	 */

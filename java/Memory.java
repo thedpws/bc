@@ -12,7 +12,7 @@ public class Memory {
         this.pc = new Stack<>();
     }
 
-    final void putSymbol(String key, Object val){
+    void putSymbol(String key, Object val){
         symbolTable.put(key, val);
     }
 

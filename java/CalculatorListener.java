@@ -118,6 +118,26 @@ public interface CalculatorListener extends ParseTreeListener {
 	 */
 	void exitCondition(CalculatorParser.ConditionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#libCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterLibCall(CalculatorParser.LibCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#libCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitLibCall(CalculatorParser.LibCallContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CalculatorParser#readCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterReadCall(CalculatorParser.ReadCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CalculatorParser#readCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitReadCall(CalculatorParser.ReadCallContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link CalculatorParser#unaryOperator}.
 	 * @param ctx the parse tree
 	 */

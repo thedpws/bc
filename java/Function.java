@@ -21,19 +21,20 @@ public class Function{
             System.err.printf("%s was given %d parameters, but expected %d.%n", fname, parameters.size(), locals.size());
         }
 
-        Memory localScope = new FunctionMemory(AST.globalScope);
+        FunctionMemory localScope = new FunctionMemory(AST.globalScope);
+        localScope.enterFunction();
+        //AST.globalScope.enterFunction();
 
         // Store parameters as local variables
         for (int i=0; i<locals.size(); i++){
             String varId = locals.get(i).varId;
-            localScope.putSymbol(varId, parameters.get(i));
+            localScope.putParam(varId, parameters.get(i));
         }
 
         //System.out.println("X is " + localScope.getDouble("x"));
 
         // execute
         // New Stack Frame
-        localScope.enterFunction();
 
 
         // block is guaranteed to call exitFunction() on return

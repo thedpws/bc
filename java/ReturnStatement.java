@@ -4,6 +4,7 @@ public class ReturnStatement implements Statement {
         this.rval = new ExpressionConstant(0);
     }
     public ReturnStatement(Expression rval){
+        System.out.printf("Return %s\n", rval);
         this.rval = rval;
     }
 

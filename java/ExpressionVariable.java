@@ -22,4 +22,8 @@ public class ExpressionVariable implements Expression {
     public String getId(){
       return this.varId;
     }
+    @Override
+    public String toString(){
+        return this.varId;
+    }
 }

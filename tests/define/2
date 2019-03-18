@@ -1,4 +1,23 @@
-define printHello(){
-    print(hello);
-    return;
-};
+define definevar(){
+    h = 5;
+}
+
+h;
+definevar();
+h;
+
+
+/* check to see if non-params are always put in global scope */
+define f1(){
+    n = f2();
+    b;
+}
+
+define f2(){
+    b = 5;
+}
+b; /* 0 */
+n = f1();
+b; /* 5 */
+/* YES. They are. */
+
