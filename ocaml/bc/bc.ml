@@ -58,7 +58,7 @@ type condition =
     | ComparisonCondition of expression * string * expression
     | ConstantCondition of bool
     | UnaryCondition of string * condition
-    | VariableCondition of string
+    (* | VariableCondition of string *)
 
 type statement = 
     | Blank
@@ -180,38 +180,21 @@ let evalCode (_code: statement) (_q:envList): unit =
     (* pop the local environment *)
     print_endline "Not implemented"
 
+
 let rec evaluateExpression (e: expression) (q:env list): float =
     match e with
         | AssignmentExpression(var, op, expr) ->
             (
                 match op with
-                | "^=" -> 
-                    let newVal = (getSymbol var q) ** (evaluateExpression expr q) in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
-                | "*=" -> 
-                    let newVal = (getSymbol var q) *. (evaluateExpression expr q) in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
-                | "/=" ->
-                    let newVal = (getSymbol var q) /. (evaluateExpression expr q) in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
-                (* | "%=" -> 
-                    let newVal = (getSymbol var q) mod (evaluateExpression expr q) in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q *)
-                | "+=" -> 
-                    let newVal = (getSymbol var q) +. (evaluateExpression expr q) in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
-                | "-=" ->
-                    let newVal = (getSymbol var q) -. (evaluateExpression expr q) in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
+                | "^=" -> (getSymbol var q) ** (evaluateExpression expr q)
+                | "*=" -> (getSymbol var q) *. (evaluateExpression expr q)
+                | "/=" -> (getSymbol var q) /. (evaluateExpression expr q)
+                (* | "%=" -> (getSymbol var q) mod (evaluateExpression expr q) *)
+                | "+=" -> (getSymbol var q) +. (evaluateExpression expr q)
+                | "-=" -> (getSymbol var q) -. (evaluateExpression expr q)
+                | "="  -> (evaluateExpression expr q)
                 | _ -> 0.0
             )
-
         | BinaryExpression(expr1, op, expr2) -> 
             (
                 match op with
@@ -228,30 +211,18 @@ let rec evaluateExpression (e: expression) (q:env list): float =
         | PostUnaryExpression(var, unaryOp) ->
             (
                 match unaryOp with
-                | "++" -> 
-                    let newVal = (getSymbol var q) +. 1.0 in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q -. 1.0
-                | "--" ->
-                    let newVal = (getSymbol var q) -. 1.0 in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q +. 1.0
+                | "++" -> (getSymbol var q) +. 1.0 
+                | "--" -> (getSymbol var q) -. 1.0
                 | _ -> getSymbol var q
             )
         | PreUnaryExpression(unaryOp, var) -> 
             (
                 match unaryOp with 
-                | "++" ->
-                    let newVal = (getSymbol var q) +. 1.0 in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
-                | "--" -> 
-                    let newVal = (getSymbol var q) -. 1.0 in
-                    let q = putSymbol var newVal q in
-                    getSymbol var q
+                | "++" -> (getSymbol var q) +. 1.0
+                | "--" -> (getSymbol var q) -. 1.0
                 | _ -> getSymbol var q
             )
-        | VariableExpression(var) -> get var q
+        | VariableExpression(var) -> getSymbol var q
         | _ -> 0.0
 
 let rec evaluateCondition (c: condition) (q:env list): bool = 
@@ -278,27 +249,87 @@ let rec evaluateCondition (c: condition) (q:env list): bool =
         | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q))
         | _ -> true
 
+let executeStatement (s: statement) (q: env list): env list =
+    match s with
+    | Expression(e) ->
+    (
+        match e with
+        | AssignmentExpression(var, op, expr) -> 
+        (
+            let q = putSymbol var (evaluateExpression e q) q in
+            getSymbol var q |> string_of_float |> print_endline;
+            q
+
+            (* Evalute expr *)
+            (* put var into list *)
+            (* print out value of expr *)
+            (* return new list *)
+            
+        )
+        | BinaryExpression(expr1, op, expr2) -> 
+        (
+            evaluateExpression e q |> string_of_float |> print_endline;
+            q
+        )
+        | FnCallExpression(fn, params)  -> 
+        (
+            q
+        )
+        | ConstantExpression(flt) -> 
+        (
+            flt |> string_of_float |> print_endline;
+            q
+        )
+        | PostUnaryExpression(var, unaryOp) -> 
+        (
+            let q = putSymbol var (evaluateExpression e q) q in
+            match unaryOp with
+            | "++" -> getSymbol var q -. 1.0|> string_of_float |> print_endline; q
+            | "--" -> getSymbol var q +. 1.0 |> string_of_float |> print_endline; q
+            | _    -> 0.0 |> string_of_float |> print_endline; q
+        )
+        | PreUnaryExpression(unaryOp, var) ->
+        (
+            let q = putSymbol var (evaluateExpression e q) q in
+            getSymbol var q |> string_of_float |> print_endline;
+            q
+        )
+        | VariableExpression(var) ->
+        (
+            let q = putSymbol var (evaluateExpression e q) q in
+            getSymbol var q |> string_of_float |> print_endline;
+            q
+        )
+        | _ -> q
+    )
+
+    | Condition(c) -> 
+    (
+        evaluateCondition c q |> string_of_bool |> print_endline;
+        q
+    )
+    | _ -> q
 
 let continue q = q
 
 (* Test for expression *)
-(* let%expect_test "evalConstantExpression" = 
+let%expect_test "evalConstantExpression" = 
     evaluateExpression (ConstantExpression 10.0) [] |>
     printf "%F";
-    [%expect {| 10. |}] *)
+    [%expect {| 10. |}]
 
 (* maybe q can hold information on whether a block / function need stop execution *)
 let rec execute (s::ss: statement list) (q:env list): env list =
     match s with
         | Blank     ->  execute ss q
-        | Block(b)  ->  execute ss
-        | Break     ->  q (* stop execution; do not recurse *)
-        | Condition(c)  ->  evaluateCondition c q m |> string_of_bool |> print_endline; execute ss q
+        | Block(b)  ->  execute ss q
+        | Break     ->  q (* stop execution; do not recurse *) (* will set the $isBroken variable *)
+        | Condition(c)  ->  executeStatement c q |> string_of_bool |> print_endline; execute ss q
         | Continue  ->  continue q
-        | Expression(e) ->  print_endline (string_of_float (evaluateExpression e q m) ); execute ss q
+        | Expression(e) ->  print_endline (string_of_float (executeStatement e q) ); execute ss q
         | FnDefinition(fname, params, instrs)   ->  execute ss q(* compose the function struct and store in memory *)
         | ForLoop(s1, c, s2, s3)    ->  execute ss q
-                (*
+            (*
                 execute [s1] q;
             while evaluateCondition c q
             do
@@ -337,7 +368,7 @@ let evalStatement (s: statement) (q:envList): envList =
 (* 
     v = 10; 
     v // display v
- *)
+*)
 (*
 let p1: block = [
         Assign("v", ConstantExpression(1.0));

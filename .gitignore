@@ -2,7 +2,5 @@
 out/
 
 .swp
-ocam/bc/_build/
+ocaml/bc/_build/
 .DS_STORE
-
-_build/
