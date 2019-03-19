@@ -1,7 +1,4 @@
-(* open Core*)
-
-(* Notes for functions: a function has a list of statements *)
-
+ open Core
 type expression = 
     | AssignmentExpression of string * string * expression
     | BinaryExpression of expression * string * expression
@@ -10,7 +7,6 @@ type expression =
     | PostUnaryExpression of string * string
     | PreUnaryExpression of string * string
     | VariableExpression of string
-(* let evalAssignment (varId: string) (env:) *)
 type condition =
     | BinaryCondition of condition * string * condition
     | ComparisonCondition of expression * string * expression
@@ -124,6 +120,7 @@ type scope =
     | InvalidScope
 let emptyScope = Normal([])
 
+
 (* Gets float rval from expressionscope *)
 let getFloat (s:scope): float =
     match s with
@@ -189,7 +186,7 @@ let popEnvironment (s:scope): scope =
     * match s with
     * | string -> putSymbol s v q |> mapParams ss vv
     * | _ -> q *)
-(* ----------------Testing scope-----------------------
+(* ----------------Testing scope----------------------- *)
 let print_kvpair kv =
     match kv with
     | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
@@ -203,6 +200,10 @@ let rec print_envlist q =
     match q with
     | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
     | [] -> print_endline ""
+let print_scope s =
+    match s with
+    | Normal(envs) -> print_envlist envs
+    | _ -> ()
 let test (s:scope): unit =
     match s with
     | Normal(q) -> print_envlist q
@@ -244,7 +245,7 @@ let _ = test myScope
 (* PopEnviro throws error on empty stack *)
 let myScope = popEnvironment myScope |> popEnvironment |> popEnvironment
 let _ = test myScope
- -----------------END Testing scope----------------------- *)
+(* -----------------END Testing scope----------------------- *)
 
 
     
@@ -284,6 +285,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
             *)
     | BinaryExpression(expr1, op, expr2) -> 
         (
+            (* Bug: q2 should be product of q1 or vice versa *)
             let f,s = match op, evaluateExpression expr1 q, evaluateExpression expr2 q with
             | "^", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 ** f2, q2
             | "*", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 *. f2, q2
@@ -294,25 +296,13 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
             in ExpressionScope(f, s)
         )
     | FnCallExpression(fn, params)  ->
-            (*
-             * match params with
-             * | [p::pp] -> evaluate Expression p q
-                 * match getFunction fn q with
-                 * | (s, st::sttt) -> mapParams s p q
-                 * | _ -> q
-               | [p::[]] ->
-               | [] -> q
-               match getFunction fn q with
-               | (s, st::sttt) -> mapParams s params q
-               | _ -> q
-
-             *)
         (
         match getFunction fn q with
-        | nullfn -> "No such function"^fn |> print_endline; ExpressionScope(0.0, q)
+        (* | nullfn -> "No such function: "^fn |> print_endline; ExpressionScope(0.0, q) *)
         | (ps,ss) ->
                 let rec pushParams (vars: string list) (vals: expression list): env =
                     match vars,vals with
+                    | [],[] -> []
                     | [],_ -> print_endline "Too many parameters passed"; []
                     | _,[] -> print_endline "Too little parameters passed"; pushParams vars [ConstantExpression(0.0)]
                     | (x::xs),(y::ys) -> 
@@ -331,6 +321,8 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
                 | _ -> ExpressionScope(0.0, q)
                 )
                 (* We might need to change evaluate to return the scope as well. Maybe have it return ReturnScope *)
+        | nullfn -> "No such function: "^fn |> print_endline; ExpressionScope(0.0, q)
+
         )
     | ConstantExpression(f) -> ExpressionScope(f, q)
     | PostUnaryExpression(var, unaryOp) ->
@@ -365,7 +357,7 @@ and execute (s: statement list) (q:scope): scope =
     (
     match currStatement with
     | Blank -> execute ss q
-    | Block([]) -> q
+    | Block([]) -> execute ss q
     | Block(qq::qs)  ->  (* Execute statements in block *)
             let q = execute [qq] q in
             (
@@ -413,11 +405,26 @@ and execute (s: statement list) (q:scope): scope =
         then execute (s1::ss) q
         else execute (s2::ss) q
     | Quit  ->  exit 0
-    | Return(rval)  ->  execute ss q (* rval ReturnScope(execute rval q, ) *)
+    | Return(rval)  ->  
+        let q = evaluateExpression rval q in
+        (
+        match q with
+        |   ExpressionScope(f,s) -> ReturnScope(f,s)
+        | _ -> ReturnScope(0.0, q)
+        )
+
     | WhileLoop(c, st)   -> 
-            if evaluateCondition c q
-            then execute (st::[currStatement]) q |> execute ss
-            else execute ss q
+            if (evaluateCondition c q = false) then BreakScope(q)
+            else
+            let q = execute [st] q in
+            let q = execute [WhileLoop(c, st)] q in
+            (
+            match q with
+            | BreakScope(qq) -> execute ss qq
+            | ReturnScope(f,qq) -> q
+            | Normal(_) -> execute ss q
+            | _ -> "Help me please!" |> print_endline; q
+            )
     | _     ->  q
 )
 )
@@ -446,7 +453,6 @@ and evaluateCondition (c: condition) (q:scope): bool =
         | ConstantCondition(boolean) -> boolean
         | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q))
         | _ -> true
-
 
 (* Test for expression *)
 let%expect_test "evalConstantExpression" = 
@@ -500,11 +506,38 @@ let arithmetic1: expression =
 
 let %test "arithmetic/1" = evaluateExpression arithmetic1 emptyScope |> getFloat = 44.
 
+let if1: statement list = [
+IfStatement(
+    ConstantCondition(true),
+    Expression(AssignmentExpression("v", "=", ConstantExpression(10.0))),
+    Expression(AssignmentExpression("v", "=", ConstantExpression(5.0)))
+);
+]
+
+let %expect_test "if1" = 
+(execute if1 emptyScope) |> getSymbol "v" |> string_of_float |> print_endline;
+[%expect {| 
+    10.
+    10. 
+|}]
+
+let while1: statement list = [
+    Expression(AssignmentExpression("i","=",ConstantExpression(10.0)));
+    WhileLoop(
+        ComparisonCondition(PreUnaryExpression("--","i"), ">", ConstantExpression(0.)),
+        Expression(PostUnaryExpression("i", "--"));
+    );
+]
+
+let %expect_test "while" = 
+(execute while1 emptyScope) |> getSymbol "i" |> string_of_float |> print_endline;
+[%expect {| 10. |}]
+
 let for1: statement list = [
     ForLoop(
         Expression(AssignmentExpression("i","=",ConstantExpression(0.0))),
         ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
-        Expression(PreUnaryExpression("++", "i" )),
+        Expression(PreUnaryExpression("++", "i")),
         Expression(VariableExpression("i"))
     ) ;
     Expression(VariableExpression("i")) ;
@@ -559,15 +592,50 @@ let euclidbody: statement list = [
         *)
         Expression(VariableExpression("a"));
 ]
-let sendToHell (s: scope): unit = ()
+let send_to_hell (s: scope): unit = ()
 
 let %expect_test "euclidbodytest" = 
-    execute euclidbody emptyScope |> sendToHell;
+    execute euclidbody emptyScope |> send_to_hell;
     [%expect {| |}]
 
 let fndef: statement list = [
-    Return(VariableExpression("a"));
+    FnDefinition("returna", ["a";"b"], [Return(VariableExpression("a"))]);
+    Expression(ConstantExpression(39.));
+    Expression(FnCallExpression(
+        "returna", 
+        [ConstantExpression(10.); ConstantExpression(15.)]
+    ));
+    Expression(ConstantExpression(39.));
 ]
+let%expect_test "fndef" = 
+    execute fndef emptyScope |> send_to_hell;
+    [%expect {| 
+        39.
+        10.
+        39. |}]
+
+let factorial: statement list =
+    [
+        FnDefinition("factorial", ["x"], [
+            IfStatement(
+                ComparisonCondition(
+                    VariableExpression("x"), "<=", ConstantExpression(1.)
+                ),
+                Return(ConstantExpression(1.)),
+                Return(BinaryExpression(
+                    VariableExpression("x"), "*", FnCallExpression("factorial", [BinaryExpression(VariableExpression("x"), "-", ConstantExpression(1.))])
+                ))
+            )
+        ]);
+        Expression(FnCallExpression(
+            "factorial",
+            [ConstantExpression(5.)]
+        ));
+    ]
+let%expect_test "factorialtest" =
+    execute factorial emptyScope |> send_to_hell;
+    [%expect {| 120. |}]
+
 (* let  *)
 
     
