@@ -2,8 +2,13 @@
 # Antlr4: if-statements, for-loops, while-loops, functions, and scoping
 
 # How to run
-Run the commands to compile: `antlr4 Calculator.g4 -o java && javac -cp java:$CLASSPATH ./java/Driver.java -d java/out`
-To run a file in tests/: `cd java/out && java Driver "../../tests/define/1"``
+1. Run the commands to compile: `antlr4 Calculator.g4 -o java && javac -cp java:$CLASSPATH ./java/Driver.java -d java/out`
+
+2. To run a file in tests/: `cd java/out && java Driver "../../tests/define/1"``
+
+3. There is a bash script that removes the lexer actions from the grammar to test only the grammar. `grammartest.sh`
+
+4. There is a script that runs our program against bc using all files under the tests/ directory. `testagainstbc.sh`
 
 # Features implemented
 * Recursion - check out the factorial and fibonacci test cases in tests/programs/

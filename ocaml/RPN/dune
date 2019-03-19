@@ -1,8 +1,0 @@
-(env
-    (dev
-        (flags (:standard -warn-error -A))))
-
-(library
- (name RPN)
- (inline_tests)
- (preprocess (pps ppx_inline_test ppx_expect)))
