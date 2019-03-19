@@ -378,18 +378,27 @@ and execute (s: statement list) (q:scope): scope =
     | Break     ->  BreakScope(q) (* stop execution; do not recurse *)
     | Condition(c)  ->  evaluateCondition c q |> string_of_bool |> print_endline; execute ss q
     | Continue  ->  q
-    | Expression(e) -> 
+    | Expression(e) ->
             (
             match evaluateExpression e q with
-            | ExpressionScope(f, newscope) -> f |> string_of_float |> print_endline; newscope
+            | ExpressionScope(f, newscope) -> f |> string_of_float |> print_endline; execute ss newscope
             | _ -> q
             )
     | FnDefinition(fname, params, instrs)   ->  putFunction fname (params,instrs) q |> execute ss(* compose the function struct and store in memory *)
-    | ForLoop(s1, c, s2, s3)    ->  
+    | ForLoop(s1, c, s2, s3)    ->
             let q = execute [s1] q in
-            if evaluateCondition c q then execute [s3] q
-            else execute [Break] q
-    |> execute ss
+            
+            if (evaluateCondition c q = false) then BreakScope(q)
+            else
+            let q = execute (s3::[s2]) q in
+            let q = execute [ForLoop(Blank, c, s2, s3)] q in
+            (
+            match q with
+            | BreakScope(qq) -> execute ss qq
+            | ReturnScope(f,qq) -> q
+            | Normal(_) -> execute ss q
+            | _ -> "Help me please!" |> print_endline; q
+            )
         (*
             execute [s1] q;
         while evaluateCondition c q
@@ -495,17 +504,28 @@ let for1: statement list = [
     ForLoop(
         Expression(AssignmentExpression("i","=",ConstantExpression(0.0))),
         ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
-        Expression(PostUnaryExpression("i", "++")),
+        Expression(PreUnaryExpression("++", "i" )),
         Expression(VariableExpression("i"))
     ) ;
-    Expression(VariableExpression("i"))
+    Expression(VariableExpression("i")) ;
+    Expression(ConstantExpression(1876757.)) ;
 ]
+(* let compare1: condition =
+    Comparison(ComparisonCondition(ConstantExpression(10.), "<", ConstantExpression(11.))) *)
+(* 
+let %expect_test "compare1" =
+    evaluateCondition 
+    [%expect {|true|}] *)
+    (*
+let %expect_test "assignment1" = 
+    let _ = execute assignment1 emptyScope;
+    [%expect {|10.|}]
+    *)
 
-(*
 let %expect_test "for/1" = 
     execute for1 emptyScope |> getSymbol "i" |> string_of_float |> print_endline;
     [%expect {| |}]
-    *)
+    
 (*
 let%expect_test "p1" =
     let _ = execute p1 (Normal([])); 
@@ -516,6 +536,40 @@ let%expect_test "p1" =
 let p2: statement list = [
 ]
 *)
+
+let euclidbody: statement list = [
+        Expression(AssignmentExpression("a", "=", ConstantExpression(10.))) ;
+        Expression(AssignmentExpression("b", "=", ConstantExpression(15.))) ;
+        (*
+        WhileLoop(
+            ComparisonCondition(
+                VariableExpression("b"), "!=", ConstantExpression(10.)
+            ),
+            IfStatement(
+                ComparisonCondition(
+                    VariableExpression("a"), ">=", VariableExpression("b")
+                ),
+                Expression(
+                    AssignmentExpression("a", "-=", VariableExpression("b"))
+                ),
+                Expression(
+                    AssignmentExpression("b", "-=", VariableExpression("a"))
+                )
+            )
+        *)
+        Expression(VariableExpression("a"));
+]
+let sendToHell (s: scope): unit = ()
+
+let %expect_test "euclidbodytest" = 
+    execute euclidbody emptyScope |> sendToHell;
+    [%expect {| |}]
+
+let fndef: statement list = [
+    Return(VariableExpression("a"));
+]
+(* let  *)
+
     
 
 (*
