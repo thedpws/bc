@@ -120,7 +120,15 @@ type scope =
     | ContinueScope of scope
     | ReturnScope of float * scope
     | BreakScope of scope
+    | ExpressionScope of float * scope
     | InvalidScope
+let emptyScope = Normal([])
+
+(* Gets float rval from expressionscope *)
+let getFloat (s:scope): float =
+    match s with
+    | ExpressionScope(f, _) -> f
+    | _ -> 0.0
 
 (* Gets symbol from scope *)
 let rec getSymbolGlobal (key:string) (s:scope): float =
@@ -254,197 +262,156 @@ let evalCode (_code: statement) (_q:envList): unit =
     (* pop the local environment *)
     print_endline "Not implemented"
 
-let rec evaluateExpression (e: expression) (q:scope): float =
+let rec evaluateExpression (e: expression) (q:scope): scope =
     match e with
-        | AssignmentExpression(var, op, expr) ->
-            (
-                match op with
-                | "^=" -> (getSymbol var q) ** (evaluateExpression expr q)
-                | "*=" -> (getSymbol var q) *. (evaluateExpression expr q)
-                | "/=" -> (getSymbol var q) /. (evaluateExpression expr q)
-                (* | "%=" -> (getSymbol var q) mod (evaluateExpression expr q) *)
-                | "+=" -> (getSymbol var q) +. (evaluateExpression expr q)
-                | "-=" -> (getSymbol var q) -. (evaluateExpression expr q)
-                | "="  -> (evaluateExpression expr q)
-                | _ -> 0.0
-            )
-        | BinaryExpression(expr1, op, expr2) -> 
-            (
-                match op with
-                | "^" -> ((evaluateExpression expr1 q) ** (evaluateExpression expr2 q))
-                | "*" -> ((evaluateExpression expr1 q) *. (evaluateExpression expr2 q))
-                | "/" -> ((evaluateExpression expr1 q) /. (evaluateExpression expr2 q))
-                (*| "%" -> ((evaluateExpression expr1 q) mod (evaluateExpression expr2 q))*)
-                | "+" -> ((evaluateExpression expr1 q) +. (evaluateExpression expr2 q))
-                | "-" -> ((evaluateExpression expr1 q) -. (evaluateExpression expr2 q))
-                | _   -> 0.0
-            )
-        | FnCallExpression(fn, params)  ->
-                (*
-                 * match params with
-                 * | [p::pp] -> evaluate Expression p q
-                     * match getFunction fn q with
-                     * | (s, st::sttt) -> mapParams s p q
-                     * | _ -> q
-                   | [p::[]] ->
-                   | [] -> q
-                   match getFunction fn q with
-                   | (s, st::sttt) -> mapParams s params q
-                   | _ -> q
+    | AssignmentExpression(var, op, expr) ->
+        let f,s = match op, evaluateExpression expr q with
+            | "^=", ExpressionScope(f,subq) -> (getSymbol var subq) ** f, putSymbol var f subq
+            | "*=", ExpressionScope(f,subq) -> (getSymbol var subq) *. f, putSymbol var f subq
+            | "/=", ExpressionScope(f,subq) -> (getSymbol var subq) /. f, putSymbol var f subq
+            | "+=", ExpressionScope(f,subq) -> (getSymbol var subq) +. f, putSymbol var f subq
+            | "-=", ExpressionScope(f,subq) -> (getSymbol var subq) -. f, putSymbol var f subq
+            | "=", ExpressionScope(f,subq) ->  f, putSymbol var f subq
+            | _,_ -> 0.0,q
+        in ExpressionScope(f, s)
+            (*
+            | "*=" -> (getSymbol var q) *. (evaluateExpression expr q)
+            | "/=" -> (getSymbol var q) /. (evaluateExpression expr q)
+            (* | "%=" -> (getSymbol var q) mod (evaluateExpression expr q) *)
+            | "+=" -> (getSymbol var q) +. (evaluateExpression expr q)
+            | "-=" -> (getSymbol var q) -. (evaluateExpression expr q)
+            | "="  -> (evaluateExpression expr q)
+            *)
+    | BinaryExpression(expr1, op, expr2) -> 
+        (
+            let f,s = match op, evaluateExpression expr1 q, evaluateExpression expr2 q with
+            | "^", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 ** f2, q2
+            | "*", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 *. f2, q2
+            | "/", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 /. f2, q2
+            | "+", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 +. f2, q2
+            | "-", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 -. f2, q2
+            | _   -> 0.0, q
+            in ExpressionScope(f, s)
+        )
+    | FnCallExpression(fn, params)  ->
+            (*
+             * match params with
+             * | [p::pp] -> evaluate Expression p q
+                 * match getFunction fn q with
+                 * | (s, st::sttt) -> mapParams s p q
+                 * | _ -> q
+               | [p::[]] ->
+               | [] -> q
+               match getFunction fn q with
+               | (s, st::sttt) -> mapParams s params q
+               | _ -> q
 
-                 *)
+             *)
+        (
+        match getFunction fn q with
+        | nullfn -> "No such function"^fn |> print_endline; ExpressionScope(0.0, q)
+        | (ps,ss) ->
+                let rec pushParams (vars: string list) (vals: expression list): env =
+                    match vars,vals with
+                    | [],_ -> print_endline "Too many parameters passed"; []
+                    | _,[] -> print_endline "Too little parameters passed"; pushParams vars [ConstantExpression(0.0)]
+                    | (x::xs),(y::ys) -> 
+                            (
+                            match evaluateExpression y q with
+                            | ExpressionScope(fy, sy) -> KVPair(x, fy) :: pushParams xs ys
+                            | _ -> print_endline "Help!"; KVPair(x, 0.0) :: pushParams xs ys
+                            )
+                in
+                let fnEnvironment = pushParams ps params in
+                let q = pushEnvironment fnEnvironment q in
+                let q = execute ss q in
                 (
-                match getFunction fn q with
-                | nullfn -> "No such function"^fn |> print_endline; 0.0
-                | (ps,ss) ->
-                        let rec pushParams (vars: string list) (vals: expression list): env =
-                            match vars,vals with
-                            | [],_ -> print_endline "Too many parameters passed"; []
-                            | _,[] -> print_endline "Too little parameters passed"; pushParams vars [ConstantExpression(0.0)]
-                            | (x::xs),(y::ys) -> KVPair(x, evaluateExpression y q) :: pushParams xs ys
-                        in
-                        let fnEnvironment = pushParams ps params in
-                        let q = pushEnvironment fnEnvironment q in
-                        let q = execute ss q in
-                        (
-                        match q with
-                        | ReturnScope(f, s) -> f
-                        | _ -> 0.0
-                        )
-                        (* We might need to change evaluate to return the scope as well. Maybe have it return ReturnScope *)
+                match q with
+                | ReturnScope(f, s) -> ExpressionScope(f, s)
+                | _ -> ExpressionScope(0.0, q)
                 )
-        | ConstantExpression(flt) -> flt
-        | PostUnaryExpression(var, unaryOp) ->
-            (
-                match unaryOp with
-                | "++" -> (getSymbol var q) +. 1.0 
-                | "--" -> (getSymbol var q) -. 1.0
-                | _ -> getSymbol var q
-            )
-        | PreUnaryExpression(unaryOp, var) -> 
-            (
-                match unaryOp with 
-                | "++" -> (getSymbol var q) +. 1.0
-                | "--" -> (getSymbol var q) -. 1.0
-                | _ -> getSymbol var q
-            )
-        | VariableExpression(var) -> getSymbol var q
-        | _ -> 0.0
-and executeStatement (s: statement) (q: scope): scope =
-    (
-    match s with
-    | Expression(e) ->
-    (
-        match e with
-        | AssignmentExpression(var, op, expr) -> 
-        (
-            let q = putSymbol var (evaluateExpression e q) q in
-            (*getSymbol var q |> string_of_float |> print_endline;*)
-            q
-
-            (* Evalute expr *)
-            (* put var into list *)
-            (* print out value of expr *)
-            (* return new list *)
-            
+                (* We might need to change evaluate to return the scope as well. Maybe have it return ReturnScope *)
         )
-        | BinaryExpression(expr1, op, expr2) -> 
-        (
-            evaluateExpression e q |> string_of_float |> print_endline;
-            q
-        )
-        | FnCallExpression(fn, params)  -> 
-        (
-            evaluateExpression e q |> string_of_float |> print_endline;
-            q
-        )
-        | ConstantExpression(flt) -> 
-        (
-            flt |> string_of_float |> print_endline;
-            q
-        )
-        | PostUnaryExpression(var, unaryOp) -> 
-        (
-            let q = putSymbol var (evaluateExpression e q) q in
-            match unaryOp with
-            | "++" -> getSymbol var q -. 1.0|> string_of_float |> print_endline; q
-            | "--" -> getSymbol var q +. 1.0 |> string_of_float |> print_endline; q
-            | _    -> 0.0 |> string_of_float |> print_endline; q
-        )
-        | PreUnaryExpression(unaryOp, var) ->
-        (
-            let q = putSymbol var (evaluateExpression e q) q in
-            getSymbol var q |> string_of_float |> print_endline;
-            q
-        )
-        | VariableExpression(var) ->
-        (
-            let q = putSymbol var (evaluateExpression e q) q in
-            getSymbol var q |> string_of_float |> print_endline;
-            q
-        )
+    | ConstantExpression(f) -> ExpressionScope(f, q)
+    | PostUnaryExpression(var, unaryOp) ->
+        let f = getSymbol var q in
+        let s = match unaryOp with
+            | "++" -> putSymbol var (f +. 1.0) q
+            | "--" -> putSymbol var (f -. 1.0) q
+            | _ -> q
+        in ExpressionScope(f, s)
+    | PreUnaryExpression(unaryOp, var) -> 
+        let f = getSymbol var q in
+        let s = match unaryOp with 
+        | "++" -> putSymbol var (f +. 1.0) q
+        | "--" -> putSymbol var (f -. 1.0) q
         | _ -> q
-    )
-    | Condition(c) -> 
-    (
-        evaluateCondition c q |> string_of_bool |> print_endline;
-        q
-    )
-    | _ -> q
-    )
-and  execute (s: statement list) (q:scope): scope =
-    match q with 
-        | ContinueScope(envList) -> q            (* for and while *)
-        | ReturnScope(flt, envList) -> q        (* function *)
-        | BreakScope(envList) -> q               (* for, while, if*)
-        | InvalidScope -> q
-        | _ ->
+        in let f = getSymbol var s
+        in ExpressionScope(f, s)
+    | VariableExpression(var) -> ExpressionScope(getSymbol var q, q)
+    | _ -> ExpressionScope(0.0, q)
+
+and execute (s: statement list) (q:scope): scope =
+    match q with
+    | ContinueScope(_) -> q            (* for and while *)
+    | ReturnScope(_,_) -> q        (* function *)
+    | BreakScope(_) -> q               (* for, while, if*)
+    | InvalidScope -> q
+    | _ ->
     (
     match s with
     | [] -> q
-    | s::ss ->
+    | currStatement::ss ->
+    (
+    match currStatement with
+    | Blank -> execute ss q
+    | Block([]) -> q
+    | Block(qq::qs)  ->  (* Execute statements in block *)
+            let q = execute [qq] q in
             (
-                match s with
-        | Blank     ->  execute ss q
-        | Block(qq::qs)  ->  
-                let q = executeStatement qq q in
-                (
-                match q with
-                | Normal(qq) -> execute qs q (* Normal behavior -> execute rest of block*)
-                | BreakScope(qq) -> execute ss (qq) (* Broken -> Exit block.  *)
-                | ContinueScope(qq) -> execute (s::ss) qq    (* Continued -> Execute block again *)
-                | ReturnScope(f, qq) -> q (* Returned -> exit functioncall *)
-                | InvalidScope -> print_endline "Invalid scope!!!!"; q
-                | _ -> q
-                )
-        | Break     ->  BreakScope(q) (* stop execution; do not recurse *)
-        | Condition(c)  ->  executeStatement s q |> execute ss
-        | Continue  ->  q
-        | Expression(e) ->  executeStatement s q |> execute ss
-        | FnDefinition(fname, params, instrs)   ->  putFunction fname (params,instrs) q |> execute ss(* compose the function struct and store in memory *)
-        | ForLoop(s1, c, s2, s3)    ->  executeStatement s1 q |> execute ss
-            (*
-                execute [s1] q;
-            while evaluateCondition c q
-            do
-                execute s3 q;
-                execute s2 q
-            done;
-            execute ss q;
-            *)
-        | IfStatement(c, s1, s2)    ->  
+            match q with (* If break, break. if continue, continue. *)
+            | Normal(_)             -> execute qs q |> execute ss (* Normal behavior -> execute rest of block*)
+            | BreakScope(qq)        -> execute ss qq (* Broken -> Exit block.  *)
+            | ContinueScope(qq)     -> execute (currStatement::ss) qq    (* Continued -> Execute block again *)
+            | _ -> q
+            )
+    | Break     ->  BreakScope(q) (* stop execution; do not recurse *)
+    | Condition(c)  ->  evaluateCondition c q |> string_of_bool |> print_endline; execute ss q
+    | Continue  ->  q
+    | Expression(e) -> 
+            (
+            match evaluateExpression e q with
+            | ExpressionScope(f, newscope) -> f |> string_of_float |> print_endline; newscope
+            | _ -> q
+            )
+    | FnDefinition(fname, params, instrs)   ->  putFunction fname (params,instrs) q |> execute ss(* compose the function struct and store in memory *)
+    | ForLoop(s1, c, s2, s3)    ->  
+            let q = execute [s1] q in
+            if evaluateCondition c q then execute [s3] q
+            else execute [Break] q
+    |> execute ss
+        (*
+            execute [s1] q;
+        while evaluateCondition c q
+        do
+            execute s3 q;
+            execute s2 q
+        done;
+        execute ss q;
+        *)
+    | IfStatement(c, s1, s2)    ->  
+        if evaluateCondition c q
+        then execute (s1::ss) q
+        else execute (s2::ss) q
+    | Quit  ->  exit 0
+    | Return(rval)  ->  execute ss q (* rval ReturnScope(execute rval q, ) *)
+    | WhileLoop(c, st)   -> 
             if evaluateCondition c q
-            then execute (s1::ss) q
-            else execute (s2::ss) q
-        | Quit  ->  exit 0
-        | Return(rval)  ->  execute ss q (* rval ReturnScope(execute rval q, ) *)
-        | WhileLoop(c, st)   -> 
-                if evaluateCondition c q
-                then execute (st::[s]) q |> execute ss
-                else execute ss q
-        | _     ->  q
-    )
-    )
+            then execute (st::[currStatement]) q |> execute ss
+            else execute ss q
+    | _     ->  q
+)
+)
 
 
 and evaluateCondition (c: condition) (q:scope): bool = 
@@ -474,29 +441,31 @@ and evaluateCondition (c: condition) (q:scope): bool =
 
 (* Test for expression *)
 let%expect_test "evalConstantExpression" = 
-    evaluateExpression (ConstantExpression 10.0) (Normal([])) |> string_of_float |> print_endline;
+    match evaluateExpression (ConstantExpression 10.0) (Normal([])) with
+    | ExpressionScope(f, s) -> f |> string_of_float |> print_endline;
     [%expect {| 11. |}]
+	
+let%expect_test _ = 
+    execute [(Expression(AssignmentExpression("v","=", ConstantExpression(5.0))))] (Normal([])) |>
+    execute[ (Expression(AssignmentExpression("i","=", (BinaryExpression(ConstantExpression(10.0), "^", VariableExpression("v"))))))] |> 
+    execute[ (Expression(PreUnaryExpression("++", "i")))] |>
+    execute[ (Expression(PostUnaryExpression("i", "++")))] |>
+    getSymbol "i" |> 
+    string_of_float |> 
+    print_endline;
+    [%expect {|
+            5. 
+            15.
+            15. 
+    |}]
+
+let%expect_test _ = 
+    evaluateExpression (BinaryExpression (ConstantExpression(10.0), "*", ConstantExpression(7.0))) (Normal([])) |> getFloat |> string_of_float |> print_endline;
+    [%expect {| 70. |}]
 
 (* let%expect_test "evalBinaryExpression" =
     * evaluateExpression (BinaryExpression( 10.0, "*", 7.0)) Normal([])) |> string_of_float |> print_endline;
     * [%expect {| 10. |}] *)
-
-(* maybe q can hold information on whether a block / function need stop execution *)
-
-
-(*
-let evalStatement (s: statement) (q:envList): envList =
-    match s with 
-        | Assign(_v, _e) -> (* eval e and store in v *) q
-        | If(e, codeT, codeF) -> 
-            let cond = evalExpr e q in
-                if(cond>0.0) then
-                    evalCode codeT q 
-                else
-                    evalCode codeF q
-            ;q
-        | _ -> q (*ignore *)
-*)
 
 (* 
     v = 10; 
@@ -507,13 +476,46 @@ let p1: statement list = [
         Expression(VariableExpression("v")) 
 ]
 let _ = execute p1 (Normal([]))
+
+
+(* arithmetic/1
+ * 5 + 6 * 8 - 9
+ *)
+let arithmetic1: expression =
+    BinaryExpression(
+        BinaryExpression(ConstantExpression(5.0), "+", BinaryExpression(ConstantExpression(6.0), "*", ConstantExpression(8.0))
+        ),
+        "-",
+        ConstantExpression(9.)
+    )
+
+let %test "arithmetic/1" = evaluateExpression arithmetic1 emptyScope |> getFloat = 44.
+
+let for1: statement list = [
+    ForLoop(
+        Expression(AssignmentExpression("i","=",ConstantExpression(0.0))),
+        ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
+        Expression(PostUnaryExpression("i", "++")),
+        Expression(VariableExpression("i"))
+    ) ;
+    Expression(VariableExpression("i"))
+]
+
+(*
+let %expect_test "for/1" = 
+    execute for1 emptyScope |> getSymbol "i" |> string_of_float |> print_endline;
+    [%expect {| |}]
+    *)
 (*
 let%expect_test "p1" =
     let _ = execute p1 (Normal([])); 
     [%expect {| 1. |}]
     *)
+
+(*
 let p2: statement list = [
 ]
+*)
     
 
 (*
