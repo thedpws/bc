@@ -7,7 +7,7 @@ grammar CalculatorNoActions;
 // A program is a list of statements
 program
 @after {}
-    : delimiter* (topStatement)*
+    : (topStatement)*
     ;
 
 topStatement: statement delimiter+ {};

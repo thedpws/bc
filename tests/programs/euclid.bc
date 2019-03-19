@@ -1,6 +1,5 @@
 1
-define e (a, b) 
-{
+define euclid(a, b) {
     while (b != 0) 
     { 
         if (a > b) {
@@ -13,6 +12,6 @@ define e (a, b)
 }
 
 2
-e(10, 15) /* gcd(10,15) = 5 -> 5 */
+euclid(10, 15) /* gcd(10,15) = 5 -> 5 */
 2
 

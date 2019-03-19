@@ -1,7 +1,18 @@
 # Project 2
 # Antlr4: if-statements, for-loops, while-loops, functions, and scoping
 
-## Introduction
+# How to run
+Run the commands to compile: `antlr4 Calculator.g4 -o java && javac -cp java:$CLASSPATH ./java/Driver.java -d java/out`
+To run a file in tests/: `cd java/out && java Driver "../../tests/define/1"``
+
+# Features implemented
+* Recursion - check out the factorial and fibonacci test cases in tests/programs/
+* While, For, If, Define statements. Each has their own directory in tests/.
+
+# A little on how we did it
+We used our own AST structure that executes recursively. The AST is instantiated and built via lexer actions. It is then executed after parsing. Scoping is implemented as a chain of environments, each linked to the global scope. Every function call pushes the parameters onto a new environment on the stack. This allows for recursion.
+
+## Introduction from document
 
 In this project, you will implement the rest of the bc features (see the specific requirements). The main challenge of this project is the fact that you need to capture symbolic information since the main tasks of this project cannot be implemented using an evaluate-as-you-parse strategy.  In essence, you need to either:
 

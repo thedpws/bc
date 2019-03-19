@@ -17,8 +17,6 @@ public class FunctionMemory extends Memory {
 
     @Override
     public void putSymbol(String key, Object val){
-        System.out.printf("Putting symbol %s, %f\n", key, (Double) val);
-        System.out.printf("Do we have %s? A: %s!\n", key, hasSymbol(key));
         if (hasSymbol(key)) symbolTable.put(key, val);
         else head.putSymbol(key, val);
     }

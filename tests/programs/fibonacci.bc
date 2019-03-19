@@ -8,5 +8,5 @@ define fib(x){
 
 fib(5);
 fib(6);
-fib(23);
+fib(30);
 

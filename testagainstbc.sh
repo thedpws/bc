@@ -14,6 +14,8 @@ for testfilepath in $(cd tests && ls ./*/* && cd ..)
 do
     echo $testfilepath
     cd java/out
+    echo "################# $testfilepath ####################"
+    cat ../../tests/$testfilepath
     ouroutput=$(java Driver "../../tests/$testfilepath")
     bcoutput=$(bc -l < "../../tests/$testfilepath")
     cd ../..
@@ -21,7 +23,10 @@ do
     touch out/$testfilepath-bc
     echo "$ouroutput" > out/$testfilepath-ours
     echo "$bcoutput" > out/$testfilepath-bc
-    echo diff $ouroutput $bcoutput
+    echo "Antlr output: \n$ouroutput"
+    echo "BC output: \n$bcoutput"
+    read -n 1 -s -r -p "Press any key to continue"
+    echo "\n"
 done
 
 exit

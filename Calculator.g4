@@ -7,7 +7,7 @@ grammar Calculator;
 // A program is a list of statements
 program
 @after { /* System.out.println("\nAST:"); ast.print(); System.out.println("\nExecution:"); */ ast.execute(); }
-    : delimiter* (topStatement)*
+    : (topStatement)*
     ;
 
 topStatement: statement delimiter+ { ast.push($statement.rval); };

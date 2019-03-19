@@ -21,9 +21,6 @@ public class ExpressionFunctionCall implements Expression {
 
     @Override
     public double evaluate(Memory scope) {
-        for (Expression e : parameters){
-            System.out.printf("%s: %f\n", e, e.evaluate(scope));
-        }
         // retrieve the corresponding function
         Function f = scope.getFunction(this.fname);
 
@@ -36,7 +33,7 @@ public class ExpressionFunctionCall implements Expression {
         }
         f.run(toPass);
         //System.out.println("Rval is..." + scope.getRval());
-        System.out.printf("fib(%f) = %f\n", param, scope.getRval());
+        //System.out.printf("fib(%f) = %f\n", param, scope.getRval());
         return scope.getRval();
     }
 }
