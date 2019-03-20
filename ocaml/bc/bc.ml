@@ -361,6 +361,8 @@ and execute (s: statement list) (q:scope): scope =
                 (
                 match e, evaluateExpression e q with
                 | AssignmentExpression(_,_,_), ExpressionScope(_, newscope) -> execute ss newscope
+                | PreUnaryExpression(_,_), ExpressionScope(_, newscope) -> execute ss newscope
+                | PostUnaryExpression(_,_), ExpressionScope(_, newscope) -> execute ss newscope
                 | _,ExpressionScope(f, newscope) -> f |> string_of_float |> print_endline; execute ss newscope
                 | _ -> q
                 )
@@ -455,17 +457,23 @@ let%expect_test "evalConstantExpression" =
 (*
     v = 5;
     i = 10^v;
-    i++;           //100000. (Print's i before incrementing)
-    ++i;           //100002. (Print's i after incrementing)
+    i++;           // 100001
+    ++i;           // 100002
 *)
+let expTest: statement list = [
+    Expression(AssignmentExpression("v","=", ConstantExpression(5.0)));
+    Block[
+        Expression(AssignmentExpression("i","=", (BinaryExpression(ConstantExpression(10.0), "^", VariableExpression("v")))));
+        Expression(PostUnaryExpression("i", "++"));
+        Expression(VariableExpression("i"));
+        Expression(PreUnaryExpression("++", "i"));
+        Expression(VariableExpression("i"))
+    ];
+]
 let%expect_test "ExpressiontTest" = 
-    execute [(Expression(AssignmentExpression("v","=", ConstantExpression(5.0))))] (Normal([])) |>
-    execute[ (Expression(AssignmentExpression("i","=", (BinaryExpression(ConstantExpression(10.0), "^", VariableExpression("v"))))))] |>
-    execute[ (Expression(PostUnaryExpression("i", "++")))] |> 
-    execute[ (Expression(PreUnaryExpression("++", "i")))] |>
-    ignore;
+    execute expTest emptyScope |> ignore;
     [%expect {|
-            100000.   
+            100001.   
             100002.
     |}]
 
@@ -513,17 +521,17 @@ let %expect_test "compare1" =
     v=20;
     i=10;
     j=3;
-    k=3;
-    (v < i) || (j == k)         // false || true -> true
+    k=7;
+    (v != i) || (j == k)         // (true || false) -> true
 *)
 let compare2: statement list = [
     Expression(AssignmentExpression("v", "=", ConstantExpression(20.)));
     Expression(AssignmentExpression("i", "=", ConstantExpression(10.)));
     Expression(AssignmentExpression("j", "=", ConstantExpression(3.)));
-    Expression(AssignmentExpression("k", "=", ConstantExpression(3.)));
+    Expression(AssignmentExpression("k", "=", ConstantExpression(7.)));
     
     Condition(BinaryCondition(
-        ComparisonCondition(VariableExpression("v"), "<", VariableExpression("i")), 
+        ComparisonCondition(VariableExpression("v"), "!=", VariableExpression("i")), 
         "||",
         ComparisonCondition(VariableExpression("j"), "==", VariableExpression("k"))
     ))
@@ -534,11 +542,11 @@ let %expect_test "compare2" =
 
 (*
     if(true){
-        v=10;
+        v=10;           //display v (10.)
     }
     else{
         v=5;
-    }                   //display v (10.)
+    }              
 *)
 let if1: statement list = [
     IfStatement(
@@ -556,7 +564,7 @@ let %expect_test "if1" =
 (*
     i=10;
     while(i-- > 0){
-        i;  //display i 
+        i;              //display i 
     }
 *)
 let while1: statement list = [
@@ -575,11 +583,15 @@ let %expect_test "while" =
         0.
     |}]
 
-
 (* 
     for(i=0; i<10; i++){
-        i == 5;
+        i == 5              //compares if i is equal to 5
+        if(i==5){
+            break;
+        }
     }
+    132.                      //display 132.
+    217.                      //display 217.
 *)
 let forbreak: statement list = [
     ForLoop(
@@ -595,17 +607,35 @@ let forbreak: statement list = [
             );
         ])
     );
-
     Block([
-        Expression(ConstantExpression(1.));
-        Expression(ConstantExpression(2.));
+        Expression(ConstantExpression(132.));
+        Expression(ConstantExpression(217.));
     ]);
 ]
-
 let%expect_test "forbreak" =
     execute forbreak emptyScope |> ignore;
-    [%expect {| |}]
+    [%expect {| 
+        false
+        false
+        false
+        false
+        false
+        true
+        132.
+        217.
+    |}]
 
+(*
+    for(i = 0; i < 10; i++){
+        i == 5;
+        if(i == 5){             //When if evaluates to true, i=5 is not printed
+            continue;           
+        }
+        i;                      //display i
+    }
+    10;
+    11;
+*)
 let forcontinue: statement list = [
     ForLoop(
         Expression(AssignmentExpression("i", "=", ConstantExpression(0.))),
@@ -623,8 +653,8 @@ let forcontinue: statement list = [
     );
 
     Block([
-        Expression(ConstantExpression(1.));
-        Expression(ConstantExpression(2.));
+        Expression(ConstantExpression(10.));
+        Expression(ConstantExpression(11.));
     ]);
 ]
 
@@ -633,35 +663,25 @@ let%expect_test "forcontinue" =
     [%expect {|
         false
         0.
-        0.
         false
-        1.
         1.
         false
         2.
-        2.
         false
         3.
-        3.
         false
-        4.
         4.
         true
-        5.
         false
-        6.
         6.
         false
         7.
-        7.
         false
-        8.
         8.
         false
         9.
-        9.
-        1.
-        2.
+        10.
+        11.
         |}]
 
 (*
@@ -736,31 +756,37 @@ let%expect_test "fndef" =
         for(i=2.0; i<10.0; i++) {
             v = v * i
         }
-    v   // display v
+    v                       // display v (362880.)
 *)
 let p2: statement list = [
     Expression(AssignmentExpression("v", "=", ConstantExpression(1.0)));
-    (*
     IfStatement(
         ComparisonCondition(VariableExpression("v"), ">", ConstantExpression(10.0)), 
         Expression(AssignmentExpression("v", "+=", ConstantExpression(1.0))), 
-        *)
         ForLoop(
             Expression(AssignmentExpression("i", "=", ConstantExpression(2.0))),
             ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.0)),
             Expression(PreUnaryExpression("++", "i")),
             Expression(AssignmentExpression("v", "*=", VariableExpression("i")))
         );
-        (*
     );
-    *)
     Expression(VariableExpression("v"))
 ]
 let%expect_test "p2" =
     execute p2 emptyScope |> ignore; 
-    [%expect {| 3628800. |}]
+    [%expect {| 362880. |}]
 
-(* Factorial Function Test *)
+(* 
+    factorial(x){
+        if(x <= 1){
+            return 1
+        }
+        else{
+            return x * factorial(x-1);
+        }
+    }
+    factorial(5);                       //120
+*)
 let factorial: statement list =
     [
         FnDefinition("factorial", ["x"], [
@@ -778,10 +804,17 @@ let factorial: statement list =
             "factorial",
             [ConstantExpression(5.)]
         ));
+        Expression(FnCallExpression(
+            "factorial",
+            [ConstantExpression(10.)]
+        ));
     ]
 let%expect_test "factorialtest" =
     execute factorial emptyScope |> ignore;
-    [%expect {| 120. |}]
+    [%expect {| 
+        120.
+        3628800.
+    |}]
 
 
 (*  Fibbonaci sequence
@@ -792,8 +825,9 @@ let%expect_test "factorialtest" =
             return (f(x-1)+f(x-2))
     }
 
-    f(3)
-    f(5)
+    f(3)                            // 2
+    f(5)                            // 5
+    f(10)                           // 55
  *)
 let fibbonaci: statement list = 
     [
@@ -832,14 +866,14 @@ let fibbonaci: statement list =
                 )
             )]
         );
-        Expression(FnCallExpression("f", [ConstantExpression(1.0)]));
-        Expression(FnCallExpression("f", [ConstantExpression(2.0)]));
         Expression(FnCallExpression("f", [ConstantExpression(3.0)]));
-        Expression(FnCallExpression("f", [ConstantExpression(4.0)]));
         Expression(FnCallExpression("f", [ConstantExpression(5.0)]));
         Expression(FnCallExpression("f", [ConstantExpression(10.0)]));
    ]
 let%expect_test "fib" =
     execute fibbonaci emptyScope |> ignore; 
     [%expect {|   
+        2.
+        5.
+        55.
     |}];
