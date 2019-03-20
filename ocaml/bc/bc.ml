@@ -173,9 +173,11 @@ let pushEnvironment (e:env)(s:scope): scope =
     match s with
     | Normal(es) -> Normal(e::es)
     | _ -> print_endline "Error pushing environment onto bad scope!";InvalidScope
-let popEnvironment (s:scope): scope =
+let rec popEnvironment (s:scope): scope =
     match s with
     | Normal(_::es) -> Normal(es)
+    | ReturnScope(f,s) -> ReturnScope(f, popEnvironment s)
+    | ExpressionScope(f,s) -> ExpressionScope(f,popEnvironment s)
     | _ -> print_endline "Empty stack error!"; InvalidScope
 (* #################### End scope interface ######################*)
 (* ----------------Testing scope----------------------- *)
@@ -283,7 +285,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
             | "+" -> f1 +. f2
             | "-" -> f1 -. f2
             | _   -> 0.0
-            in let _ = "BinaryExpress => "^(string_of_float f1)^op^(string_of_float f2)^" = "^(string_of_float f) |> print_endline in ExpressionScope(f, q)
+            (*in let _ = "BinaryExpress => "^(string_of_float f1)^op^(string_of_float f2)^" = "^(string_of_float f) |> print_endline*) in ExpressionScope(f, q)
         )
     | FnCallExpression(fn, params)  ->
         (
@@ -305,9 +307,10 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
                 let fnEnvironment = pushParams ps params in
                 let q = pushEnvironment fnEnvironment q in
                 let q = execute ss q in
+                let q = popEnvironment q in
                 (
                 match q with
-                | ReturnScope(f, s) -> "Evaluated rval to "^(string_of_float f) |> print_endline; ExpressionScope(f, s)
+                | ReturnScope(f, s) -> (*"Evaluated rval to "^(string_of_float f) |> print_endline; *) ExpressionScope(f, s)
                 | _ -> ExpressionScope(0.0, q)
                 )
 
@@ -331,6 +334,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
     | VariableExpression(var) -> ExpressionScope(getSymbol var q, q)
 
 and execute (s: statement list) (q:scope): scope =
+    (*let _ = print_scope q in*)
     match q with
     | ContinueScope(_) -> q            (* for and while *)
     | ReturnScope(f,_) -> q        (* function *)
@@ -403,7 +407,7 @@ and execute (s: statement list) (q:scope): scope =
         let q = evaluateExpression rval q in
         (
         match q with
-        |   ExpressionScope(f,s) -> ("Return Statement returning "^string_of_float f) |> print_endline;ReturnScope(f,s)
+        |   ExpressionScope(f,s) -> (*("Return Statement returning "^string_of_float f) |> print_endline;*)ReturnScope(f,s)
         | _ -> ReturnScope(0.0, q)
         )
 
@@ -685,7 +689,7 @@ let fibbonaci: statement list =
                 ComparisonCondition(
                     VariableExpression("x"), 
                     "<=",
-                    ConstantExpression(1.0)
+                    ConstantExpression(2.0)
                 ),
                 Return(ConstantExpression(1.0)),
                 Return(
