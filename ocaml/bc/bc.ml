@@ -34,6 +34,7 @@ type program =
 
 (* ############ Function interface ############# *)
 type ftype = string list * statement list
+let nullfn = ([], [])
 (* ############ End function interface ############# *)
 
 
@@ -42,7 +43,6 @@ type kvpair =
     | KVPair of string * float (* For variables *)
     | KFPair of string * ftype (* For functions *)
 type map = kvpair list
-let nullfn = ([], [])
 let rec get (key:string) (map:map): float = 
     match map with
     | KVPair(k, v)::tail -> if key = k then v else get key tail
@@ -71,39 +71,34 @@ let rec putFn (key:string) (fn:ftype) (map:map): map =
 (* has: string -> map -> bool *)
 let rec has (key:string) (map:map): bool = 
     match map with
-    | KVPair(k, v)::tail -> key = k || has key tail
+    | KVPair(k,_)::tail -> key = k || has key tail
     | _::tail -> has key tail
     | [] -> false
 (* hasFn: string -> map -> bool *)
 let rec hasFn (key:string) (map:map): bool =
     match map with
-    | KFPair(k, f)::tail -> key = k || hasFn key tail
+    | KFPair(k,_)::tail -> key = k || hasFn key tail
     | _::tail -> hasFn key tail
     | [] -> false
 (* ############# End Map interface ############# *)
 
-(* ------Test Map ------
-let mymap = []
-let main _ = get "pi" mymap |> string_of_float |> print_endline
-let _ = main() (* 0.0 *)
+(* ------Test Map ------ *)
+    let %test "Map: handles empty list" = 
+        get "pi" [] = 0.
 
-(* put *)
-let mymap = put "pi" 3.14 mymap
+    let %test "Map: put" = 
+        put "pi" 3.14 [] = [KVPair("pi", 3.14)]
 
-(* get *)
-let main _ = get "pi" mymap |> string_of_float |> print_endline
-let _ = main() (* 3.14 *)
+    let %test "Map: get existent returns value" = 
+        get "pi" [KVPair("pi", 3.14)] = 3.14
 
-(* get nonexistent -> 0 *)
-let main _ = get "pip" mymap |> string_of_float |> print_endline
-let _ = main() (* 0.0 *)
+    let %test "Map: get nonexistent value -> 0" = 
+        get "pip" [KVPair("pi", 3.14)] = 0.
 
-(* overwrite previous value *)
-let mymap = put "pi" 6.28 mymap
-let main _ = get "pi" mymap |> string_of_float |> print_endline
-let _ = main() (* 6.28 *)
+    let %test "Map: put existent value overwrites in map" = 
+        put "pi" 6.28 [KVPair("pi", 3.14)] |> get "pi" = 6.28
 
-------End Test Map ------*)
+(*------End Test Map ------*)
 
 
 
@@ -117,10 +112,11 @@ type scope =
     | ReturnScope of float * scope
     | BreakScope of scope
     | ExpressionScope of float * scope
+    | ConditionScope of bool * scope
     | InvalidScope
 let emptyScope = Normal([])
 
-
+(*############# Scope Interface ##############*)
 (* Gets float rval from expressionscope *)
 let getFloat (s:scope): float =
     match s with
@@ -176,75 +172,71 @@ let rec getFunction (key:string) (s:scope): ftype =
 let pushEnvironment (e:env)(s:scope): scope =
     match s with
     | Normal(es) -> Normal(e::es)
-    | _ -> print_endline "tried to push enviro to emppty scope"; InvalidScope
+    | _ -> print_endline "Error pushing environment onto bad scope!";InvalidScope
 let popEnvironment (s:scope): scope =
     match s with
-    | Normal(e::es) -> Normal(es)
-    | _ -> print_endline "tried to pop enviro from empty scope"; InvalidScope
-
-(* let rec mapParams (s::ss: string list) (v::vv: expression list) (q: scope): scope =
-    * match s with
-    * | string -> putSymbol s v q |> mapParams ss vv
-    * | _ -> q *)
+    | Normal(_::es) -> Normal(es)
+    | _ -> print_endline "Empty stack error!"; InvalidScope
+(* #################### End scope interface ######################*)
 (* ----------------Testing scope----------------------- *)
-let print_kvpair kv =
-    match kv with
-    | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
-    | KFPair(k, f) -> "(ƒ_"^k^")" |> print_string
-    | _ -> ()
-let rec print_env e =
-    match e with
-    | kv::kvs -> print_kvpair kv; print_env kvs
-    | [] -> ()
-let rec print_envlist q =
-    match q with
-    | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
-    | [] -> print_endline ""
-let print_scope s =
-    match s with
-    | Normal(envs) -> print_envlist envs
-    | _ -> ()
-let test (s:scope): unit =
-    match s with
-    | Normal(q) -> print_envlist q
-    | Normal([]) -> print_endline "empty enviro"
-    | InvalidScope -> print_endline "problem"
-    | _ -> print_endline "other problem"
-(* PutSymbol handles an empty environment *)
-let myScope = Normal([])
-let myScope = putSymbol "i" 0.0 myScope
-let _ = test myScope
-(* Push creates environment *)
-let newEnviro = [KVPair("j",0.0)]
-let myScope = pushEnvironment newEnviro myScope
-let _ = test myScope
-(* PutSymbol replaces parameters *)
-let newEnviro = [KVPair("i", 0.0)]
-let myScope = pushEnvironment newEnviro myScope
-let _ = test myScope
-let myScope = putSymbol "i" 1.0 myScope
-let _ = test myScope (* Expected: replace i in topmost enviro *)
-(* PutSymbol inserts into global *)
-let myScope = putSymbol "j" 1.0 myScope
-let _ = test myScope (* Expected: Do not replace j in inner scope. Insert J in global scope *)
-(* PutSymbol replaces in global *)
-let myScope = putSymbol "j" 2.0 myScope
-let _ = test myScope (* Expected: replace J=1 with J=2 *)
-(* All functions go to global scope *)
-let myFunction = (["a";"b"], [
-    Return(VariableExpression("a"))
-])
-let myScope = putFunction "euclid" myFunction myScope
-let _ = test myScope (* Expected: Insert euclid into global scope *)
-(* GetSymbol gets parameters or global *)
-let _ = getSymbol "i" myScope |> string_of_float |> print_endline
-let _ = getSymbol "j" myScope |> string_of_float |> print_endline
-(* PopEnviro pops the topmost environment *)
-let myScope = popEnvironment myScope
-let _ = test myScope
-(* PopEnviro throws error on empty stack *)
-let myScope = popEnvironment myScope |> popEnvironment |> popEnvironment
-let _ = test myScope
+    let print_kvpair kv =
+        match kv with
+        | KVPair(k, v) -> "("^k^":"^string_of_float v^")" |> print_string
+        | KFPair(k, _) -> "(ƒ_"^k^")" |> print_string
+    let rec print_env e =
+        match e with
+        | kv::kvs -> print_kvpair kv; print_env kvs
+        | [] -> ()
+    let rec print_envlist q =
+        match q with
+        | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
+        | [] -> print_endline ""
+    let print_scope s =
+        match s with
+        | Normal(envs) -> print_envlist envs
+        | _ -> ()
+    let test (s:scope): unit =
+        match s with
+        | Normal(q) -> print_envlist q
+        | InvalidScope -> print_endline "problem"
+        | _ -> print_endline "other problem"
+    (* PutSymbol handles an empty environment *)
+    let %test "PutSymbol: handle empty scope" = putSymbol "i" 0.0 emptyScope = Normal([[KVPair("i", 0.0)]])
+    (* Push creates environment *)
+    let %test "PushEnvironment pushes environments" = 
+        pushEnvironment [] (Normal([[]])) = 
+        Normal([[] ; []])
+    (* PutSymbol replaces parameters *)
+    let %test "PutSymbol replaces parameters" = 
+        pushEnvironment [KVPair("i", 0.)] emptyScope 
+        |> pushEnvironment [KVPair("i", 0.)] 
+        |> putSymbol "i" 1. =
+        Normal([    [KVPair("i", 1.)];  [KVPair("i", 0.)];  ])
+    
+    let %test "PutSymbol inserts into global" =
+        putSymbol "i" 1. (Normal([[];[]])) = (Normal([[];[KVPair("i", 1.)]]))
+        (* Expected: Do not replace j in inner scope. Insert J in global scope *)
+    let %test "PutSymbol replaces in global" =
+        putSymbol "i" 1. (Normal([   []; [KVPair("i", 0.)]  ])) = (Normal([[];[KVPair("i", 1.)]]))
+    (* All functions go to global scope *)
+    let %test "PutFunction puts in global scope" =
+        putFunction "myfunction" nullfn (Normal([[];[]])) = (Normal([[];[KFPair("myfunction", nullfn)]]))
+    (* GetSymbol gets parameters or global *)
+    let %test "GetSymbol gets parameters." =
+        getSymbol "i" (Normal([[KVPair("i", 1.)] ; [KVPair("i", 2.)]])) = 1.
+    let %test "Else, GetSymbol gets from global" =
+        getSymbol "i" (Normal([[];[KVPair("i", 1.)]])) = 1.
+    let %test "GetSymbol never gets from intermediate environments" =
+        getSymbol "i" (Normal([[];[KVPair("i", 10.)]; []])) = 0.
+
+    (* PopEnviro pops the topmost environment *)
+    let %test "PopEnvironment pops the topmost environment" =
+        popEnvironment (Normal([[KVPair("i",0.)];[KVPair("i",1.)]])) = (Normal([ [KVPair("i",1.)]]))
+    (* PopEnviro throws error on empty stack *)
+    let %expect_test "PopEnvironment throws empty stack error" =
+        let f _ = () in
+        popEnvironment emptyScope |> f ;
+        [%expect {| Empty stack error! |}]
 (* -----------------END Testing scope----------------------- *)
 
 
@@ -257,23 +249,19 @@ let _ = test myScope
 (* not in local scope -> check next scope *)
 (* not in global scope -> 0 *)
 
-let evalCode (_code: statement) (_q:envList): unit = 
-    (* crate new environment *)
-    (* user fold_left  *)
-    (* pop the local environment *)
-    print_endline "Not implemented"
-
 let rec evaluateExpression (e: expression) (q:scope): scope =
     match e with
     | AssignmentExpression(var, op, expr) ->
-        let f,s = match op, evaluateExpression expr q with
-            | "^=", ExpressionScope(f,subq) -> (getSymbol var subq) ** f, putSymbol var f subq
-            | "*=", ExpressionScope(f,subq) -> (getSymbol var subq) *. f, putSymbol var f subq
-            | "/=", ExpressionScope(f,subq) -> (getSymbol var subq) /. f, putSymbol var f subq
-            | "+=", ExpressionScope(f,subq) -> (getSymbol var subq) +. f, putSymbol var f subq
-            | "-=", ExpressionScope(f,subq) -> (getSymbol var subq) -. f, putSymbol var f subq
-            | "=", ExpressionScope(f,subq) ->  f, putSymbol var f subq
+        let f,ss = match op, evaluateExpression expr q with
+            | "^=", ExpressionScope(ff,subq) -> (getSymbol var subq) ** ff, subq
+            | "*=", ExpressionScope(ff,subq) -> (getSymbol var subq) *. ff, subq
+            | "/=", ExpressionScope(ff,subq) -> (getSymbol var subq) /. ff, subq
+            | "+=", ExpressionScope(ff,subq) -> (getSymbol var subq) +. ff, subq
+            | "-=", ExpressionScope(ff,subq) -> (getSymbol var subq) -. ff, subq
+            | "=", ExpressionScope(ff,subq) ->  ff, subq
             | _,_ -> 0.0,q
+        in
+        let s = putSymbol var f ss
         in ExpressionScope(f, s)
             (*
             | "*=" -> (getSymbol var q) *. (evaluateExpression expr q)
@@ -286,14 +274,16 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
     | BinaryExpression(expr1, op, expr2) -> 
         (
             (* Bug: q2 should be product of q1 or vice versa *)
-            let f,s = match op, evaluateExpression expr1 q, evaluateExpression expr2 q with
-            | "^", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 ** f2, q2
-            | "*", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 *. f2, q2
-            | "/", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 /. f2, q2
-            | "+", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 +. f2, q2
-            | "-", ExpressionScope(f1,q1), ExpressionScope(f2,q2) -> f1 -. f2, q2
-            | _   -> 0.0, q
-            in ExpressionScope(f, s)
+            let ExpressionScope(f1,q) = evaluateExpression expr1 q in
+            let ExpressionScope(f2,q) = evaluateExpression expr2 q in
+            let f = match op with
+            | "^" -> f1 ** f2
+            | "*" -> f1 *. f2
+            | "/" -> f1 /. f2
+            | "+" -> f1 +. f2
+            | "-" -> f1 -. f2
+            | _   -> 0.0
+            in ExpressionScope(f, q)
         )
     | FnCallExpression(fn, params)  ->
         (
@@ -308,7 +298,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
                     | (x::xs),(y::ys) -> 
                             (
                             match evaluateExpression y q with
-                            | ExpressionScope(fy, sy) -> KVPair(x, fy) :: pushParams xs ys
+                            | ExpressionScope(fy, _) -> KVPair(x, fy) :: pushParams xs ys
                             | _ -> print_endline "Help!"; KVPair(x, 0.0) :: pushParams xs ys
                             )
                 in
@@ -320,8 +310,6 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
                 | ReturnScope(f, s) -> ExpressionScope(f, s)
                 | _ -> ExpressionScope(0.0, q)
                 )
-                (* We might need to change evaluate to return the scope as well. Maybe have it return ReturnScope *)
-        | nullfn -> "No such function: "^fn |> print_endline; ExpressionScope(0.0, q)
 
         )
     | ConstantExpression(f) -> ExpressionScope(f, q)
@@ -341,7 +329,6 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
         in let f = getSymbol var s
         in ExpressionScope(f, s)
     | VariableExpression(var) -> ExpressionScope(getSymbol var q, q)
-    | _ -> ExpressionScope(0.0, q)
 
 and execute (s: statement list) (q:scope): scope =
     match q with
@@ -368,42 +355,38 @@ and execute (s: statement list) (q:scope): scope =
             | _ -> q
             )
     | Break     ->  BreakScope(q) (* stop execution; do not recurse *)
-    | Condition(c)  ->  evaluateCondition c q |> string_of_bool |> print_endline; execute ss q
+    | Condition(c)  ->  
+            let ConditionScope(b,s) = evaluateCondition c q in
+            b |> string_of_bool |> print_endline;
+            execute ss s;
     | Continue  ->  q
     | Expression(e) ->
-            (
-            match evaluateExpression e q with
-            | ExpressionScope(f, newscope) -> f |> string_of_float |> print_endline; execute ss newscope
-            | _ -> q
-            )
+                (
+                match e, evaluateExpression e q with
+                | AssignmentExpression(_,_,_), ExpressionScope(_, newscope) -> execute ss newscope
+                | _,ExpressionScope(f, newscope) -> f |> string_of_float |> print_endline; execute ss newscope
+                | _ -> q
+                )
     | FnDefinition(fname, params, instrs)   ->  putFunction fname (params,instrs) q |> execute ss(* compose the function struct and store in memory *)
     | ForLoop(s1, c, s2, s3)    ->
             let q = execute [s1] q in
-            
-            if (evaluateCondition c q = false) then BreakScope(q)
+            let ConditionScope(b,q) = evaluateCondition c q in
+            if (not b) then BreakScope(q)
             else
             let q = execute (s3::[s2]) q in
             let q = execute [ForLoop(Blank, c, s2, s3)] q in
             (
             match q with
             | BreakScope(qq) -> execute ss qq
-            | ReturnScope(f,qq) -> q
+            | ReturnScope(_,_) -> q
             | Normal(_) -> execute ss q
             | _ -> "Help me please!" |> print_endline; q
             )
-        (*
-            execute [s1] q;
-        while evaluateCondition c q
-        do
-            execute s3 q;
-            execute s2 q
-        done;
-        execute ss q;
-        *)
     | IfStatement(c, s1, s2)    ->  
-        if evaluateCondition c q
-        then execute (s1::ss) q
-        else execute (s2::ss) q
+        let ConditionScope(b,s) = evaluateCondition c q in
+        if b
+        then execute (s1::ss) s
+        else execute (s2::ss) s
     | Quit  ->  exit 0
     | Return(rval)  ->  
         let q = evaluateExpression rval q in
@@ -414,50 +397,57 @@ and execute (s: statement list) (q:scope): scope =
         )
 
     | WhileLoop(c, st)   -> 
-            if (evaluateCondition c q = false) then BreakScope(q)
+            let ConditionScope(b,q) = evaluateCondition c q in
+            if (not b) then BreakScope(q)
             else
             let q = execute [st] q in
             let q = execute [WhileLoop(c, st)] q in
             (
             match q with
             | BreakScope(qq) -> execute ss qq
-            | ReturnScope(f,qq) -> q
+            | ReturnScope(_,_) -> q
             | Normal(_) -> execute ss q
             | _ -> "Help me please!" |> print_endline; q
             )
-    | _     ->  q
 )
 )
 
 
-and evaluateCondition (c: condition) (q:scope): bool = 
+and evaluateCondition (c: condition) (q:scope): scope = 
     match c with
         | BinaryCondition(cond1, op, cond2) -> 
-            (
+                (
+                let ConditionScope(c1,s1) = evaluateCondition cond1 q in
+                let ConditionScope(c2,s2) = evaluateCondition cond2 s1 in
                 match op with
-                | "&&" -> ((evaluateCondition cond1 q) && (evaluateCondition cond2 q))
-                | "||" -> ((evaluateCondition cond1 q) || (evaluateCondition cond2 q))
-                | _    -> true
-            )
+                | "&&" -> ConditionScope(c1 && c2, s2)
+                | "||" -> ConditionScope(c1 || c2, s2)
+                | _ -> ConditionScope(true, q)
+                )
         | ComparisonCondition(expr1, op, expr2) -> 
-            (
-                match op with
-                | "=="  -> ((evaluateExpression expr1 q) =  (evaluateExpression expr2 q))
-                | ">"   -> ((evaluateExpression expr1 q) >   (evaluateExpression expr2 q))
-                | "<"   -> ((evaluateExpression expr1 q) <   (evaluateExpression expr2 q))
-                | ">="  -> ((evaluateExpression expr1 q) >=  (evaluateExpression expr2 q))
-                | "<="  -> ((evaluateExpression expr1 q) <=  (evaluateExpression expr2 q))
-                | "!="  -> not ((evaluateExpression expr1 q) =  (evaluateExpression expr2 q))
-                | _     -> true
-            )
-        | ConstantCondition(boolean) -> boolean
-        | UnaryCondition(unaryOp, cond) -> (not (evaluateCondition cond q))
-        | _ -> true
+                (
+                let ExpressionScope(f1,q) = evaluateExpression expr1 q in
+                let ExpressionScope(f2,q) = evaluateExpression expr2 q in
+                let b = match op with
+                | "=="  -> f1 =  f2
+                | ">"   -> f1 >  f2
+                | "<"   -> f1 <  f2
+                | ">="  -> f1 >= f2
+                | "<="  -> f1 <= f2
+                | "!="  -> not (f1 = f2)
+                | _     -> false
+                in ConditionScope(b, q)
+                )
+        | ConstantCondition(boolean) -> ConditionScope(boolean, q)
+        | UnaryCondition(_, cond) -> 
+                let ConditionScope(c,s) = evaluateCondition cond q in
+                ConditionScope(not c, s)
+        | _ -> ConditionScope(true, q)
 
 (* Test for expression *)
 let%expect_test "evalConstantExpression" = 
-    match evaluateExpression (ConstantExpression 10.0) (Normal([])) with
-    | ExpressionScope(f, s) -> f |> string_of_float |> print_endline;
+    let ExpressionScope(f,_) = evaluateExpression (ConstantExpression 10.0) (Normal([])) in
+    f |> string_of_float |> print_endline;
     [%expect {| 11. |}]
 	
 let%expect_test _ = 
@@ -507,31 +497,31 @@ let arithmetic1: expression =
 let %test "arithmetic/1" = evaluateExpression arithmetic1 emptyScope |> getFloat = 44.
 
 let if1: statement list = [
-IfStatement(
-    ConstantCondition(true),
-    Expression(AssignmentExpression("v", "=", ConstantExpression(10.0))),
-    Expression(AssignmentExpression("v", "=", ConstantExpression(5.0)))
-);
+    IfStatement(
+        ConstantCondition(true),
+        Expression(AssignmentExpression("v", "=", ConstantExpression(10.0))),
+        Expression(AssignmentExpression("v", "=", ConstantExpression(5.0)))
+    );
 ]
 
 let %expect_test "if1" = 
-(execute if1 emptyScope) |> getSymbol "v" |> string_of_float |> print_endline;
-[%expect {| 
-    10.
-    10. 
-|}]
+    (execute if1 emptyScope) |> getSymbol "v" |> string_of_float |> print_endline;
+    [%expect {| 
+        10.
+        10. 
+    |}]
 
 let while1: statement list = [
     Expression(AssignmentExpression("i","=",ConstantExpression(10.0)));
     WhileLoop(
-        ComparisonCondition(PreUnaryExpression("--","i"), ">", ConstantExpression(0.)),
-        Expression(PostUnaryExpression("i", "--"));
+        ComparisonCondition(PostUnaryExpression("i", "--"), ">", ConstantExpression(0.)),
+        Expression(VariableExpression("i"));
     );
 ]
 
 let %expect_test "while" = 
-(execute while1 emptyScope) |> getSymbol "i" |> string_of_float |> print_endline;
-[%expect {| 10. |}]
+    (execute while1 emptyScope) |> getSymbol "i" |> string_of_float |> print_endline;
+    [%expect {| 10. |}]
 
 let for1: statement list = [
     ForLoop(
@@ -573,14 +563,13 @@ let p2: statement list = [
 let euclidbody: statement list = [
         Expression(AssignmentExpression("a", "=", ConstantExpression(10.))) ;
         Expression(AssignmentExpression("b", "=", ConstantExpression(15.))) ;
-        (*
         WhileLoop(
             ComparisonCondition(
-                VariableExpression("b"), "!=", ConstantExpression(10.)
+                VariableExpression("b"), "!=", ConstantExpression(0.)
             ),
             IfStatement(
                 ComparisonCondition(
-                    VariableExpression("a"), ">=", VariableExpression("b")
+                    VariableExpression("a"), ">", VariableExpression("b")
                 ),
                 Expression(
                     AssignmentExpression("a", "-=", VariableExpression("b"))
@@ -589,14 +578,14 @@ let euclidbody: statement list = [
                     AssignmentExpression("b", "-=", VariableExpression("a"))
                 )
             )
-        *)
+        );
         Expression(VariableExpression("a"));
 ]
-let send_to_hell (s: scope): unit = ()
+let send_to_hell _ = ()
 
 let %expect_test "euclidbodytest" = 
     execute euclidbody emptyScope |> send_to_hell;
-    [%expect {| |}]
+    [%expect {| 5.|}]
 
 let fndef: statement list = [
     FnDefinition("returna", ["a";"b"], [Return(VariableExpression("a"))]);
@@ -733,3 +722,21 @@ let%expect_test "p3" =
         5.      
     |}];
     *)
+let p2: statement list = [
+    Expression(AssignmentExpression("v", "=", ConstantExpression(1.0)));
+    IfStatement(
+        ComparisonCondition(VariableExpression("v"), ">", ConstantExpression(10.0)), 
+        Expression(AssignmentExpression("v", "+=", ConstantExpression(1.0))), 
+        ForLoop(
+            Expression(AssignmentExpression("i", "=", ConstantExpression(2.0))),
+            ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.0)),
+            Expression(PreUnaryExpression("++", "i")),
+            Expression(AssignmentExpression("v", "*=", VariableExpression("i")))
+        )
+    );
+    Expression(VariableExpression("v"))
+]
+
+let%expect_test "p1" =
+    execute p2 emptyScope |> send_to_hell; 
+    [%expect {| 3628800. |}]
