@@ -580,7 +580,7 @@ let %expect_test "while" =
         i == 5;
     }
 *)
-let forblock1: statement list = [
+let forbreak: statement list = [
     ForLoop(
         Expression(AssignmentExpression("i", "=", ConstantExpression(0.))),
         ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
@@ -601,9 +601,66 @@ let forblock1: statement list = [
     ]);
 ]
 
-let%expect_test "forblock1" =
-    execute forblock1 emptyScope |> send_to_hell;
+let%expect_test "forbreak" =
+    execute forbreak emptyScope |> ignore;
     [%expect {| |}]
+
+let forcontinue: statement list = [
+    ForLoop(
+        Expression(AssignmentExpression("i", "=", ConstantExpression(0.))),
+        ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
+        Expression(PostUnaryExpression("i","++")),
+        Block([
+            Condition(ComparisonCondition(VariableExpression("i"), "==", ConstantExpression(5.)));
+            IfStatement(
+                ComparisonCondition(VariableExpression("i"), "==", ConstantExpression(5.)),
+                Continue,
+                Blank
+            );
+            Expression(VariableExpression("i"));
+        ])
+    );
+
+    Block([
+        Expression(ConstantExpression(1.));
+        Expression(ConstantExpression(2.));
+    ]);
+]
+
+let%expect_test "forcontinue" =
+    execute forcontinue emptyScope |> ignore;
+    [%expect {|
+        false
+        0.
+        0.
+        false
+        1.
+        1.
+        false
+        2.
+        2.
+        false
+        3.
+        3.
+        false
+        4.
+        4.
+        true
+        5.
+        false
+        6.
+        6.
+        false
+        7.
+        7.
+        false
+        8.
+        8.
+        false
+        9.
+        9.
+        1.
+        2.|}]
 
 (*
     a=10;
