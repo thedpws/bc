@@ -193,9 +193,10 @@ let rec popEnvironment (s:scope): scope =
         match q with
         | qq::qs -> print_char '['; print_env qq; print_char ']'; print_envlist qs
         | [] -> print_endline ""
-    let print_scope s =
+    let rec print_scope s =
         match s with
         | Normal(envs) -> print_envlist envs
+        | BreakScope(n) -> print_endline "BreakScope: "; print_scope n
         | _ -> ()
     let test (s:scope): unit =
         match s with
@@ -338,7 +339,7 @@ and execute (s: statement list) (q:scope): scope =
     match q with
     | ContinueScope(_) -> q            (* for and while *)
     | ReturnScope(f,_) -> q        (* function *)
-    | BreakScope(_) -> q               (* for, while*)
+    | BreakScope(_) -> print_endline "tried to execute with breakscope"; q               (* for, while*)
     | InvalidScope -> q
     | _ ->
     (
@@ -349,15 +350,7 @@ and execute (s: statement list) (q:scope): scope =
     match currStatement with
     | Blank -> execute ss q
     | Block([]) -> execute ss q
-    | Block(qq::qs)  ->  (* Execute statements in block *)
-            let q = execute [qq] q in
-            (
-            match q with (* If break, break. if continue, continue. *)
-            | Normal(_)             -> execute qs q |> execute ss (* Normal behavior -> execute rest of block*)
-            | BreakScope(qq)        -> execute ss qq (* Broken -> Exit block.  *)
-            | ContinueScope(qq)     -> execute (currStatement::ss) qq    (* Continued -> Execute block again *)
-            | _ -> q
-            )
+    | Block(qs)  -> execute qs q 
     | Break     ->  BreakScope(q) (* stop execution; do not recurse *)
     | Condition(c)  ->  
             let ConditionScope(b,s) = evaluateCondition c q in
@@ -373,29 +366,18 @@ and execute (s: statement list) (q:scope): scope =
                 )
     | FnDefinition(fname, params, instrs)   ->  putFunction fname (params,instrs) q |> execute ss(* compose the function struct and store in memory *)
     | ForLoop(s1, c, s2, s3)    ->
-            let q = execute [s1] q in
-            let ConditionScope(b,q) = evaluateCondition c q in
-            if (not b) then BreakScope(q)
+            let q = execute [s1] q in (* Execute initial statement *)
+            let ConditionScope(b,q) = evaluateCondition c q in (* Break if condition is false *)
+            if (not b) then execute ss q
             else
-            let q = execute (s3::[s2]) q in
+            let q = execute (s3::[s2]) q in (* 1st execution of body *)
+            (*let q = execute [ForLoop(Blank, c, s2, s3)] q in*)
             (
-                match q with
-                | ContinueScope(qq) -> execute [s2] q |> execute [ForLoop(Blank, c, s2, s3)]
-                | _ -> 
-                (
-                    let q = execute [ForLoop(Blank, c, s2, s3)] q in
-                    (
-                    match q with
-                    | ContinueScope(qq) -> execute [s2] q |> execute [ForLoop(Blank, c, s2, s3)]
-                    | BreakScope(qq) -> execute ss qq
-                    | ReturnScope(_,_) -> q
-                    | Normal(_) -> execute ss q
-                    | _ -> "Help me please!" |> print_endline; q
-                    )
-                ) 
+            match q with
+            | ReturnScope(_,_) -> q
+            | BreakScope(qq) -> execute ss qq
+            | _ -> execute (s2::[ForLoop(Blank, c, s2, s3)]) q |> execute ss 
             )
-           
-
 
     | IfStatement(c, s1, s2)    ->  
         let ConditionScope(b,s) = evaluateCondition c q in
@@ -730,4 +712,34 @@ let fibbonaci: statement list =
 let%expect_test "fib" =
     execute fibbonaci emptyScope |> send_to_hell; 
     [%expect {|   
-    |}];
+    |}]
+
+(* 
+    for(i=0; i<10; i++){
+        i == 5;
+    }
+*)
+let forblock1: statement list = [
+    ForLoop(
+        Expression(AssignmentExpression("i", "=", ConstantExpression(0.))),
+        ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
+        Expression(PostUnaryExpression("i","++")),
+        Block([
+            Condition(ComparisonCondition(VariableExpression("i"), "==", ConstantExpression(5.)));
+            IfStatement(
+                ComparisonCondition(VariableExpression("i"), "==", ConstantExpression(5.)),
+                Break,
+                Blank
+            );
+        ])
+    );
+
+    Block([
+        Expression(ConstantExpression(1.));
+        Expression(ConstantExpression(2.));
+    ]);
+]
+
+let%expect_test "forblock1" =
+    execute forblock1 emptyScope |> send_to_hell;
+    [%expect {| |}]
