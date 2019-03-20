@@ -334,7 +334,7 @@ and execute (s: statement list) (q:scope): scope =
     match q with
     | ContinueScope(_) -> q            (* for and while *)
     | ReturnScope(_,_) -> q        (* function *)
-    | BreakScope(_) -> q               (* for, while, if*)
+    | BreakScope(_) -> q               (* for, while*)
     | InvalidScope -> q
     | _ ->
     (
@@ -359,7 +359,7 @@ and execute (s: statement list) (q:scope): scope =
             let ConditionScope(b,s) = evaluateCondition c q in
             b |> string_of_bool |> print_endline;
             execute ss s;
-    | Continue  ->  q
+    | Continue  ->  ContinueScope(q)
     | Expression(e) ->
                 (
                 match e, evaluateExpression e q with
@@ -374,14 +374,25 @@ and execute (s: statement list) (q:scope): scope =
             if (not b) then BreakScope(q)
             else
             let q = execute (s3::[s2]) q in
-            let q = execute [ForLoop(Blank, c, s2, s3)] q in
             (
-            match q with
-            | BreakScope(qq) -> execute ss qq
-            | ReturnScope(_,_) -> q
-            | Normal(_) -> execute ss q
-            | _ -> "Help me please!" |> print_endline; q
+                match q with
+                | ContinueScope(qq) -> execute [s2] q |> execute [ForLoop(Blank, c, s2, s3)]
+                | _ -> 
+                (
+                    let q = execute [ForLoop(Blank, c, s2, s3)] q in
+                    (
+                    match q with
+                    | ContinueScope(qq) -> execute [s2] q |> execute [ForLoop(Blank, c, s2, s3)]
+                    | BreakScope(qq) -> execute ss qq
+                    | ReturnScope(_,_) -> q
+                    | Normal(_) -> execute ss q
+                    | _ -> "Help me please!" |> print_endline; q
+                    )
+                ) 
             )
+           
+
+
     | IfStatement(c, s1, s2)    ->  
         let ConditionScope(b,s) = evaluateCondition c q in
         if b
@@ -409,7 +420,7 @@ and execute (s: statement list) (q:scope): scope =
             | Normal(_) -> execute ss q
             | _ -> "Help me please!" |> print_endline; q
             )
-)
+    )
 )
 
 
@@ -528,11 +539,16 @@ let for1: statement list = [
         Expression(AssignmentExpression("i","=",ConstantExpression(0.0))),
         ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.)),
         Expression(PreUnaryExpression("++", "i")),
-        Expression(VariableExpression("i"))
+        Break
     ) ;
     Expression(VariableExpression("i")) ;
     Expression(ConstantExpression(1876757.)) ;
 ]
+
+let %expect_test "for/1" = 
+    execute for1 emptyScope |> getSymbol "i" |> string_of_float |> print_endline;
+    [%expect {| 1876757. |}]
+
 (* let compare1: condition =
     Comparison(ComparisonCondition(ConstantExpression(10.), "<", ConstantExpression(11.))) *)
 (* 
@@ -544,21 +560,12 @@ let %expect_test "assignment1" =
     let _ = execute assignment1 emptyScope;
     [%expect {|10.|}]
     *)
-
-let %expect_test "for/1" = 
-    execute for1 emptyScope |> getSymbol "i" |> string_of_float |> print_endline;
-    [%expect {| |}]
     
 (*
 let%expect_test "p1" =
     let _ = execute p1 (Normal([])); 
     [%expect {| 1. |}]
     *)
-
-(*
-let p2: statement list = [
-]
-*)
 
 let euclidbody: statement list = [
         Expression(AssignmentExpression("a", "=", ConstantExpression(10.))) ;
@@ -639,89 +646,7 @@ let%expect_test "factorialtest" =
         }
     v   // display v
 *)
-(*
-let p2: statement list = [
-    AssignmentExpression("v", "=", ConstantExpression(1.0));
-    If(
-        Op2(">", Var("v"), ConstantExpression(10.0)), 
-        [Assign("v", Op2("+", Var("v"), ConstantExpression(1.0)))], 
-        [For(
-            Assign("i", ConstantExpression(2.0)),
-            Op2("<", Var("i"), ConstantExpression(10.0)),
-            Expr(Op1("++a", Var("i"))),
-            [
-                Assign("v", Op2("*", Var("v"), Var("i")))
-            ]
-        )]
-    );
-    Expr(Var("v"))
-]
 
-let%expect_test "p1" =
-    evalCode p2 []; 
-    [%expect {| 3628800. |}]
-    *)
-
-(*  Fibbonaci sequence
-    define f(x) {
-        if (x<1.0) then
-            return (1.0)
-        else
-            return (f(x-1)+f(x-2))
-    }
-
-    f(3)
-    f(5)
- *)
-(*
-let p3: statement list = 
-    [
-        FnDefinition("f", ["x"], [
-            IfStatement(
-                ComparisonCondition(
-                    VariableExpression("x"), 
-                    "<",
-                    ConstantExpression(1.0)
-                ),
-                [Return(ConstantExpression(1.0))],
-                [Return(
-                    BinaryExpression(
-                        FnCallExpression(
-                            "f", 
-                            [
-                            BinaryExpression(
-                                VariableExpression("x"),
-                                "-",
-                                ConstantExpression(1.0)
-                            )
-                            ]
-                        ),
-                        "+",
-                        FnCallExpression(
-                            "f",
-                            [
-                            BinaryExpression(
-                                VariableExssion("x"),
-                                "-",
-                                ConstantExpression(1.0)
-                            )
-                            ]
-                        )
-                    )
-                )]
-            )
-        ]);
-        Expression(FnCallExpression("f", [ConstantExpression(3.0)]));
-        Expression(FnCallExpression("f", [ConstantExpression(5.0)]));
-   ]
-
-let%expect_test "p3" =
-    evalCode p3 []; 
-    [%expect {| 
-        2. 
-        5.      
-    |}];
-    *)
 let p2: statement list = [
     Expression(AssignmentExpression("v", "=", ConstantExpression(1.0)));
     IfStatement(
@@ -740,3 +665,65 @@ let p2: statement list = [
 let%expect_test "p1" =
     execute p2 emptyScope |> send_to_hell; 
     [%expect {| 3628800. |}]
+
+(*  Fibbonaci sequence
+    define f(x) {
+        if (x<1.0) then
+            return (1.0)
+        else
+            return (f(x-1)+f(x-2))
+    }
+
+    f(3)
+    f(5)
+ *)
+
+let fibbonaci: statement list = 
+    [
+        FnDefinition("f", ["x"], [
+            IfStatement(
+                ComparisonCondition(
+                    VariableExpression("x"), 
+                    "<=",
+                    ConstantExpression(2.0)
+                ),
+                Return(ConstantExpression(1.0)),
+                Return(
+                    BinaryExpression(
+                        FnCallExpression(
+                            "f", 
+                            [
+                            BinaryExpression(
+                                VariableExpression("x"),
+                                "-",
+                                ConstantExpression(1.0)
+                            )
+                            ]
+                        ),
+                        "+",
+                        FnCallExpression(
+                            "f",
+                            [
+                            BinaryExpression(
+                                VariableExpression("x"),
+                                "-",
+                                ConstantExpression(2.0)
+                            )
+                            ]
+                        )
+                    )
+                )
+            )]
+        );
+        Expression(FnCallExpression("f", [ConstantExpression(1.0)]));
+        Expression(FnCallExpression("f", [ConstantExpression(2.0)]));
+        Expression(FnCallExpression("f", [ConstantExpression(3.0)]));
+        Expression(FnCallExpression("f", [ConstantExpression(4.0)]));
+        Expression(FnCallExpression("f", [ConstantExpression(5.0)]));
+        Expression(FnCallExpression("f", [ConstantExpression(6.0)]));
+   ]
+
+let%expect_test "fib" =
+    execute fibbonaci emptyScope |> send_to_hell; 
+    [%expect {|   
+    |}];
