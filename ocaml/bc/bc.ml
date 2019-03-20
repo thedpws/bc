@@ -197,7 +197,7 @@ let rec popEnvironment (s:scope): scope =
         match s with
         | Normal(envs) -> print_envlist envs
         | BreakScope(n) -> print_endline "BreakScope: "; print_scope n
-        | _ -> ()
+        | _ -> print_endline "Weird scope here!"; ()
     let test (s:scope): unit =
         match s with
         | Normal(q) -> print_envlist q
@@ -370,12 +370,13 @@ and execute (s: statement list) (q:scope): scope =
             let ConditionScope(b,q) = evaluateCondition c q in (* Break if condition is false *)
             if (not b) then execute ss q
             else
-            let q = execute (s3::[s2]) q in (* 1st execution of body *)
+            let q = execute ([s3]) q in (* 1st execution of body *)
             (*let q = execute [ForLoop(Blank, c, s2, s3)] q in*)
             (
             match q with
             | ReturnScope(_,_) -> q
             | BreakScope(qq) -> execute ss qq
+            | ContinueScope(qq) -> execute (s2::[ForLoop(Blank, c, s2, s3)]) qq |> execute ss 
             | _ -> execute (s2::[ForLoop(Blank, c, s2, s3)]) q |> execute ss 
             )
 
@@ -660,7 +661,8 @@ let%expect_test "forcontinue" =
         9.
         9.
         1.
-        2.|}]
+        2.
+        |}]
 
 (*
     a=10;
@@ -738,16 +740,20 @@ let%expect_test "fndef" =
 *)
 let p2: statement list = [
     Expression(AssignmentExpression("v", "=", ConstantExpression(1.0)));
+    (*
     IfStatement(
         ComparisonCondition(VariableExpression("v"), ">", ConstantExpression(10.0)), 
         Expression(AssignmentExpression("v", "+=", ConstantExpression(1.0))), 
+        *)
         ForLoop(
             Expression(AssignmentExpression("i", "=", ConstantExpression(2.0))),
             ComparisonCondition(VariableExpression("i"), "<", ConstantExpression(10.0)),
             Expression(PreUnaryExpression("++", "i")),
             Expression(AssignmentExpression("v", "*=", VariableExpression("i")))
-        )
+        );
+        (*
     );
+    *)
     Expression(VariableExpression("v"))
 ]
 let%expect_test "p2" =
