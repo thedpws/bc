@@ -283,7 +283,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
             | "+" -> f1 +. f2
             | "-" -> f1 -. f2
             | _   -> 0.0
-            in ExpressionScope(f, q)
+            in let _ = "BinaryExpress => "^(string_of_float f1)^op^(string_of_float f2)^" = "^(string_of_float f) |> print_endline in ExpressionScope(f, q)
         )
     | FnCallExpression(fn, params)  ->
         (
@@ -307,7 +307,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
                 let q = execute ss q in
                 (
                 match q with
-                | ReturnScope(f, s) -> ExpressionScope(f, s)
+                | ReturnScope(f, s) -> "Evaluated rval to "^(string_of_float f) |> print_endline; ExpressionScope(f, s)
                 | _ -> ExpressionScope(0.0, q)
                 )
 
@@ -333,7 +333,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
 and execute (s: statement list) (q:scope): scope =
     match q with
     | ContinueScope(_) -> q            (* for and while *)
-    | ReturnScope(_,_) -> q        (* function *)
+    | ReturnScope(f,_) -> q        (* function *)
     | BreakScope(_) -> q               (* for, while*)
     | InvalidScope -> q
     | _ ->
@@ -403,7 +403,7 @@ and execute (s: statement list) (q:scope): scope =
         let q = evaluateExpression rval q in
         (
         match q with
-        |   ExpressionScope(f,s) -> ReturnScope(f,s)
+        |   ExpressionScope(f,s) -> ("Return Statement returning "^string_of_float f) |> print_endline;ReturnScope(f,s)
         | _ -> ReturnScope(0.0, q)
         )
 
@@ -685,7 +685,7 @@ let fibbonaci: statement list =
                 ComparisonCondition(
                     VariableExpression("x"), 
                     "<=",
-                    ConstantExpression(2.0)
+                    ConstantExpression(1.0)
                 ),
                 Return(ConstantExpression(1.0)),
                 Return(
