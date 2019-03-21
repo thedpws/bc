@@ -454,8 +454,7 @@ let%expect_test "evalConstantExpression" =
     let ExpressionScope(f,_) = evaluateExpression (ConstantExpression 10.0) (Normal([])) in
     f |> string_of_float |> print_endline;
     [%expect {| 10. |}]
-    
-    
+      
 (*
     v = 5;
     i = 10^v;
