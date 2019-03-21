@@ -1,4 +1,4 @@
- open Core
+open Core
 type expression = 
     | AssignmentExpression of string * string * expression
     | BinaryExpression of expression * string * expression
@@ -329,6 +329,7 @@ let rec evaluateExpression (e: expression) (q:scope): scope =
         let s = match unaryOp with 
         | "++" -> putSymbol var (f +. 1.0) q
         | "--" -> putSymbol var (f -. 1.0) q
+        | "-" -> putSymbol var (f *. -1.0) q
         | _ -> q
         in let f = getSymbol var s
         in ExpressionScope(f, s)
@@ -454,11 +455,13 @@ let%expect_test "evalConstantExpression" =
     f |> string_of_float |> print_endline;
     [%expect {| 10. |}]
     
+    
 (*
     v = 5;
     i = 10^v;
     i++;           // 100001
     ++i;           // 100002
+    -i;            // -100002
 *)
 let expTest: statement list = [
     Expression(AssignmentExpression("v","=", ConstantExpression(5.0)));
@@ -467,6 +470,8 @@ let expTest: statement list = [
         Expression(PostUnaryExpression("i", "++"));
         Expression(VariableExpression("i"));
         Expression(PreUnaryExpression("++", "i"));
+        Expression(VariableExpression("i"));
+        Expression(PreUnaryExpression("-", "i"));
         Expression(VariableExpression("i"))
     ];
 ]
@@ -475,6 +480,7 @@ let%expect_test "ExpressiontTest" =
     [%expect {|
             100001.   
             100002.
+            -100002.
     |}]
 
 (* 10*70 = 70 *)
